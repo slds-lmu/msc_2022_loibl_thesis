@@ -12,6 +12,11 @@ data_slim_pred = cbind(y_pred_slim, X_slim)
 # Vergleiche MOB, CTree und SLIM für LM mit Basissplines 
 tree_slim_bspline = compute_tree_slim(y_pred_slim, X_slim, n.split = 3, fit.bsplines = TRUE, impr.par = 0.05, min.split = n/100, pruning = "forward",
                                approximate = FALSE, df.spline = 15)
+splitting = extract_split_criteria(tree_slim_bspline)
+models = extract_models(tree_slim_bspline)
+x_slim_pred = predict_slim(tree_slim_bspline, newdata = X_slim)
+View(cbind(x_slim_pred$y_hat,y_pred_slim))
+rss = sum((x_slim_pred$y_hat - y_pred_slim)^2)
 
 tree_slim_bspline_approx = compute_tree_slim(y_pred_slim, X_slim, n.split = 3, fit.bsplines = TRUE, impr.par = 0.05, min.split = n/100, pruning = "forward",
                                       approximate = TRUE, df.spline = 15)

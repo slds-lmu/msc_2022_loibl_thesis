@@ -13,6 +13,12 @@ data_bike_pred = cbind(y_pred_bike, x_bike)
 # Vergleiche MOB, CTree und SLIM für LM mit Basissplines 
 tree_bike_bspline = compute_tree_slim(y_pred_bike, x_bike, n.split = 2, fit.bspline = TRUE, degree.poly = 1, impr.par = 0.05, min.split = round(n/100), pruning = "forward", df.spline = 25)
 res_bike_bspline = extract_split_criteria(tree_bike_bspline)
+models = extract_models(tree_bike_bspline)
+
+bike_pred = predict_slim(tree_bike_bspline, newdata = x_bike)
+View(cbind(bike_pred$y_hat, y_pred_bike))
+rss = sum((bike_pred$y_hat - y_pred_bike)^2)
+
 
 
 tree_bike_bspline_approx = compute_tree_slim(y_pred_bike, x_bike, n.split = 2, fit.bspline = TRUE, approximate = TRUE, impr.par = 0.05, min.split = round(n/100), pruning = "forward", df.spline = 25)

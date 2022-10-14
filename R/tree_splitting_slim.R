@@ -196,8 +196,8 @@ Node <- R6Class("Node", list(
       variable.importance.right = round(apply(term.predictions.right, MARGIN = 2, var), 4)
       
       
-      child.type.left = paste(self$split.feature, ifelse(self$split.type == "numerical", paste("<=", self$split.value), ifelse(self$split.type == "categorical", paste0("in {", paste0(self$split.value, collapse = ","), "}"), NULL)))
-      child.type.right =  paste(self$split.feature, ifelse(self$split.type == "numerical", paste(">", self$split.value), ifelse(self$split.type == "categorical", paste0("not in {", paste0(self$split.value, collapse = ","), "}"), NULL)))
+      child.type.left = paste(self$split.feature, ifelse(self$split.type == "numerical", paste("<=", self$split.value), ifelse(self$split.type == "categorical", paste0("%in% c(", paste0(self$split.value, collapse = ","), ")"), NULL)))
+      child.type.right =  paste(ifelse(self$split.type == "numerical", paste(self$split.feature, ">", self$split.value), ifelse(self$split.type == "categorical", paste0("!(",self$split.feature, " %in% c(", paste0(self$split.value, collapse = ","), "))"), NULL)))
       if(!is.null(self$child.type)){
         child.type.left = paste(self$child.type, child.type.left, sep = " & ")
         child.type.right = paste(self$child.type, child.type.right, sep = " & ")
@@ -272,7 +272,6 @@ compute_tree_slim = function(y,
   } 
   
   # set arguments of objective and splitting function
-  print(formals(fit.model))
   formals(split.objective) = list(y = data.frame(), x = data.frame(), 
                                    .degree.poly = degree.poly,
                                    .df.spline = df.spline,
@@ -284,7 +283,6 @@ compute_tree_slim = function(y,
                              .df.spline = df.spline,
                              .fit.bsplines = fit.bsplines,
                              .family = family)
-  print(formals(fit.model))
 
   # Initialize the parent node of the tree
   model.parent = fit.model(y = input.data$Y, x = input.data$X)

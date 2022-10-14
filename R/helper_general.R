@@ -1,28 +1,50 @@
 # Helper functions
 
+predict_slim = function(tree, newdata){
+  nodes = extract_split_criteria(tree)
+  nodes = nodes[nodes$split.feature == "leafnode",c("child.type", "id.node")]
+  models = extract_models(tree)
+  newdata = as.data.table(newdata)
+  newdata$row_id = 1:nrow(newdata)
+  predictions = c()
+  for(n in 1:nrow(nodes)){
+    node_data = as.data.frame(newdata[eval(parse(text = nodes[n, "child.type"])),])
+    node_id = as.character(nodes[n,"id.node"])
+    if(nrow(node_data) > 0){
+      y_hat = predict(models[[node_id]]$model, newdata = subset(node_data, select = -c(row_id)))
+      
+      predictions = rbind(predictions, cbind(node_data, y_hat))
+    }
+  }
+  predictions = predictions[order(predictions$row_id),]
+  rownames(predictions) = predictions$row_id
+  predictions$row_id = NULL
+  return(predictions)
+}
+
 
 extract_split_criteria = function(tree){
   list.split.criteria = lapply(tree, function(depth){
     lapply(depth, function(node){
       if(is.null(node)){
-        df = data.frame("depth" = "final", "id" = "final", 
-                        "id.parent" = "final",
-                        "objective.value" = "final", 
-                        "objective.value.parent" = "final",
-                        "intImp" = "final", 
+        df = data.frame("depth" = NA, "id" = NA, 
+                        "id.parent" = NA,
+                        "objective.value" = NA, 
+                        "objective.value.parent" = NA,
+                        "intImp" = NA, 
                         "split.feature" = "final", 
-                        "split.value" = "final",
+                        "split.value" = NA,
                         "child.type" = "final",
-                        "size" = "final")
+                        "size" = NA)
       } else{
         df = data.frame("depth" = node$depth, "id" = node$id,
-                        "id.parent" = ifelse(is.null(node$id.parent), "rootnode", node$id.parent),
-                        "objective.value" = ifelse(is.null(node$objective.value), "leafnode", node$objective.value),
-                        "objective.value.parent" = ifelse(is.null(node$objective.value.parent), "leafnode", node$objective.value.parent),
-                        "intImp" = ifelse(is.null(node$objective.value.parent), "leafnode", node$intImp),
+                        "id.parent" = ifelse(is.null(node$id.parent), 0, node$id.parent),
+                        "objective.value" = ifelse(is.null(node$objective.value), NA, node$objective.value),
+                        "objective.value.parent" = ifelse(is.null(node$objective.value.parent), NA, node$objective.value.parent),
+                        "intImp" = ifelse(is.null(node$objective.value.parent), NA, node$intImp),
                         "split.feature" = ifelse(is.null(node$split.feature), "leafnode", node$split.feature),
-                        "split.value" = ifelse(is.null(node$split.value), "leafnode", node$split.value),
-                        "child.type" = ifelse(is.null(node$child.type), "leafnode", node$child.type),
+                        "split.value" = ifelse(is.null(node$split.value), NA, node$split.value),
+                        "child.type" = ifelse(is.null(node$child.type), "rootnode", node$child.type),
                         "size" = length(node$subset.idx))
       }
       df
@@ -32,8 +54,11 @@ extract_split_criteria = function(tree){
   list.split.criteria = list.clean(list.split.criteria, function(x) length(x) == 0L, TRUE)
   df.split.criteria = unlist(list.split.criteria, recursive = FALSE)
   df.split.criteria = as.data.frame(do.call(rbind, df.split.criteria))
-  n.final = length(which(df.split.criteria$depth == "final"))
-  df.split.criteria = df.split.criteria[df.split.criteria$depth!="final",]
+  n.final = length(which(df.split.criteria$child.type == "final"))
+  df.split.criteria = df.split.criteria[df.split.criteria$child.type!="final",]
+  df.split.criteria$id.node = 0:(nrow(df.split.criteria)-1)
+  row.names(df.split.criteria) = df.split.criteria$id.node
+  df.split.criteria[] <- lapply(df.split.criteria, unlist)
   print(paste0("RSS:",(sum(unlist(df.split.criteria[df.split.criteria$split.feature=="leafnode",]$objective.value.parent)))))
   return(df.split.criteria)
 }
@@ -54,10 +79,8 @@ extract_models = function(tree){
   })
 
   list.split.criteria = unlist(list.split.criteria, recursive = FALSE)
-  names = lapply(list.split.criteria, function(node){
-    paste(node$depth, node$id.parent, node$id, sep = "_")
-  })
-  names(list.split.criteria) = names
+  list.split.criteria = list.split.criteria[!sapply(list.split.criteria,is.null)]
+  names(list.split.criteria) = 0:(length(list.split.criteria) - 1)
   return(list.split.criteria)
 }
 
@@ -539,8 +562,10 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, 
     numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > .degree.poly+1))]
     poly = paste0("poly(",numeric.names, ", degree =", .degree.poly,")")
   } else if (.fit.bsplines) {
-    numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > .df.spline))]
-    splines = paste0("bs(", numeric.names, ", df = ", .df.spline, ", degree = 1)")  
+    numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval)))]
+    if(length(numeric.names)>0){
+      splines = paste0("bs(", numeric.names, ", df = ", .df.spline, ", degree = 1)")  
+    }
   }
   
   fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], poly, splines), collapse = "+")))
