@@ -73,7 +73,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   #assert_choice(target.col, choices = colnames(data))
   assert_integerish(n.splits)
   assert_integerish(min.node.size)
-  assert_function(objective, args = c("y", "x", "requires.x"))
+  assert_function(objective, args = c("y", "x"))
   assert_function(optimizer, args = c("xval", "y"))
   # find best split points per feature
   opt.feature = lapply(X, function(feat) {
@@ -291,14 +291,10 @@ perform_split = function(split.points, xval, x, y, min.node.size, objective, ...
     return(Inf)
   # compute objective in each interval and sum it up
   y.list = split(y, node.number)
-  # x.list only needed if this is used in the objective
-  requires.x = formals(objective)[["requires.x"]]
-  if (isTRUE(requires.x))
-    x.list = split(x, node.number) else
-      x.list = NULL
+  x.list = split(x, node.number) 
   
   res = vapply(seq_along(y.list), FUN = function(i) {
-    objective(y = y.list[[i]], x = x.list[[i]], sub.number = which(node.number == i), ...)
+    objective(y = y.list[[i]], x = x.list[[i]])
   }, FUN.VALUE = NA_real_, USE.NAMES = FALSE)
   sum(res)
 }
@@ -534,39 +530,45 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
 
 # objectives and fitting functions
 
-get_model_lm = function(y, x, requires.x = TRUE, degree.poly = 1, ...) {
+get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, ...) {
   x = x %>% select(where(~ n_distinct(.) > 1))
-  poly = c()
   numeric.names = c()
-  if (degree.poly > 1) {
-    numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > degree.poly+1))]
-    poly = paste0("poly(",numeric.names, ", degree =", degree.poly,")")
+  poly = c()
+  splines = c()
+  if (.degree.poly > 1) {
+    numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > .degree.poly+1))]
+    poly = paste0("poly(",numeric.names, ", degree =", .degree.poly,")")
+  } else if (.fit.bsplines) {
+    numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > .df.spline))]
+    splines = paste0("bs(", numeric.names, ", df = ", .df.spline, ", degree = 1)")  
   }
-  fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], poly), collapse = "+")))
+  
+  fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], poly, splines), collapse = "+")))
   data = cbind(y,x)
-  model = lm(fm, data)
+  model = glm(fm, data, family = .family)
   return(model)
 }
 
-get_objective_lm = function(y, x, requires.x = TRUE, degree.poly, ...) {
-  model = get_model_lm(y, x, degree.poly)
+get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15, ...) {
+  model = get_model_lm(y, x, .family = .family, .degree.poly = .degree.poly, 
+                       .fit.bsplines = .fit.bsplines, .df.spline = .df.spline)
   sse = crossprod(model$residuals)
   return(sse)
 }
 
 get_prediction_lm = function(model, x, ...) {
-  prediction = predict.lm(model, x, type = "terms")
+  prediction = predict.glm(model, x, type = "terms")
   return(prediction)
 }
 
-get_model_glmnet = function(y, x, requires.x = TRUE, alpha, degree.poly = 1, ...) {
+get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, ...) {
   y = unlist(y)
   x = x %>% select(where(~ n_distinct(.) > 1))
-  if (degree.poly > 1) {
+  if (.degree.poly > 1) {
     features = names(x)
     for(f in features){
       if (is.numeric(x[[f]])){
-        for(d in 2:degree.poly){
+        for(d in 2:.degree.poly){
           x = cbind(x, "new" = x[[f]]^d)
           colnames(x)[which(names(x) == "new")] = paste0(f,"_",d)
         }
@@ -580,13 +582,13 @@ get_model_glmnet = function(y, x, requires.x = TRUE, alpha, degree.poly = 1, ...
   } else {
     x = as.matrix(x)
   }  
-  cv.model = cv.glmnet(x, y, alpha = alpha)
-  model = glmnet(x, y, alpha = alpha, lambda = cv.model$lambda.min)
+  cv.model = cv.glmnet(x, y, alpha = .alpha, family = .family)
+  model = glmnet(x, y, alpha = .alpha, family = .family, lambda = cv.model$lambda.min)
   return(model)
 }
 
-get_objective_glmnet = function(y, x, requires.x = TRUE , alpha, degree.poly = 1, ...) {
-  model = get_model_glmnet(y, x, requires.x = TRUE , alpha)
+get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, ...) {
+  model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha, .degree.poly = .degree.poly)
   factor.names = names(x)[sapply(x,class) == "factor"]
   if (length(factor.names) > 0){
     xfactors = model.matrix(as.formula(paste("y ~", paste(factor.names, collapse = "+"))), data = cbind(y,x))[, -1]
@@ -611,7 +613,7 @@ get_prediction_glmnet = function(model, x, ...) {
   return(prediction)
 }
 
-get_model_lad = function(y, x, requires.x = TRUE, ...){
+get_model_lad = function(y, x, ...){
   x = x %>% select(where(~ n_distinct(.) > 1))
   fm = as.formula(paste("y~", paste(names(x), collapse = "+")))
   data = cbind(y,x)
@@ -619,42 +621,15 @@ get_model_lad = function(y, x, requires.x = TRUE, ...){
   return(model)
 }
 
-get_objective_lad = function(y, x, requires.x = TRUE, ...){
+get_objective_lad = function(y, x,  ...){
   model = get_model_lad(y, x)
   sae = sum(abs(model$residuals))
   return(sae)
 }
 
-get_model_bspline = function(y, x, requires.x = TRUE, df = 15, ...) {
-  x = x %>% select(where(~ n_distinct(.) > 1))
-  term = c()
-  for (n in names(x)){
-    if (is.numeric(x[,n])){
-      newterm = paste0("bs(", n, ", df = ", df, ", degree = 1)")    
-    } else {
-      newterm = n
-    }
-    term = c(term, newterm)
-  }
-  fm = as.formula(paste("y~", paste(term, collapse = "+")))
-  data = cbind(y,x)
-  model = lm(formula = fm, data = data)
-  return(model)
-}
 
 
-get_objective_bspline = function(y, x, requires.x = TRUE, df = 15, ...) {
-  model = get_model_bspline(y, x, requires.x = TRUE, df = df)
-  sse = crossprod(residuals(model))
-  return(sse)
-}
-
-get_prediction_bspline = function(model, x, ...) {
-  prediction = predict.lm(model, x, type = "terms")
-  return(prediction)
-}
-
-get_model_gam = function(y, x, requires.x = TRUE, ...) {
+get_model_gam = function(y, x, .family, .df.spline, ...) {
   x = x %>% select(where(~ n_distinct(.) > 1))
   term = c()
   for (n in names(x)){
@@ -673,12 +648,12 @@ get_model_gam = function(y, x, requires.x = TRUE, ...) {
   }
   fm = as.formula(paste("y ~", paste(term, collapse = "+")))
   data = cbind(y,x)
-  model = gam(formula = fm, data = data, method = "REML")
+  model = gam(formula = fm, data = data, family = .family, method = "REML")
   return(model)
 }
 
-get_objective_gam = function(y, x, requires.x = TRUE, df, ...) {
-  model = get_model_gam(y, x, requires.x = TRUE, df)
+get_objective_gam = function(y, x, .family, .df.spline,  ...) {
+  model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline)
   sse = crossprod(residuals(model))
   return(sse)
 }

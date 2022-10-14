@@ -16,6 +16,7 @@ library(BBmisc)
 #' @param approximate should approximate splitting algorithm be used
 #' @param pruning select pruning method ('forward', 'none')
 #' @param objective character string with objective function to use ('MSE', 'MAE')
+#' @param family a description of the error distribution and link function to be used in the model. This can be a character string naming a family function, a family function or the result of a call to a family function
 #' @param degree.poly degree of included polynomials
 #' @param fit.bsplines should bsplines be fitted
 #' @param fit.gam should a gam be fitted
@@ -110,7 +111,6 @@ Node <- R6Class("Node", list(
           self$intImp = 0
         }
         intImp = (self$objective.value - split$objective.value[split$best.split][1]) / self$objective.value.parent
-        # browser()
         if(self$intImp == 0){
           if ( intImp < impr.par & pruning == "forward"){
             self$improvement.met = TRUE
@@ -215,11 +215,23 @@ Node <- R6Class("Node", list(
 
 
 
+
 # compute single tree based on Class 'Node' 
-compute_tree_slim = function(y, x, objective = "MSE", penalization = NULL, n.split, 
-                             impr.par = 0.1, min.split = 10, degree.poly = 1, pruning = "forward", 
-                             fit.bsplines = FALSE, fit.gam = FALSE, df.spline = 15, 
-                             n.quantiles = 100,  approximate = FALSE) {
+compute_tree_slim = function(y,
+                             x,
+                             n.split, 
+                             impr.par = 0.1,
+                             min.split = 10,
+                             n.quantiles = 100,
+                             approximate = FALSE,
+                             pruning = "forward", 
+                             objective = "MSE",
+                             family = "gaussian",
+                             degree.poly = 1,
+                             fit.bsplines = FALSE,
+                             fit.gam = FALSE,
+                             df.spline = 15,
+                             penalization = NULL) {
   time.start = Sys.time()
   
   input.data = list(X=as.data.frame(x), Y=as.data.frame(y))
@@ -231,44 +243,50 @@ compute_tree_slim = function(y, x, objective = "MSE", penalization = NULL, n.spl
       fit.model = get_model_gam
       predict_response = get_prediction_gam
       
-    } else if (fit.bsplines){
-      formals(get_objective_bspline)$df = df.spline
-      formals(get_model_bspline)$df = df.spline
-      split.objective = get_objective_bspline
-      fit.model = get_model_bspline
-      predict_response = get_prediction_bspline
-      
     } else {
       if (is.null(penalization)){
-        formals(get_objective_lm)$degree.poly = degree.poly
-        formals(get_model_lm)$degree.poly = degree.poly
         split.objective = get_objective_lm
         fit.model = get_model_lm
         predict_response = get_prediction_lm
         
       } else if (penalization %in% c("L1", "L2")){
         alpha = ifelse(penalization == "L1", 1, 0)
-        formals(get_objective_glmnet)$alpha = alpha
-        formals(get_model_glmnet)$alpha = alpha
-        formals(get_objective_glmnet)$degree.poly = degree.poly
-        formals(get_model_glmnet)$degree.poly = degree.poly
         split.objective = get_objective_glmnet
+        formals(split.objective)$.alpha = alpha
         fit.model = get_model_glmnet
+        formals(fit.model)$.alpha = alpha
         predict_response = get_prediction_glmnet
         
       } else {
         stop(paste("penalization", penalization, "is not supported."))
       }
+      
+      
     }
   } else if (objective == "MAE"){
     split.objective = get_objective_lad
     fit.model = get_model_lad
-  } else {
+  }
+  else {
     stop(paste("objective", objective, "is not supported."))
   } 
+  
+  # set arguments of objective and splitting function
+  print(formals(fit.model))
+  formals(split.objective) = list(y = data.frame(), x = data.frame(), 
+                                   .degree.poly = degree.poly,
+                                   .df.spline = df.spline,
+                                   .fit.bsplines = fit.bsplines,
+                                   .family = family)
+  
+  formals(fit.model) = list(y = data.frame(), x = data.frame(), 
+                             .degree.poly = degree.poly,
+                             .df.spline = df.spline,
+                             .fit.bsplines = fit.bsplines,
+                             .family = family)
+  print(formals(fit.model))
 
   # Initialize the parent node of the tree
-  
   model.parent = fit.model(y = input.data$Y, x = input.data$X)
   term.predictions.parent = predict_response(model.parent, input.data$X)
   parent = Node$new(id = 0, depth = 1, subset.idx = seq_len(nrow(input.data$X)), improvement.met = FALSE, intImp = 0, model.fit = model.parent, 
@@ -283,7 +301,6 @@ compute_tree_slim = function(y, x, objective = "MSE", penalization = NULL, n.spl
     tree[[depth + 1]] = list()
     
     for (node.idx in seq_along(leaves)) {
-      # browser()
       node.to.split = leaves[[node.idx]]
       
       if (!is.null(node.to.split)) {
