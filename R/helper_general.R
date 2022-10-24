@@ -59,7 +59,7 @@ extract_split_criteria = function(tree){
   df.split.criteria$id.node = 0:(nrow(df.split.criteria)-1)
   row.names(df.split.criteria) = df.split.criteria$id.node
   df.split.criteria[] <- lapply(df.split.criteria, unlist)
-  print(paste0("RSS:",(sum(unlist(df.split.criteria[df.split.criteria$split.feature=="leafnode",]$objective.value.parent)))))
+  # print(paste0("RSS:",(sum(unlist(df.split.criteria[df.split.criteria$split.feature=="leafnode",]$objective.value.parent)))))
   return(df.split.criteria)
 }
 
@@ -149,7 +149,11 @@ find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, 
   assert_choice(n.splits, choices = 1)
   
   # use different split candidates to perform split
-  q = generate_split_candidates(xval, n.quantiles = n.quantiles, min.node.size = min.node.size)
+  if (is.null(n.quantiles) & !is.factor(xval)){
+    q = unique(xval)
+  } else{
+    q = generate_split_candidates(xval, n.quantiles = n.quantiles, min.node.size = min.node.size)
+  }
   splits = vapply(q, FUN = function(i) {
     perform_split(i, xval = xval, x = x, y = y, min.node.size = min.node.size,
                   objective = objective, ...)
@@ -607,8 +611,14 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, ...) {
   } else {
     x = as.matrix(x)
   }  
-  cv.model = cv.glmnet(x, y, alpha = .alpha, family = .family)
-  model = glmnet(x, y, alpha = .alpha, family = .family, lambda = cv.model$lambda.min)
+  
+  fit = glmnet(x, y, nlambda=100)
+  rss = deviance(fit)
+  bic = n*log(rss/n) + log(n)*fit$df
+  lambda = fit$lambda[which.min(bic)]
+  
+  # cv.model = cv.glmnet(x, y, alpha = .alpha, family = .family)
+  model = glmnet(x, y, alpha = .alpha, family = .family, lambda = lambda)
   return(model)
 }
 
@@ -686,5 +696,10 @@ get_objective_gam = function(y, x, .family, .df.spline,  ...) {
 get_prediction_gam = function(model, x, ...) {
   prediction = predict.gam(model, x, type = "terms")
   return(prediction)
+}
+
+# MOB/CTree fitting functions
+model_lm = function(y, x, start = NULL, weights = NULL, offset = NULL, ...) {
+  lm(y ~ x , ...)
 }
 

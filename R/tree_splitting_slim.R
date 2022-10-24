@@ -236,6 +236,7 @@ compute_tree_slim = function(y,
   
   input.data = list(X=as.data.frame(x), Y=as.data.frame(y))
 
+  alpha = 0
   if (objective == "MSE"){
     
     if (fit.gam){
@@ -273,16 +274,18 @@ compute_tree_slim = function(y,
   
   # set arguments of objective and splitting function
   formals(split.objective) = list(y = data.frame(), x = data.frame(), 
-                                   .degree.poly = degree.poly,
-                                   .df.spline = df.spline,
-                                   .fit.bsplines = fit.bsplines,
-                                   .family = family)
+                                  .degree.poly = degree.poly,
+                                  .df.spline = df.spline,
+                                  .fit.bsplines = fit.bsplines,
+                                  .family = family,
+                                  .alpha = alpha)
   
   formals(fit.model) = list(y = data.frame(), x = data.frame(), 
-                             .degree.poly = degree.poly,
-                             .df.spline = df.spline,
-                             .fit.bsplines = fit.bsplines,
-                             .family = family)
+                            .degree.poly = degree.poly,
+                            .df.spline = df.spline,
+                            .fit.bsplines = fit.bsplines,
+                            .family = family,
+                            .alpha = alpha)
 
   # Initialize the parent node of the tree
   model.parent = fit.model(y = input.data$Y, x = input.data$X)
@@ -318,7 +321,7 @@ compute_tree_slim = function(y,
 
   }
   time.end = Sys.time()
-  print(time.end-time.start)
+  # print(time.end-time.start)
   return(tree)
 }
 
