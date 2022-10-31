@@ -11,10 +11,12 @@ What should be checked by the simulations?
 What scenarios are we interested in?
 \begin{enumerate}
     \item basic scenario linear: relatively simple linear model with few predictors and interactions (can possibly be omitted)
+    e.g. $$y = x_{1} + 4x_{2} + 3 x_{2}x_{3} + 5x_{2}x_{4} + 2x_{1}(I_{x5>0}) + \epsilon$$
+    with predictors $x_{1},...,x_{5}$ iid $U(-1,1)$
     \item basic scenario nonlinear: simple nonlinear model with few predictors and interactions 
     \item complex scenario nonlinear:  complex nonlinear model with many predictors and interactions 
     \item sparse scenario: basic scenario + multiple noise variables (Lasso Regression)
-    \item Multicollinearity: basic scenario with correlated predictors (Lasso or Ridge Regression)
+    \item Multicollinearity: basic scenario with correlated predictors (Lasso/Ridge Regression or concept trees)
     \item skewed scenario: basic scenario + skewed distribution of the predictors
     \item outlier scenario: basic scenario + need for a robust regression
     \item selection bias scenario: Simulate probability of variable selection when the respone is independent of all variables \citep{Hothorn.2006}
