@@ -19,9 +19,15 @@ Residual based categorical association test\\
 
 
 \subsection{SLIM with Permutation Tests}
-Idea: \citep{.4581}
-Test at each split by permutation tests whether there is a significant relationship between the predictor and the response
+\textbf{Idea}: \citep{.4581}
+Test at each split by permutation tests whether there is a significant relationship between the predictor and the response.\\
+\textbf{Approach}: Hold the predictors constant and permute the reponse variable. Generate Models on permuted datasets and determine frequency of models equal or better than that with the original data\\
 
 \subsection{Stable SLIM}
-Improve the stability by applying a method similar to \citep{Zhou.2018}
-\textbf{Disadvantage}: 
+Improve the stability by applying a method similar to \citep{Zhou.2018}\\
+\textbf{Approach}: Test for each alternative split candidate if the difference in Gini gains is greater than zero. The sum of p-values of this test gives a bound of likelihood of  splitting the current node a different way. Subsample data to control this probability
+\textbf{Disadvantage}:  Computationally very complex
+
+
+\subsection{SLIM combined with concepts}
+\citep{Renard.2019}
