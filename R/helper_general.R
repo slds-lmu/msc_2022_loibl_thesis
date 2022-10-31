@@ -18,8 +18,7 @@ predict_slim = function(tree, newdata){
   }
   predictions = predictions[order(predictions$row_id),]
   rownames(predictions) = predictions$row_id
-  predictions$row_id = NULL
-  return(predictions)
+  return(predictions$y_hat)
 }
 
 
@@ -88,27 +87,100 @@ extract_models = function(tree){
 # helper functions for tree splitting
 
 # performs one split
+
 split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
-                             objective, approximate, n.quantiles, penalization, 
-                             fit.bsplines, df.spline, ...) {
-  require(data.table)
-  assert_data_frame(X)
-  #assert_choice(target.col, choices = colnames(data))
-  assert_integerish(n.splits)
-  assert_integerish(min.node.size)
-  assert_function(objective, args = c("y", "x"))
-  assert_function(optimizer, args = c("xval", "y"))
-  # find best split points per feature
-  opt.feature = lapply(X, function(feat) {
+                             objective, fit, approximate, n.quantiles, penalization, 
+                             fit.bsplines, df.spline, split.method, ...) {
+
+  if(split.method == "slim"){
+    z = colnames(X)
+  } else if (split.method == "anova"){
+    interaction_models = find_split_variable(Y = Y, X = X,
+                                             objective = objective, 
+                                             fit = fit,
+                                             approximate = approximate, 
+                                             penalization = penalization, 
+                                             fit.bsplines = fit.bsplines,
+                                             df.spline = df.spline)
+    z = list(interaction_models$z)
+  }
+  
+  split_point = find_split_point(Y = Y, X = X, z = z, n.splits = n.splits,
+                                 min.node.size = min.node.size, 
+                                 optimizer = optimizer,
+                                 objective = objective, 
+                                 approximate = approximate, 
+                                 n.quantiles = n.quantiles, 
+                                 penalization = penalization, 
+                                 fit.bsplines = fit.bsplines,
+                                 df.spline = df.spline)
+  
+  
+}
+
+find_split_variable = function(Y, X, objective, fit, approximate, penalization, 
+                               fit.bsplines, df.spline, ...) {
+  main_effect_model = fit(y = Y, x = X)
+
+  aov_interaction = lapply(colnames(X), function(z){
+    # terms = colnames(X)
+    # 
+    # for (interaction in colnames(X)[colnames(X)!=z]){
+    #   if (!is.factor(X[,z])){
+    #     if (!is.factor(X[,interaction])){
+    #       terms = c(terms, paste0("ti(", z, ",", interaction, ")"))
+    #     } else if(is.factor(X[,interaction])){
+    #       terms = c(terms, paste0("s(", z, ", by = ", interaction, ")"))
+    #     } 
+    #   } else if (is.factor(X[,z])){
+    #     if (!is.factor(X[,interaction])){
+    #       terms = c(terms, paste0("s(", interaction, ", by = ", z, ")"))
+    #     } else if(is.factor(X[,interaction])){
+    #       terms = c(terms, paste0(z, ":", interaction))
+    #     }
+    #   }
+    # }
+    # 
+    # fm = as.formula(paste("y ~ ", paste(terms, collapse = "+")))
+    # interaction_model = gam(fm, data = cbind(Y,X))
+    # 
+    fm = paste("y ~",paste(paste0(z, "*", colnames(X)[colnames(X)!=z]), collapse = " + "))
+    x_new = as.data.frame(model.matrix(as.formula(fm), data = cbind(Y,X)))
+    interaction_model = fit(y = Y, x = x_new)
+    aov = anova(main_effect_model, interaction_model, test = "F")
+    resid_def = aov[["Resid. Dev"]][2]
+    p = aov[["Pr(>F)"]][2]
+    return(c(resid_def = resid_def, p_value = p))
+  })
+  aov_interaction = as.data.frame(do.call(cbind, aov_interaction))
+  min_p = aov_interaction["p_value", ] == min(aov_interaction["p_value", ], na.rm = TRUE)
+  min_p[is.na(min_p)] = FALSE
+  aov_best = aov_interaction[, min_p]
+  z = colnames(X)[min_p]
+  if (length(z)>1){
+    min_def = aov_best["resid_def", ] == min(aov_best["resid_def", ], na.rm = TRUE)
+    min_def[is.na(min_def)] = FALSE
+    aov_best = aov_best[, min_def]
+    z = z[min_def]
+  }
+  return(list(aov_interaction = aov_interaction, z = z))
+}
+
+find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer,
+                            objective, approximate, n.quantiles, penalization, 
+                            fit.bsplines, df.spline, ...) {
+# find best split point per splitting feature z
+  opt.feature = lapply(z, function(feat) {
     t1 = proc.time()
-    res = optimizer(xval = feat, x = X, y = Y, n.splits = n.splits, min.node.size = min.node.size,
-                    objective = objective, n.quantiles = n.quantiles, penalization = penalization, fit.bsplines = fit.bsplines, df.spline = df.spline, ...)
+    res = optimizer(xval = X[,feat], x = X, y = Y, n.splits = n.splits, min.node.size = min.node.size,
+                    objective = objective, n.quantiles = n.quantiles, penalization = penalization, 
+                    fit.bsplines = fit.bsplines, df.spline = df.spline, ...)
     t2 = proc.time()
     res$runtime = (t2 - t1)[[3]]
     return(res)
   })
+  names(opt.feature) = z
   result = data.table::rbindlist(lapply(opt.feature, as.data.frame), idcol = "feature")
-  # result = result[, .(split.points = as.character(split.points)), by = c("feature", "objective.value", "runtime"), with = TRUE]
   result$best.split = result$objective.value == min(result$objective.value)
   result = result[best.split == TRUE]
   if (result$split.type == "numerical" & is.factor(result$split.points)){
@@ -118,9 +190,11 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   } else if (result$split.type == "categorical"){
     result$split.points = as.character(result$split.points)
   }
-    
+  
   return(result)
 }
+
+
 
 generate_node_index = function(Y, X, result) {
   assert_data_table(result)
@@ -557,7 +631,7 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
 
 # objectives and fitting functions
 
-get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, ...) {
+get_model_glm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, ...) {
   x = x %>% select(where(~ n_distinct(.) > 1))
   numeric.names = c()
   poly = c()
@@ -578,14 +652,14 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, 
   return(model)
 }
 
-get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15, ...) {
-  model = get_model_lm(y, x, .family = .family, .degree.poly = .degree.poly, 
+get_objective_glm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15, ...) {
+  model = get_model_glm(y, x, .family = .family, .degree.poly = .degree.poly, 
                        .fit.bsplines = .fit.bsplines, .df.spline = .df.spline)
   sse = crossprod(model$residuals)
   return(sse)
 }
 
-get_prediction_lm = function(model, x, ...) {
+get_prediction_glm= function(model, x, ...) {
   prediction = predict.glm(model, x, type = "terms")
   return(prediction)
 }
@@ -698,8 +772,5 @@ get_prediction_gam = function(model, x, ...) {
   return(prediction)
 }
 
-# MOB/CTree fitting functions
-model_lm = function(y, x, start = NULL, weights = NULL, offset = NULL, ...) {
-  lm(y ~ x , ...)
-}
+
 

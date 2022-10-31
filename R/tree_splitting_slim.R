@@ -14,6 +14,7 @@ library(BBmisc)
 #' @param min.split minimum number of observations per node
 #' @param n.quantiles number of quantile splits to be evaluated per splitting variable
 #' @param approximate should approximate splitting algorithm be used
+#' @param split.method how should splits be performed? "slim" for exhaustive search, "anova" for zwo step approach
 #' @param pruning select pruning method ('forward', 'none')
 #' @param objective character string with objective function to use ('MSE', 'MAE')
 #' @param family a description of the error distribution and link function to be used in the model. This can be a character string naming a family function, a family function or the result of a call to a family function
@@ -91,8 +92,8 @@ Node <- R6Class("Node", list(
     self$variable.importance = variable.importance
   },
   
-  computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, pruning, n.quantiles, penalization, fit.bsplines, df.spline) {
-    if (length(self$subset.idx) < min.split | (self$improvement.met == TRUE & pruning == "forward")) {
+  computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, pruning, n.quantiles, penalization, fit.bsplines, df.spline, split.method) {
+    if (length(self$subset.idx) < (2*min.split + 1) | (self$improvement.met == TRUE & pruning == "forward")) {
       self$stop.criterion.met = TRUE
       self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
       self$objective.value = NULL
@@ -102,9 +103,11 @@ Node <- R6Class("Node", list(
       tryCatch({
         split = split_parent_node(Y = Y[self$subset.idx, ,drop = FALSE], X = X[self$subset.idx, ], 
                                   objective = objective, optimizer = optimizer, 
+                                  fit = fit,
                                   min.node.size = min.split, n.quantiles = n.quantiles,
                                   penalization = penalization, 
-                                  fit.bsplines = fit.bsplines, df.spline = df.spline)
+                                  fit.bsplines = fit.bsplines, df.spline = df.spline,
+                                  split.method = split.method)
 
         if(is.null(self$intImp)) {
           #self$rsqrt = 0 
@@ -224,6 +227,7 @@ compute_tree_slim = function(y,
                              min.split = 10,
                              n.quantiles = 100,
                              approximate = FALSE,
+                             split.method = "slim",
                              pruning = "forward", 
                              objective = "MSE",
                              family = "gaussian",
@@ -233,7 +237,6 @@ compute_tree_slim = function(y,
                              df.spline = 15,
                              penalization = NULL) {
   time.start = Sys.time()
-  
   input.data = list(X=as.data.frame(x), Y=as.data.frame(y))
 
   alpha = 0
@@ -246,9 +249,9 @@ compute_tree_slim = function(y,
       
     } else {
       if (is.null(penalization)){
-        split.objective = get_objective_lm
-        fit.model = get_model_lm
-        predict_response = get_prediction_lm
+        split.objective = get_objective_glm
+        fit.model = get_model_glm
+        predict_response = get_prediction_glm
         
       } else if (penalization %in% c("L1", "L2")){
         alpha = ifelse(penalization == "L1", 1, 0)
@@ -305,10 +308,12 @@ compute_tree_slim = function(y,
       node.to.split = leaves[[node.idx]]
       
       if (!is.null(node.to.split)) {
-        node.to.split$computeSplit(X = input.data$X, Y = input.data$Y, objective = split.objective, 
+        node.to.split$computeSplit(X = input.data$X, Y = input.data$Y, objective = split.objective,
+                                   fit = fit.model, 
                                    impr.par = impr.par, optimizer = ifelse(approximate == FALSE, find_best_binary_split, find_best_binary_split_approx), 
                                    min.split = min.split, pruning = pruning, n.quantiles = n.quantiles,
-                                   penalization = penalization, fit.bsplines = fit.bsplines, df.spline = df.spline)
+                                   penalization = penalization, fit.bsplines = fit.bsplines, df.spline = df.spline,
+                                   split.method = split.method)
         node.to.split$computeChildren(input.data$X, input.data$Y, objective = split.objective,
                                       fit = fit.model, predict_response = predict_response, 
                                       pruning = pruning)
