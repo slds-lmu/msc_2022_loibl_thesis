@@ -47,9 +47,10 @@ predict_ctree = function(ctree, fit_ctree, newdata){
   return(predictions$y_hat)
 }
 
-fit_trees = function(x_train, y_train, x_test, y_test, minsize, maxdepth, impr, alpha, pruning){
+fit_trees = function(x_train, y_train, x_test, y_test, minsize, maxdepth, impr, alpha, pruning, approximate){
   
-  slim = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning, impr.par = impr, min.split = minsize)
+  slim = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning, 
+                           impr.par = impr, min.split = minsize, approximate = approximate)
   split_slim = extract_split_criteria(slim)
   n_term_nodes_slim = sum(split_slim$split.feature == "leafnode")
   rule_slim = split_slim$child.type[split_slim$split.feature == "leafnode"]
@@ -106,7 +107,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, minsize, maxdepth, impr, 
 
 # function to run different simulation scenarios
 
-generate_data_sim = function(scenario, type = "performance", rep, n, minsize = 20, maxdepth = 3, impr = 0.1, alpha = 0.05, pruning = "forward"){
+generate_data_sim = function(scenario, type = "performance", rep, n, minsize = 20, maxdepth = 3, impr = 0.1, alpha = 0.05, pruning = "forward", approximate = FALSE){
   
   pb = txtProgressBar(min = 0, max = rep, initial = 0) 
   
@@ -178,9 +179,11 @@ generate_data_sim = function(scenario, type = "performance", rep, n, minsize = 2
    
     
     result_original = fit_trees(x_train = x_train, y_train = y_train, x_test = x_test, y_test = y_test,  
-                                minsize = minsize, maxdepth = maxdepth, impr = impr, alpha = alpha, pruning = pruning)
+                                minsize = minsize, maxdepth = maxdepth, impr = impr, alpha = alpha, 
+                                pruning = pruning, approximate = approximate)
     result_surrogate  = fit_trees(x_train = x_train, y_train = y_hat_train, x_test = x_test, y_test = y_hat_test,  
-                                  minsize = minsize, maxdepth = maxdepth, impr = impr, alpha = alpha, pruning = pruning)
+                                  minsize = minsize, maxdepth = maxdepth, impr = impr, alpha = alpha, 
+                                  pruning = pruning, approximate = approximate)
     
     mse_acc_train = rbind(mse_acc_train, result_original$mse_train)
     mse_acc_test = rbind(mse_acc_test, result_original$mse_test)
