@@ -40,9 +40,9 @@ create_sim_data_slim = function(n, type, ...){
     
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)
-    x3 = as.factor(sample(c(0, 1), size = n, replace = TRUE, prob = c(0.5, 0.5)))
-    x4 = as.factor(sample(c(0, 1), size = n, replace = TRUE, prob = c(0.7, 0.3)))
-    x5 = as.factor(sample(c(0, 1), size = n, replace = TRUE, prob = c(0.5, 0.5)))
+    x3 = as.numeric(rbernoulli(n))
+    x4 = as.numeric(rbernoulli(n))
+    x5 = as.numeric(rbernoulli(n))
     x6 = rnorm(n, mean = 1, sd = 5)
     
     formula = 0.2*x1 - 8*x2 + ifelse(x3 == 0, I(16*x2),0) + ifelse(x1 > mean(x1), I(8*x2),0) 
@@ -56,9 +56,9 @@ create_sim_data_slim = function(n, type, ...){
     
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)
-    x3 = sample(c(0, 1), size = n, replace = TRUE, prob = c(0.5, 0.5))
-    x4 = sample(c(0, 1), size = n, replace = TRUE, prob = c(0.7, 0.3))
-    x5 = sample(c(0, 1), size = n, replace = TRUE, prob = c(0.5, 0.5))
+    x3 = as.numeric(rbernoulli(n))
+    x4 = as.numeric(rbernoulli(n))
+    x5 = as.numeric(rbernoulli(n))
     for(i in 6:20){
       x = runif(n, -1, 1)
       assign(paste0("x",i), x)

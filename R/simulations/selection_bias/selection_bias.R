@@ -8,7 +8,7 @@ library(partykit)
 library(REdaS)
 
 
-rep = 10000
+rep = 1000
 n = 1000
 
 split_slim = c()

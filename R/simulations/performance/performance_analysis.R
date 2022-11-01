@@ -12,7 +12,9 @@ simulation_list = list(linear_smooth = linear_smooth,
 if (!dir.exists("Figures")) dir.create("Figures", recursive = TRUE)
 if (!dir.exists("Figures/Performance")) dir.create("Figures/Performance", recursive = TRUE)
 
-
+simulation_list = list(linear_abrupt_big = linear_abrupt_big,
+                       linear_smooth_big = linear_smooth_big,
+                       categorical_linear_big = categorical_linear_big)
 for(el in names(simulation_list)){
   if (!dir.exists(paste0("Figures/Performance/", el))) dir.create(paste0("Figures/Performance/", el), recursive = TRUE)
   
