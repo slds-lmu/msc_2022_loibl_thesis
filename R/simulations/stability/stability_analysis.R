@@ -1,6 +1,7 @@
 # Analysis of stability/ Interpretability
 
 library(ggpubr)
+library(stringr)
 load("Data/simulations/simulation_study/stability/stability_linear.RData")
 
 
@@ -21,7 +22,7 @@ for(el in names(simulation_list)){
                                        surrogate = simulation_list[[el]]$interpr_surr)),
                       aes(x = ind, y = values)) +
     stat_boxplot(geom = "errorbar", width = 0.5) +
-    ggtitle("Number of terminal nodes", subtitle = el) +
+    ggtitle("Number of terminal nodes", subtitle = str_replace(el, "_", " ")) +
     labs(x="model", y="number of terminal nodes") +
     geom_boxplot()
   
@@ -32,7 +33,7 @@ for(el in names(simulation_list)){
                                        surrogate = simulation_list[[el]]$r2_fid_train)),
                       aes(x = ind, y = values)) +
     stat_boxplot(geom = "errorbar", width = 0.5) +
-    ggtitle("R squared - Training", subtitle = el) +
+    ggtitle("R squared - Training", subtitle = str_replace(el, "_", " ")) +
     labs(x="model", y="R2") +
     geom_boxplot()
   
@@ -42,7 +43,7 @@ for(el in names(simulation_list)){
                                       surrogate = simulation_list[[el]]$r2_fid_test)),
                      aes(x = ind, y = values)) +
     stat_boxplot(geom = "errorbar", width = 0.5) +
-    ggtitle("R squared - Test", subtitle = el) +
+    ggtitle("R squared - Test", subtitle = str_replace(el, "_", " ")) +
     labs(x="model", y="R2") +
     geom_boxplot()
   

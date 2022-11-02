@@ -1,13 +1,13 @@
 source("R/simulations/simulation_helper_slim.R")
 
 # max depth 4 -> 8 terminal nodes
-linear_smooth = generate_data_sim("basic_linear_smooth", n = 1500, rep = 200, maxdepth = 4, minsize = 50, alpha = 1, pruning = "none")
+linear_smooth = generate_data_sim("basic_linear_smooth", n = 1500, rep = 500, maxdepth = 4, minsize = 50, alpha = 1, pruning = "none")
 
-linear_abrupt = generate_data_sim("basic_linear_abrupt", n = 1500, rep = 200, maxdepth = 4, minsize = 50, alpha = 1, pruning = "none")
+linear_abrupt = generate_data_sim("basic_linear_abrupt", n = 1500, rep = 500, maxdepth = 4, minsize = 50, alpha = 1, pruning = "none")
 
-categorical_linear = generate_data_sim("categorical_linear", n = 1500, rep = 200, maxdepth = 4, minsize = 50, alpha = 1, pruning = "none")
+categorical_linear = generate_data_sim("categorical_linear", n = 1500, rep = 500, maxdepth = 4, minsize = 50, alpha = 1, pruning = "none")
 
-linear_mixed = generate_data_sim(scenario = "linear_mixed", n = 3000, rep = 200, maxdepth = 4, 
+linear_mixed = generate_data_sim(scenario = "linear_mixed", n = 3000, rep = 500, maxdepth = 4, 
                                            minsize = 100, alpha = 1, pruning = "none")
 
 save(linear_smooth, linear_abrupt, categorical_linear, linear_mixed, file = "Data/simulations/simulation_study/performance/performance_linear.RData")
@@ -15,7 +15,7 @@ save(linear_smooth, linear_abrupt, categorical_linear, linear_mixed, file = "Dat
 
 # max depth 5 -> 16 terminal nodes
 
-linear_smooth_big = generate_data_sim("basic_linear_smooth", n = 3000, rep = 20, maxdepth = 5, minsize = 50, alpha = 1, pruning = "none", approximate = TRUE)
+linear_smooth_big = generate_data_sim("basic_linear_smooth", n = 3000, rep = 200, maxdepth = 5, minsize = 50, alpha = 1, pruning = "none", approximate = TRUE)
 
 linear_abrupt_big = generate_data_sim("basic_linear_abrupt", n = 3000, rep = 200, maxdepth = 5, minsize = 50, alpha = 1, pruning = "none", approximate = TRUE)
 
