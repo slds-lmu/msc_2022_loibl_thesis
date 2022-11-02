@@ -102,9 +102,9 @@ x6 & 1.0 & 0.0 & 0.0\\
 
 \textbf{Procedure:} 
 
-For each simulation run
+For each simulation run (500 repetitions)
 \begin{enumerate}
-    \item create simulation data and perform train/test split
+    \item create simulation data and perform train/test split (2/3)
     \item fit black box model to the training data and measure training and generalization performance ($R^2$ and MSE)
     \item For each model in SLIM, MOB, CTree fit surrogate model to the original training data to measure accuracy (training and generalization) and to the blackbox output to measure fidelity (training and generalization)
 \end{enumerate}
@@ -118,13 +118,13 @@ For each simulation run
 \textbf{Question:} 
 \textbf{simulation scenarios:}
 \begin{enumerate}
-    \item \textbf{Linear smooth} $$ Y = X_1 + 4 \cdot X_2 + 3 \cdot X_2 \cdot X_3 + 5\cdot X_2\cdot X_4 + X_5 + \epsilon $$
+    \item \textbf{Linear smooth} $n= 1500$ $$ Y = X_1 + 4 \cdot X_2 + 3 \cdot X_2 \cdot X_3 + 5\cdot X_2\cdot X_4 + X_5 + \epsilon $$
     $X_1,..., X_5 \sim U(-1,1)$, $X_6, X_7 \sim N(0,1)$, $\epsilon \sim N(0, sd_{data})$
     
-    \item \textbf{Linear Categorical} $$ Y =  0.5\cdot X_{1} - 8\cdot X_2 + 16\cdot X_2\cdot \mathbf{I}_{X_3 = 0} + 8\cdot X_2\cdot \mathbf{I}_{mean(X_1 > X_1} + \epsilon $$
+    \item \textbf{Linear Categorical} $n= 1500$ $$ Y =  0.5\cdot X_{1} - 8\cdot X_2 + 16\cdot X_2\cdot \mathbf{I}_{X_3 = 0} + 8\cdot X_2\cdot \mathbf{I}_{mean(X_1 > X_1} + \epsilon $$
     $X_1, X_2 \sim U(-1,1)$, $X_3, ..., X_5 \sim Bern(0.5)$, $X_6 \sim N(0,1)$,  $\epsilon \sim N(0, sd_{data})$
     
-    \item \textbf{Linear Mixed} 
+    \item \textbf{Linear Mixed}  $n= 3000$
     \begin{align*}
     Y = & 4 \cdot X_2 + 2 \cdot X_4 + 2 \cdot X_6 + 2 \cdot X_8 + 4 \cdot X_2 \cdot X_1 + 8 \cdot X_2 \cdot \mathbf{I}_{X_3 = 0} + 10 \cdot X_2 \cdot X_6  \cdot \mathbf{I}_{X_5 = 1} \\
     & + 8 \cdot X_2 \cdot X_7 + 3 \cdot X_1 \cdot X_3 + 3 \cdot X_8 \cdot X_10 + 3 \cdot X_7 \cdot X_9     
@@ -133,6 +133,31 @@ For each simulation run
 \end{enumerate}
     
 \end{frame}
+
+\begin{frame}{Performance Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Performance/linear_smooth/r2_train.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Performance Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Performance/linear_smooth/r2_test.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Performance Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Performance/categorical_linear/r2_train.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Performance Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Performance/linear_mixed/r2_train.pdf}
+\end{figure}
+\end{frame}
+
 
 \section{Stability}
 \begin{frame}{Stability Comparison}
@@ -147,6 +172,43 @@ For each simulation run
         \item count number of terminal nodes in for the surrogate model and the tree based model on the original 
     \end{enumerate}
 \end{enumerate}
+\end{frame}
+
+\begin{frame}{Stability Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Stability/linear_smooth/nofnodes.pdf}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}{Stability Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Stability/linear_smooth/r2_train.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Stability Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Stability/categorical_linear/nofnodes.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Stability Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Stability/categorical_linear/r2_train.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Stability Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Stability/linear_mixed/nofnodes.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Stability Comparison}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Stability/linear_mixed/r2_train.pdf}
+\end{figure}
 \end{frame}
 
 
