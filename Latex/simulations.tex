@@ -121,7 +121,7 @@ For each simulation run (500 repetitions)
     \item \textbf{Linear smooth} $n= 1500$ $$ Y = X_1 + 4 \cdot X_2 + 3 \cdot X_2 \cdot X_3 + 5\cdot X_2\cdot X_4 + X_5 + \epsilon $$
     $X_1,..., X_5 \sim U(-1,1)$, $X_6, X_7 \sim N(0,1)$, $\epsilon \sim N(0, sd_{data})$
     
-    \item \textbf{Linear Categorical} $n= 1500$ $$ Y =  0.5\cdot X_{1} - 8\cdot X_2 + 16\cdot X_2\cdot \mathbf{I}_{X_3 = 0} + 8\cdot X_2\cdot \mathbf{I}_{mean(X_1 > X_1} + \epsilon $$
+    \item \textbf{Linear Categorical} $n= 1500$ $$ Y =  0.5\cdot X_{1} - 8\cdot X_2 + 16\cdot X_2\cdot \mathbf{I}_{X_3 = 0} + 8\cdot X_2\cdot \mathbf{I}_{mean(X_1 > X_1)} + \epsilon $$
     $X_1, X_2 \sim U(-1,1)$, $X_3, ..., X_5 \sim Bern(0.5)$, $X_6 \sim N(0,1)$,  $\epsilon \sim N(0, sd_{data})$
     
     \item \textbf{Linear Mixed}  $n= 3000$
