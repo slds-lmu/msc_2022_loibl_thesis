@@ -14,7 +14,8 @@ library(BBmisc)
 #' @param min.split minimum number of observations per node
 #' @param n.quantiles number of quantile splits to be evaluated per splitting variable
 #' @param approximate should approximate splitting algorithm be used
-#' @param split.method how should splits be performed? "slim" for exhaustive search, "anova" for zwo step approach
+#' @param split.method how should splits be performed? "slim" for exhaustive search, "anova" for zwo step approach with modelcomparison via F-Test. 
+#' "R2" for Model comparison with r squared an "R2_adj" for model comparison with adjusted r squared
 #' @param pruning select pruning method ('forward', 'none')
 #' @param objective character string with objective function to use ('MSE', 'MAE')
 #' @param family a description of the error distribution and link function to be used in the model. This can be a character string naming a family function, a family function or the result of a call to a family function
@@ -249,9 +250,9 @@ compute_tree_slim = function(y,
       
     } else {
       if (is.null(penalization)){
-        split.objective = get_objective_glm
-        fit.model = get_model_glm
-        predict_response = get_prediction_glm
+        split.objective = get_objective_lm
+        fit.model = get_model_lm
+        predict_response = get_prediction_lm
         
       } else if (penalization %in% c("L1", "L2")){
         alpha = ifelse(penalization == "L1", 1, 0)

@@ -94,15 +94,17 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
 
   if(split.method == "slim"){
     z = colnames(X)
-  } else if (split.method == "anova"){
+  } else if (split.method != "slim"){
+    X = X %>% select(where(~ n_distinct(.) > 1))
     interaction_models = find_split_variable(Y = Y, X = X,
                                              objective = objective, 
                                              fit = fit,
-                                             approximate = approximate, 
+                                             split.method = split.method,
                                              penalization = penalization, 
                                              fit.bsplines = fit.bsplines,
                                              df.spline = df.spline)
     z = list(interaction_models$z)
+
   }
   
   split_point = find_split_point(Y = Y, X = X, z = z, n.splits = n.splits,
@@ -118,51 +120,45 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   
 }
 
-find_split_variable = function(Y, X, objective, fit, approximate, penalization, 
+find_split_variable = function(Y, X, objective, fit, split.method, penalization, 
                                fit.bsplines, df.spline, ...) {
   main_effect_model = fit(y = Y, x = X)
-
   aov_interaction = lapply(colnames(X), function(z){
-    # terms = colnames(X)
-    # 
-    # for (interaction in colnames(X)[colnames(X)!=z]){
-    #   if (!is.factor(X[,z])){
-    #     if (!is.factor(X[,interaction])){
-    #       terms = c(terms, paste0("ti(", z, ",", interaction, ")"))
-    #     } else if(is.factor(X[,interaction])){
-    #       terms = c(terms, paste0("s(", z, ", by = ", interaction, ")"))
-    #     } 
-    #   } else if (is.factor(X[,z])){
-    #     if (!is.factor(X[,interaction])){
-    #       terms = c(terms, paste0("s(", interaction, ", by = ", z, ")"))
-    #     } else if(is.factor(X[,interaction])){
-    #       terms = c(terms, paste0(z, ":", interaction))
-    #     }
-    #   }
-    # }
-    # 
-    # fm = as.formula(paste("y ~ ", paste(terms, collapse = "+")))
-    # interaction_model = gam(fm, data = cbind(Y,X))
-    # 
-    fm = paste("y ~",paste(paste0(z, "*", colnames(X)[colnames(X)!=z]), collapse = " + "))
-    x_new = as.data.frame(model.matrix(as.formula(fm), data = cbind(Y,X)))
-    interaction_model = fit(y = Y, x = x_new)
-    aov = anova(main_effect_model, interaction_model, test = "F")
-    resid_def = aov[["Resid. Dev"]][2]
-    p = aov[["Pr(>F)"]][2]
-    return(c(resid_def = resid_def, p_value = p))
+
+      fm = paste("y ~",paste(paste0(z, "*", colnames(X)[colnames(X)!=z]), collapse = " + "))
+      x_new = as.data.frame(model.matrix(as.formula(fm), data = cbind(Y,X)))
+      interaction_model = fit(y = Y, x = x_new)
+      aov = anova(main_effect_model, interaction_model, test = "F")
+      p = aov[["Pr(>F)"]][2]
+      R2_adj = summary(interaction_model)$adj.r.squared
+      R2 = summary(interaction_model)$r.squared
+      
+
+    return(c(p_value = p, R2_adj = R2_adj, R2 = R2))
   })
   aov_interaction = as.data.frame(do.call(cbind, aov_interaction))
-  min_p = aov_interaction["p_value", ] == min(aov_interaction["p_value", ], na.rm = TRUE)
-  min_p[is.na(min_p)] = FALSE
-  aov_best = aov_interaction[, min_p]
-  z = colnames(X)[min_p]
-  if (length(z)>1){
-    min_def = aov_best["resid_def", ] == min(aov_best["resid_def", ], na.rm = TRUE)
-    min_def[is.na(min_def)] = FALSE
-    aov_best = aov_best[, min_def]
-    z = z[min_def]
+  z = colnames(X)
+  if(split.method == "anova"){
+    min_p = aov_interaction["p_value", ] == min(aov_interaction["p_value", ], na.rm = TRUE)
+    min_p[is.na(min_p)] = FALSE
+    aov_best = aov_interaction[, min_p]
+    z = z[min_p]
+    if (length(z)>1){
+      max_r2 = aov_best["R2", ] == max(aov_best["R2", ], na.rm = TRUE)
+      max_r2[is.na(max_r2)] = FALSE
+      aov_best = aov_best[, max_r2]
+      z = z[max_r2]
+    }
+  } else if(split.method == "R2"){
+    max_r2 = aov_interaction["R2", ] == max(aov_interaction["R2", ], na.rm = TRUE)
+    max_r2[is.na(max_r2)] = FALSE
+    z = z[max_r2]
+  } else if(split.method == "R2_adj"){
+    max_r2_adj = aov_interaction["R2_adj", ] == max(aov_interaction["R2_adj", ], na.rm = TRUE)
+    max_r2_adj[is.na(max_r2_adj)] = FALSE
+    z = z[max_r2_adj]
   }
+
   return(list(aov_interaction = aov_interaction, z = z))
 }
 
@@ -631,7 +627,7 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
 
 # objectives and fitting functions
 
-get_model_glm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, ...) {
+get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, ...) {
   x = x %>% select(where(~ n_distinct(.) > 1))
   numeric.names = c()
   poly = c()
@@ -648,19 +644,19 @@ get_model_glm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
   
   fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], poly, splines), collapse = "+")))
   data = cbind(y,x)
-  model = glm(fm, data, family = .family)
+  model = lm(fm, data)
   return(model)
 }
 
-get_objective_glm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15, ...) {
-  model = get_model_glm(y, x, .family = .family, .degree.poly = .degree.poly, 
+get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15, ...) {
+  model = get_model_lm(y, x, .degree.poly = .degree.poly, 
                        .fit.bsplines = .fit.bsplines, .df.spline = .df.spline)
   sse = crossprod(model$residuals)
   return(sse)
 }
 
-get_prediction_glm= function(model, x, ...) {
-  prediction = predict.glm(model, x, type = "terms")
+get_prediction_lm= function(model, x, ...) {
+  prediction = predict.lm(model, x, type = "terms")
   return(prediction)
 }
 

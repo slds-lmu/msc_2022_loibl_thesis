@@ -8,47 +8,62 @@ library(partykit)
 library(REdaS)
 
 
-rep = 1000
-n = 1000
 
-split_slim = c()
-split_mob = c()
-split_mob_test = c()
-split_ctree = c()
-split_slim_anova = c()
-pb = txtProgressBar(min = 0, max = rep, initial = 0) 
-
-for(i in 1:rep){
-  data = create_sim_data_slim(n, "selection_bias")$data
-  x = data[,colnames(data) != "y"]
-  y = data$y
+run_simulation_selection_bias = function(type = "independence", rep, n, n.quantiles = NULL){
+  split_slim = c()
+  split_mob = c()
+  split_ctree = c()
+  split_slim_anova = c()
+  split_slim_R2 = c()
+  split_slim_R2_adj = c()
+  pb = txtProgressBar(min = 0, max = rep, initial = 0) 
   
-  slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = 10)
-  extract_split_criteria(slim)
-  split_slim = c(split_slim, slim[[1]][[1]][["split.feature"]])
-
-  mob = lmtree(y~x1+x2+x3+x4+x5+x6|x1+x2+x3+x4+x5+x6, data = data, minsize = 10, maxdepth = 2, alpha = 1)
-  mobrule = partykit:::.list.rules.party(mob)[1]
-  split_mob = c(split_mob,str_extract(mobrule,"^.*(?=( <=| %in))"))
-  
-  ctree = suppressWarnings(ctree(as.formula(y~x1+x2+x3+x4+x5+x6|x1+x2+x3+x4+x5+x6),
-                                 data = data,
-                                 ytrafo = fit_lm,
-                                 control = ctree_control(minsplit  = 10, maxdepth = 1, alpha = 1)))
-  ctreerule = partykit:::.list.rules.party(ctree)[1]
-  split_ctree = c(split_ctree, str_extract(ctreerule,"^.*(?=( <=| %in))"))
-
-  slim_anova = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = 10, split.method = "anova")
-  extract_split_criteria(slim_anova)
-  split_slim_anova = c(split_slim_anova, slim_anova[[1]][[1]][["split.feature"]])
-
-  setTxtProgressBar(pb,i)
+  for(i in 1:rep){
+    data = create_sim_data_slim(n, paste0("selection_bias_", type))$data
+    x = data[,colnames(data) != "y"]
+    y = data$y
+    
+    slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = 10)
+    extract_split_criteria(slim)
+    split_slim = c(split_slim, slim[[1]][[1]][["split.feature"]])
+    
+    fm_mob = formula(paste("y ~", paste(colnames(x), collapse = "+"), "|", paste(colnames(x), collapse = "+")))
+    
+    mob = lmtree(fm_mob, data = data, minsize = 10, maxdepth = 2, alpha = 1)
+    mobrule = partykit:::.list.rules.party(mob)[1]
+    split_mob = c(split_mob,str_extract(mobrule,"^.*(?=( <=| %in))"))
+    
+    ctree = suppressWarnings(ctree(fm_mob,
+                                   data = data,
+                                   ytrafo = fit_lm,
+                                   control = ctree_control(minsplit  = 10, maxdepth = 1, alpha = 1)))
+    ctreerule = partykit:::.list.rules.party(ctree)[1]
+    split_ctree = c(split_ctree, str_extract(ctreerule,"^.*(?=( <=| %in))"))
+    
+    slim_anova = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = 10, split.method = "anova")
+    extract_split_criteria(slim_anova)
+    split_slim_anova = c(split_slim_anova, slim_anova[[1]][[1]][["split.feature"]])
+    
+    slim_R2 = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = 10, split.method = "R2")
+    extract_split_criteria(slim_R2)
+    split_slim_R2 = c(split_slim_R2, slim_R2[[1]][[1]][["split.feature"]])
+    
+    slim_R2_adj = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = 10, split.method = "R2_adj")
+    extract_split_criteria(slim_R2_adj)
+    split_slim_R2_adj = c(split_slim_R2_adj, slim_R2_adj[[1]][[1]][["split.feature"]])
+    
+    setTxtProgressBar(pb,i)
+  }
+  close(pb)
+  return(data.frame(split_slim, split_slim_anova, split_slim_R2, split_slim_R2_adj, split_mob, split_ctree))
 }
-close(pb)
 
+selection_bias_independence = run_simulation_selection_bias(type = "independence", rep = 1000, n = 500, n.quantiles = NULL)
+selection_bias_independence_small = run_simulation_selection_bias(type = "independence_small", rep = 1000, n = 500, n.quantiles = NULL)
+selection_bias_interaction = run_simulation_selection_bias(type = "interaction", rep = 1000, n = 500, n.quantiles = NULL)
+selection_bias_full_interaction = run_simulation_selection_bias(type = "full_interaction", rep = 1000, n = 500, n.quantiles = NULL)
 
-# save(split_slim,
-#      split_mob, 
-#      split_ctree,
-#      split_slim_anova,
-#      file = "Data/simulations/selection_bias.RData")
+save(selection_bias_independence,  file = "Data/simulations/simulation_study/selection_bias/selection_bias_independence.RData")
+save(selection_bias_independence_small,  file = "Data/simulations/simulation_study/selection_bias/selection_bias_independence_small.RData")
+save(selection_bias_interaction,  file = "Data/simulations/simulation_study/selection_bias/selection_bias_interaction.RData")
+save(selection_bias_full_interaction,  file = "Data/simulations/simulation_study/selection_bias/selection_bias_full_interaction.RData")

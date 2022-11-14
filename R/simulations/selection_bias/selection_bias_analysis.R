@@ -1,23 +1,36 @@
-load("Data/simulations/simulation_study/selection_bias.RData")
+load("Data/simulations/simulation_study/selection_bias/selection_bias_independence.RData")
+load("Data/simulations/simulation_study/selection_bias/selection_bias_interaction.RData")
+load("Data/simulations/simulation_study/selection_bias/selection_bias_full_interaction.RData")
+
 library(REdaS)
 library(kableExtra)
 
 table(split_slim)/length(split_slim)*100
-freqCI(split_slim, level = c(.95))
-
-table(split_mob)/length(split_mob)*100
-freqCI(split_mob, level = c(.95))
-
-table(split_ctree)/length(split_ctree)*100
-freqCI(split_ctree, level = c(.95))
-
-table(split_slim_anova)/length(split_slim_anova)
-freqCI(split_slim_anova, level = c(.95))
+freqCI(selection_bias_interaction$split_slim, level = c(.95))
+freqCI(selection_bias_interaction$split_slim_anova, level = c(.95))
+freqCI(selection_bias_interaction$split_mob, level = c(.95))
+freqCI(selection_bias_interaction$split_ctree, level = c(.95))
 
 
-frequency_table = cbind(SLIM = table(split_slim)/length(split_slim)*100,
-                        MOB = table(split_mob)/length(split_mob)*100,
-                        CTree = table(split_ctree)/length(split_ctree)*100)
+
+frequency_table_independence = apply(selection_bias_independence, 2, function(col){
+  table(col)/length(col)*100
+})
+frequency_table_independence = do.call(cbind, frequency_table_independence)
+
+
+frequency_table_independence_small = apply(selection_bias_independence_small, 2, function(col){
+  table(col)/length(col)*100
+})
+
+
+frequency_table_interaction = apply(selection_bias_interaction, 2, function(col){
+  table(col)/length(col)*100
+})
+
+frequency_table_full_interaction = apply(selection_bias_full_interaction, 2, function(col){
+  table(col)/length(col)*100
+})
 
 
 
