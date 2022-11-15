@@ -61,7 +61,7 @@ extract_splits_from_rules = function(sim_data, depth = 2){
         rule_data = do.call(rbind, rule_list)
         
         
-        extract_split = function(rule_data, id = "1"){
+        extract_split = function(rule_data, id = "0"){
           depth = length(str_split(id, "_")[[1]])
           if(all(is.na(rule_data[,1]))) {
             splitlist = list(paste0(c(depth, id, NA, NA, NA), collapse = " AND "))
@@ -121,6 +121,10 @@ extract_splits_from_rules = function(sim_data, depth = 2){
 
 }
 
+categorical_linear_impr_005[["result_surrogate_lm"]][, "rule_slim"]
+categorical_linear_impr_005[["result_surrogate_lm"]][, "rule_mob"]
+
+
 
 # Create barplots for rare data (e.g. number of terminal nodes)
 
@@ -174,50 +178,63 @@ create_figures_stability = function(simulation_list){
     r2_train_surr_lm = simulation_list[[el]]$result_surrogate_lm[,str_detect(col_res_surr_lm, "r2_train")]
     colnames(r2_train_surr_lm) = str_remove(colnames(r2_train_surr_lm), "r2_train_")
     
-    p_r2_train_lm = ggplot(stack(data.frame(orig = r2_train_orig,
-                                            surr = r2_train_surr_lm)),
-                           aes(x = ind, y = values)) +
+    
+    p_r2_train_accuracy = ggplot(stack(data.frame(r2_train_orig)),
+                                 aes(x = ind, y = values)) +
       stat_boxplot(geom = "errorbar", width = 0.5) +
-      ggtitle("R squared - Training", subtitle = str_replace(el, "_", " ")) +
+      ggtitle("Accuracy - Training", subtitle = str_replace(el, "_", " ")) +
       labs(x="model", y="R2") +
       geom_boxplot()
     
-    ggexport(p_r2_train_lm, filename = paste0("Figures/Stability/", el, "/lm_r2_train.pdf"), width = 12, height = 3.8)
+    ggexport(p_r2_train_accuracy, filename = paste0("Figures/Stability/", el, "/r2_acc_train.pdf"), width = 8, height = 3.8)
     
     r2_train_surr_xgboost = simulation_list[[el]]$result_surrogate_xgboost[,str_detect(col_res_surr_xgboost, "r2_train")]
     colnames(r2_train_surr_xgboost) = str_remove(colnames(r2_train_surr_xgboost), "r2_train_")
     
-    p_r2_train_xgboost = ggplot(stack(data.frame(orig = r2_train_orig,
-                                                 surr = r2_train_surr_xgboost)),
-                                aes(x = ind, y = values)) +
+    
+    p_r2_train_fidelity = ggplot(stack(data.frame(lm = r2_train_surr_lm,
+                                                  xgb = r2_train_surr_xgboost)),
+                                 aes(x = ind, y = values)) +
       stat_boxplot(geom = "errorbar", width = 0.5) +
-      ggtitle("R squared - Training", subtitle = str_replace(el, "_", " ")) +
+      ggtitle("Fidelity - Training", subtitle = str_replace(el, "_", " ")) +
       labs(x="model", y="R2") +
       geom_boxplot()
     
-    ggexport(p_r2_train_xgboost, filename = paste0("Figures/Stability/", el, "/xgboost_r2_train.pdf"), width = 12, height = 3.8)
+    ggexport(p_r2_train_fidelity, filename = paste0("Figures/Stability/", el, "/r2_fidelity_train.pdf"), width = 10, height = 5)
+    
+  
     
     
+    r2_test_orig = simulation_list[[el]]$result_original[,str_detect(col_res_orig,"r2_test")]
+    colnames(r2_test_orig) = str_remove(colnames(r2_test_orig), "r2_test_")
     
-    p_r2_test_lm = ggplot(stack(data.frame(orig = simulation_list[[el]]$result_original[,str_detect(col_res_orig, "r2_test")],
-                                           surr = simulation_list[[el]]$result_surrogate_lm[,str_detect(col_res_surr_lm, "r2_test")])),
-                          aes(x = ind, y = values)) +
+    r2_test_surr_lm = simulation_list[[el]]$result_surrogate_lm[,str_detect(col_res_surr_lm, "r2_test")]
+    colnames(r2_test_surr_lm) = str_remove(colnames(r2_test_surr_lm), "r2_test_")
+    
+    
+    p_r2_test_accuracy = ggplot(stack(data.frame(r2_test_orig)),
+                                 aes(x = ind, y = values)) +
       stat_boxplot(geom = "errorbar", width = 0.5) +
-      ggtitle("R squared - testing", subtitle = str_replace(el, "_", " ")) +
+      ggtitle("Accuracy - testing", subtitle = str_replace(el, "_", " ")) +
       labs(x="model", y="R2") +
       geom_boxplot()
     
-    ggexport(p_r2_test_lm, filename = paste0("Figures/Stability/", el, "/lm_r2_test.pdf"), width = 12, height = 3.8)
+    ggexport(p_r2_test_accuracy, filename = paste0("Figures/Stability/", el, "/r2_acc_test.pdf"), width = 8, height = 3.8)
     
-    p_r2_test_xgboost = ggplot(stack(data.frame(orig = simulation_list[[el]]$result_original[,str_detect(col_res_orig, "r2_test")],
-                                                surr = simulation_list[[el]]$result_surrogate_xgboost[,str_detect(col_res_surr_xgboost, "r2_test")])),
-                               aes(x = ind, y = values)) +
+    r2_test_surr_xgboost = simulation_list[[el]]$result_surrogate_xgboost[,str_detect(col_res_surr_xgboost, "r2_test")]
+    colnames(r2_test_surr_xgboost) = str_remove(colnames(r2_test_surr_xgboost), "r2_test_")
+    
+    
+    p_r2_test_fidelity = ggplot(stack(data.frame(lm = r2_test_surr_lm,
+                                                  xgb = r2_test_surr_xgboost)),
+                                 aes(x = ind, y = values)) +
       stat_boxplot(geom = "errorbar", width = 0.5) +
-      ggtitle("R squared - testing", subtitle = str_replace(el, "_", " ")) +
+      ggtitle("Fidelity - testing", subtitle = str_replace(el, "_", " ")) +
       labs(x="model", y="R2") +
       geom_boxplot()
     
-    ggexport(p_r2_test_xgboost, filename = paste0("Figures/Stability/", el, "/xgboost_r2_test.pdf"), width = 12, height = 3.8)
+    ggexport(p_r2_test_fidelity, filename = paste0("Figures/Stability/", el, "/r2_fidelity_test.pdf"), width = 10, height = 5)
+    
   }
 }
 

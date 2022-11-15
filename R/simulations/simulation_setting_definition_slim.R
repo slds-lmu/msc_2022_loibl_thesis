@@ -1,3 +1,7 @@
+library(mlr3viz)
+library(mlr3learners)
+library(mlr3tuning)
+library(mlr3pipelines)
 # define different simulation settings for slim
 
 create_sim_data_slim = function(n, type, ...){

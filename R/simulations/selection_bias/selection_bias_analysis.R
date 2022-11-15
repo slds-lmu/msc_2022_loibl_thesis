@@ -1,6 +1,5 @@
 load("Data/simulations/simulation_study/selection_bias/selection_bias_independence.RData")
 load("Data/simulations/simulation_study/selection_bias/selection_bias_independence_small.RData")
-
 load("Data/simulations/simulation_study/selection_bias/selection_bias_interaction.RData")
 load("Data/simulations/simulation_study/selection_bias/selection_bias_full_interaction.RData")
 
@@ -44,33 +43,42 @@ freqCI(selection_bias_interaction$split_ctree, level = c(.95))
 #   kable_minimal(full_width = F)
 # 
 
+library(ggplot2)
+library(ggpubr)
 
-ggplot(stack(selection_bias_independence),
-       aes(x = values, color=ind, fill = ind)) +
+if (!dir.exists("Figures/Selection_Bias")) dir.create("Figures/Selection_Bias", recursive = TRUE)
+
+
+p_ind = ggplot(stack(selection_bias_independence),
+               aes(x = values, color=ind, fill = ind)) +
   stat_count(position = "dodge") +
   ggtitle("Frequency of selection", subtitle = "Independence") +
-  labs(x="selected variable", y="frequeny") +
-  geom_boxplot()
+  labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
+
+ggexport(p_ind, filename = "Figures/Selection_Bias/independence_frequency.pdf", width = 8, height = 3.8)
 
 
-ggplot(stack(selection_bias_independence_small),
-       aes(x = values, color=ind, fill = ind)) +
+p_ind_small = ggplot(stack(selection_bias_independence_small),
+                     aes(x = values, color=ind, fill = ind)) +
   stat_count(position = "dodge") +
   ggtitle("Frequency of selection", subtitle = "Independence small") +
-  labs(x="selected variable", y="frequeny") +
-  geom_boxplot()
+  labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
 
-ggplot(stack(selection_bias_interaction),
+ggexport(p_ind_small, filename = paste0("Figures/Selection_Bias/independence_small_frequency.pdf"), width = 8, height = 3.8)
+
+
+p_int = ggplot(stack(selection_bias_interaction),
        aes(x = values, color=ind, fill = ind)) +
   stat_count(position = "dodge") +
-  ggtitle("Frequency of selection", subtitle = "Interaction between x1*x2 an x3*x4") +
-  labs(x="selected variable", y="frequeny") +
-  geom_boxplot()
+  ggtitle("Frequency of selection", subtitle = "Interaction between x1*x2 and x3*x4") +
+  labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
+ggexport(p_int, filename = paste0("Figures/Selection_Bias/interaction_frequency.pdf"), width = 8, height = 3.8)
 
-ggplot(stack(selection_bias_full_interaction),
-       aes(x = values, color=ind, fill = ind)) +
+
+p_int_full = ggplot(stack(selection_bias_full_interaction),
+                    aes(x = values, color=ind, fill = ind)) +
   stat_count(position = "dodge") +
   ggtitle("Frequency of selection", subtitle = "Interaction between all pairs") +
-  labs(x="selected variable", y="frequeny") +
-  geom_boxplot()
+  labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
+ggexport(p_int_full, filename = paste0("Figures/Selection_Bias/interaction_full_frequency.pdf"), width = 8, height = 3.8)
 
