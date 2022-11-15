@@ -54,48 +54,56 @@
 \begin{frame}{Selection Bias}
 \textbf{Goal:} 
 
-Comparison of SLIM, MOB and CTree with respect to selection bias
+Comparison of different versions of SLIM, MOB and CTree with respect to selection bias
 \vspace{0.5cm}
 
 
 \textbf{Selection bias:} 
 
 An algorithm for recursive partitionig is called unbiased when, under the conditions of the null hypothesis of independence between a response $Y$ an covariates $X_{1},...X_{m}$ the probability of selecting covariate $X_{j}$ is $1/m$ for all $j = 1,...,m$ regardless of the measurement scales of number of missing values. \citep{Hothorn.2006}
+\vspace{0.5cm}
+
+\textbf{Simulation Setting:} $1000$ simulation runs with $n= 500$
+\end{frame}
+
+
+\begin{frame}{SScenario Independence}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Selection_Bias/independence_frequency.pdf}
+\end{figure}
+
+$X_{1}, X_{2} \sim U(0,1)$; 
+$X_{3} \sim U(0,1)$ and rounded to one digit;
+$X_{4}$ binary;
+$X_{5}$ categorical with 5 levels;
+$X_{6}$ categorical with 8 levels\\
+$Y \sim N(0,1)$
 
 \end{frame}
 
-\begin{frame}{Selection Bias}
 
-\textbf{Scenario 1 Data:}  $1000$ simulation runs with $n= 100$
-\begin{itemize}
-    \item $X_{1}, X_{2} \sim U(0,1) $
-    \item $X_{3} \sim U(0,1)$ and rounded to one digit
-    \item $X_{4}$ binary
-    \item $X_{5}$ categorical with 5 levels
-    \item $X_{6}$ categorical with 8 levels
-    \item $Y \sim N(0,1)$
-
-\end{itemize}
-
+\begin{frame}{Scenario Independence small}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Selection_Bias/independence_small_frequency.pdf}
+\end{figure}
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
+$Y \sim N(0,1)$
 \end{frame}
-\begin{frame}{Selection Bias}
-\begin{table}
-\caption{Relative frequency of selecting covariate $X_i$ as splitting variable}
 
-\centering
-\begin{tabular}[t]{l|l|r|r|r|r|r|r}
-\hline
-  & & SLIM & SLIM Anova & SLIM R2 & SLIM R2 adj & MOB & CTree\\
-\hline
-x1 & U(0,1) & 44.1 & 19.1 & 0 & 14.9 & 27.2 & 26.1\\
-x2 & U(0,1) & 39.2 & 17.7 & 0 & 13.8 & 23.8 & 24.4\\
-x3 & U(0,1) rounded 1 & 11.9 & 19.3 & 0 & 14.5 & 27.2 & 28.4\\
-x4 & binary & 1.3 & 17.2 & 0 & 13.9 & 20.6 & 20.4\\
-x5 & 5 categories & 2.1 & 14.2 & 9.7 & 20.4 & 1.2 & 0.7\\
-x6 & 8 categories & 1.4 & 12.5 & 90.3 & 22.5 & 0 & 0\\
-\hline
-\end{tabular}
-\end{table}
+\begin{frame}{Scenario Interaction small}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Selection_Bias/interaction_frequency.pdf}
+\end{figure}
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
+$Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_3 X_4 + eps$
+\end{frame}
+
+\begin{frame}{Scenario Interaction full}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Selection_Bias/interaction_full_frequency.pdf}
+\end{figure}
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
+$Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X_3 X_4 + eps$
 \end{frame}
 
 \begin{frame}{Performance Comparison}
@@ -103,10 +111,10 @@ x6 & 8 categories & 1.4 & 12.5 & 90.3 & 22.5 & 0 & 0\\
 
 \textbf{Procedure:} 
 
-For each simulation run (500 repetitions)
+For each simulation run (50 repetitions)
 \begin{enumerate}
     \item create simulation data and perform train/test split (2/3)
-    \item fit black box model to the training data and measure training and generalization performance ($R^2$ and MSE)
+    \item fit black box model (correct specified lm and xgboost model) to the training data and measure training and generalization performance ($R^2$ and MSE)
     \item For each model in SLIM, MOB, CTree fit surrogate model to the original training data to measure accuracy (training and generalization) and to the blackbox output to measure fidelity (training and generalization)
 \end{enumerate}
 
@@ -119,10 +127,10 @@ For each simulation run (500 repetitions)
 \textbf{Question:} 
 \textbf{simulation scenarios:}
 \begin{enumerate}
-    \item \textbf{Linear smooth} $n= 1500$ $$ Y = X_1 + 4 \cdot X_2 + 3 \cdot X_2 \cdot X_3 + 5\cdot X_2\cdot X_4 + X_5 + \epsilon $$
+    \item \textbf{Linear smooth} $n= 1500$ $$ Y = X_1 + 4 \cdot X_2 + 3 \cdot X_2 \cdot X_3 + 4\cdot X_4\cdot X_5 + X_5 + \epsilon $$
     $X_1,..., X_5 \sim U(-1,1)$, $X_6, X_7 \sim N(0,1)$, $\epsilon \sim N(0, sd_{data})$
     
-    \item \textbf{Linear Categorical} $n= 1500$ $$ Y =  0.5\cdot X_{1} - 8\cdot X_2 + 16\cdot X_2\cdot \mathbf{I}_{X_3 = 0} + 8\cdot X_2\cdot \mathbf{I}_{mean(X_1 > X_1)} + \epsilon $$
+    \item \textbf{Linear Categorical} $n= 1500$ $$ Y =  0.2\cdot X_{1} - 8\cdot X_2 + 16\cdot X_2\cdot \mathbf{I}_{X_3 = 0} + 8\cdot X_2\cdot \mathbf{I}_{X_1 > mean(X_1)} + \epsilon $$
     $X_1, X_2 \sim U(-1,1)$, $X_3, ..., X_5 \sim Bern(0.5)$, $X_6 \sim N(0,1)$,  $\epsilon \sim N(0, sd_{data})$
     
     \item \textbf{Linear Mixed}  $n= 3000$
@@ -135,9 +143,12 @@ For each simulation run (500 repetitions)
     
 \end{frame}
 
-\begin{frame}{Performance Comparison}
+\begin{frame}{Linear Smooth}
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/Performance/linear_smooth/r2_train.pdf}
+    \includegraphics[width=11cm]{Figures/Performance/linear_smooth/lm_r2_train.pdf}
+\end{figure}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Performance/linear_smooth/xgboost_r2_train.pdf}
 \end{figure}
 \end{frame}
 
