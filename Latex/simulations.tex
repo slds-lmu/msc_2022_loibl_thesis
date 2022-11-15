@@ -67,11 +67,7 @@ An algorithm for recursive partitionig is called unbiased when, under the condit
 \end{frame}
 
 
-\begin{frame}{SScenario Independence}
-\begin{figure}
-    \includegraphics[width=11cm]{Figures/Selection_Bias/independence_frequency.pdf}
-\end{figure}
-
+\begin{frame}{Scenario Independence}
 $X_{1}, X_{2} \sim U(0,1)$; 
 $X_{3} \sim U(0,1)$ and rounded to one digit;
 $X_{4}$ binary;
@@ -79,36 +75,44 @@ $X_{5}$ categorical with 5 levels;
 $X_{6}$ categorical with 8 levels\\
 $Y \sim N(0,1)$
 
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Selection_Bias/independence_frequency.pdf}
+\end{figure}
 \end{frame}
 
 
 \begin{frame}{Scenario Independence small}
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
+$Y \sim N(0,1)$
 \begin{figure}
     \includegraphics[width=11cm]{Figures/Selection_Bias/independence_small_frequency.pdf}
 \end{figure}
-All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
-$Y \sim N(0,1)$
+
 \end{frame}
 
 \begin{frame}{Scenario Interaction small}
+
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
+$Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_3 X_4 + eps$
 \begin{figure}
     \includegraphics[width=11cm]{Figures/Selection_Bias/interaction_frequency.pdf}
 \end{figure}
-All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
-$Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_3 X_4 + eps$
+
 \end{frame}
 
 \begin{frame}{Scenario Interaction full}
+
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
+$Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X_3 X_4 + eps$
 \begin{figure}
     \includegraphics[width=11cm]{Figures/Selection_Bias/interaction_full_frequency.pdf}
 \end{figure}
-All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
-$Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X_3 X_4 + eps$
+
 \end{frame}
 
+
+\section{Performance}
 \begin{frame}{Performance Comparison}
-
-
 \textbf{Procedure:} 
 
 For each simulation run (50 repetitions)
@@ -119,34 +123,15 @@ For each simulation run (50 repetitions)
 \end{enumerate}
 
 \textbf{Note:} All three Methods are forced to generate models with the same terminal node size, i.e. no pruning except fixed tree depth and minimum node size is used
-
 \end{frame}
 
-\section{Performance}
-\begin{frame}{Performance Comparison}
-\textbf{Question:} 
-\textbf{simulation scenarios:}
-\begin{enumerate}
-    \item \textbf{Linear smooth} 
-    
-    \item \textbf{Linear Categorical} $n= 1500$ $$ Y =  0.2\cdot X_{1} - 8\cdot X_2 + 16\cdot X_2\cdot \mathbf{I}_{X_3 = 0} + 8\cdot X_2\cdot \mathbf{I}_{X_1 > mean(X_1)} + \epsilon $$
-    $X_1, X_2 \sim U(-1,1)$, $X_3, ..., X_5 \sim Bern(0.5)$, $X_6 \sim N(0,1)$,  $\epsilon \sim N(0, sd_{data})$
-    
-    \item \textbf{Linear Mixed}  $n= 3000$
-    \begin{align*}
-    Y = & 4 \cdot X_2 + 2 \cdot X_4 + 2 \cdot X_6 + 2 \cdot X_8 + 4 \cdot X_2 \cdot X_1 + 8 \cdot X_2 \cdot \mathbf{I}_{X_3 = 0} + 10 \cdot X_2 \cdot X_6  \cdot \mathbf{I}_{X_5 = 1} \\
-    & + 8 \cdot X_2 \cdot X_7 + 3 \cdot X_1 \cdot X_3 + 3 \cdot X_8 \cdot X_10 + 3 \cdot X_7 \cdot X_9     
-    \end{align*}
-    $X_1, X_2 \sim U(-1,1)$, $X_3, ..., X_5 \sim Bern(0.5)$, $X_6, ... X_20 \sim N(0,1)$,  $\epsilon \sim N(0, sd_{data})$
-\end{enumerate}
-    
-\end{frame}
+
 
 \begin{frame}{Linear Smooth}
-\textbf{Data ($n= 1500$):}
+\textbf{Data} ($n= 1500$):
 \begin{itemize}
     \item $X_1,..., X_5 \sim U(-1,1)$, $X_6, X_7 \sim N(0,1)$, $\epsilon \sim N(0, sd_{data})$
-    \item $ Y = X_1 + 4 \cdot X_2 + 3 \cdot X_2 \cdot X_3 + 4\cdot X_4\cdot X_5 + X_5 + \epsilon $
+    \item $ Y = X_1 + 4   X_2 + 3   X_2   X_3 + 4  X_4  X_5 + X_5 + \epsilon $
 \end{itemize}
 
 \begin{figure}
@@ -161,21 +146,43 @@ For each simulation run (50 repetitions)
     
 \end{frame}
 
-\begin{frame}{Performance Comparison}
+\begin{frame}{Linear Categorical}
+\textbf{Data} ($n= 1500$):
+\begin{itemize}
+    \item $X_1, X_2 \sim U(-1,1)$, $X_3, ..., X_5 \sim Bern(0.5)$, $X_6 \sim N(0,1)$,  $\epsilon \sim N(0, sd_{data})$
+    \item $ Y =  0.2  X_{1} - 8  X_2 + 16  X_2  \mathbf{I}_{X_3 = 0} + 8  X_2  \mathbf{I}_{X_1 > mean(X_1)} + \epsilon $
+\end{itemize}
+
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/Performance/linear_smooth/r2_test.pdf}
+    \includegraphics[width=11cm]{Figures/Performance/categorical_linear/r2_acc_train.pdf}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Performance Comparison}
+\begin{frame}{Linear Categorical - Fidelity}
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/Performance/categorical_linear/r2_train.pdf}
+    \includegraphics[width=11cm]{Figures/Performance/categorical_linear/r2_fidelity_train.pdf}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Performance Comparison}
+\begin{frame}{Linear Mixed}
+\textbf{Data} ($n= 3000$):
+\begin{itemize}
+    \item $X_1, X_2 \sim U(-1,1)$, $X_3, ..., X_5 \sim Bern(0.5)$, $X_6, ... X_20 \sim N(0,1)$,  $\epsilon \sim N(0, sd_{data})$
+    \item \begin{align*}
+    Y = & 4   X_2 + 2   X_4 + 2   X_6 + 2   X_8 + 4   X_2   X_1 + 8   X_2   \mathbf{I}_{X_3 = 0} + 10   X_2   X_6    \mathbf{I}_{X_5 = 1} \\
+    & + 8   X_2   X_7 + 3   X_1   X_3 + 3   X_8   X_{10} + 3   X_7   X_9     
+    \end{align*}
+    
+\end{itemize}
+
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/Performance/linear_mixed/r2_train.pdf}
+    \includegraphics[width=11cm]{Figures/Performance/linear_mixed/r2_acc_train.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Linear Mixed - Fidelity}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/Performance/linear_mixed/r2_fidelity_train.pdf}
 \end{figure}
 \end{frame}
 
@@ -184,7 +191,7 @@ For each simulation run (50 repetitions)
 \begin{frame}{Stability Comparison}
 \textbf{Procedure:} 
 \begin{enumerate}
-    \item create simulation data and train black box model on the data (this dataset is only used to train the black box model)
+    \item create simulation data and train black box models on the data (this datasets are only used to train the black box model)
     \item for each simulation run 
     \begin{enumerate}
         \item create a new dataset and perform train/test split
