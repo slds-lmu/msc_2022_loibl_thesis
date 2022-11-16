@@ -9,7 +9,7 @@ analyse_stability = function(sim_data, depth = 3){
   aggregated_split_list = lapply(split_list, function(bb_model_list){
     lapply(bb_model_list, function(tree_method_list){
       data_aggr = tree_method_list %>% dplyr::group_by(depth, split_id, feature) %>% 
-        dplyr::summarise(share = round(n()/30,2), split.mean = round(mean(as.numeric(value)),2),
+        dplyr::summarise(share = round(n()/50,2), split.mean = round(mean(as.numeric(value)),2),
                          split.sd = round(sd(as.numeric(value)),2)) %>%
         arrange(depth, split_id, desc(share))
       
@@ -98,7 +98,7 @@ extract_splits_from_rules = function(sim_data, depth = 2){
       colnames(split_df_sim) = c("depth", "split_id", "feature", "value", "rule", "sim_id")
       split_dt_sim = as.data.table(split_df_sim)
       for(id in unique(split_dt_sim$split_id)){
-        missing = setdiff(as.character(1:30), split_dt_sim[split_id == id, sim_id])
+        missing = setdiff(as.character(1:50), split_dt_sim[split_id == id, sim_id])
         if(length(missing) > 0){
           for(missing_sim_id in missing){
             split_dt_sim = rbind(split_dt_sim, t(c(length(str_split(id, "_")[[1]]), id, NA, NA, NA, missing_sim_id)), use.names = FALSE)
