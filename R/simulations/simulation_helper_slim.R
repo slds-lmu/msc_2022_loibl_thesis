@@ -49,7 +49,6 @@ predict_ctree = function(ctree, fit_ctree, newdata){
 
 fit_trees = function(x_train, y_train, x_test, y_test, minsize, maxdepth, impr, alpha, pruning, approximate){
   
-  print("slim")
   slim = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning, 
                            impr.par = impr, min.split = minsize, approximate = approximate)
   split_slim = extract_split_criteria(slim)
@@ -62,7 +61,6 @@ fit_trees = function(x_train, y_train, x_test, y_test, minsize, maxdepth, impr, 
   mse_test_slim = mean((predict_slim(slim, x_test)- y_test)^2)
   r2_test_slim = r_2(y_test, predict_slim(slim, x_test))
   
-  print("anova")
   slim_aov = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning, 
                               impr.par = impr, min.split = minsize, approximate = approximate, split.method = "anova")
   split_slim_aov = extract_split_criteria(slim_aov)
@@ -75,7 +73,6 @@ fit_trees = function(x_train, y_train, x_test, y_test, minsize, maxdepth, impr, 
   mse_test_slim_aov = mean((predict_slim(slim_aov, x_test)- y_test)^2)
   r2_test_slim_aov = r_2(y_test, predict_slim(slim_aov, x_test))
   
-  print("R2")
   slim_r2 = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning, 
                                  impr.par = impr, min.split = minsize, approximate = approximate, split.method = "R2")
   split_slim_r2 = extract_split_criteria(slim_r2)
@@ -88,7 +85,6 @@ fit_trees = function(x_train, y_train, x_test, y_test, minsize, maxdepth, impr, 
   mse_test_slim_r2 = mean((predict_slim(slim_r2, x_test)- y_test)^2)
   r2_test_slim_r2 = r_2(y_test, predict_slim(slim_r2, x_test))
   
-  print("R2_adj")
   slim_r2_adj = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning, 
                               impr.par = impr, min.split = minsize, approximate = approximate, split.method = "R2_adj")
   split_slim_r2_adj = extract_split_criteria(slim_r2_adj)
