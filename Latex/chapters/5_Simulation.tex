@@ -1,23 +1,40 @@
-What should be checked by the simulations?
+\subsection{Evaluation measures}
+on training and test data as well as on the original targets (accuracy) and predictions of different black box models (fidelity)
+\subsubsection{Performance}
 \begin{itemize}
-    \item SLIM Accuracy (Train/Test)
-    \item SLIM Fidelity (Train/Test)
-    \item Blackbox Accuracy (Train/Test)
-    \item Interpretability (e.g. number of leaf nodes)
-    \item Stability (e.g. number of occurence of unique structures of a tree (barplot) \citep{Zhou.2018}, adjusted Rand index (ARI) \citep{Schlosser.24.06.2019}
+    \item MSE
+    \item R squared
+\end{itemize}
+
+\subsubsection{Stability}
+\begin{itemize}
+    \item Assumption: All methods have a problem with instability \citep{Fokkema.2020}
+    \item Definition of stability? A distinction can be made between semantic and structural stability \citep{Wang.2018}
+    \item how similar are the found subspaces? (decision region compatibility) \citep{Wang.2018}
+
+    \item difference in tree size and depth can be used as indicator \citep{Wang.2018}
+
+
 \end{itemize}
 
 
-What scenarios are we interested in?
-\begin{enumerate}
-    \item basic scenario linear: relatively simple linear model with few predictors and interactions (can possibly be omitted)
-    e.g. $$y = x_{1} + 4x_{2} + 3 x_{2}x_{3} + 5x_{2}x_{4} + 2x_{1}(I_{x5>0}) + \epsilon$$
-    with predictors $x_{1},...,x_{5}$ iid $U(-1,1)$
-    \item basic scenario nonlinear: simple nonlinear model with few predictors and interactions 
-    \item complex scenario nonlinear:  complex nonlinear model with many predictors and interactions 
-    \item sparse scenario: basic scenario + multiple noise variables (Lasso Regression)
-    \item Multicollinearity: basic scenario with correlated predictors (Lasso/Ridge Regression or concept trees)
-    \item skewed scenario: basic scenario + skewed distribution of the predictors
-    \item outlier scenario: basic scenario + need for a robust regression
-    \item selection bias scenario: Simulate probability of variable selection when the respone is independent of all variables \citep{Hothorn.2006}
-\end{enumerate}
+
+
+
+
+\subsubsection{Interpretability}
+Number of leafnodes to reach the same performance
+
+\subsection{Linear Models in the leafnodes}
+Comparison of SLIM, MOB, CTree and GUIDE
+
+Simulation Scenarios:
+\begin{itemize}
+    \item numerical or/and categorical features
+    \item abrupt vs smooth vs mixed interactions
+    \item different correlation patterns between features
+\end{itemize}
+
+
+\subsection{Sparse (spline-based) models in the leafnodes}
+Comparison of SLIM and GA2M (EBM)
