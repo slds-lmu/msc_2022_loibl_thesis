@@ -1,3 +1,6 @@
+source("R/load_packages.R")
+source("R/helper_general.R")
+
 library(R6)
 library(data.table)
 library(BBmisc)
@@ -188,12 +191,13 @@ Node <- R6Class("Node", list(
       
       model.left = fit(y = Y[idx.left, ,drop = FALSE], x = X[idx.left, ])
       model.right = fit(y = Y[idx.right, ,drop = FALSE], x = X[idx.right, ])
-      
       term.predictions.left = predict_response(model.left, x = X[idx.left, ])
       term.predictions.right = predict_response(model.right, x = X[idx.right, ])
       intersection = intersect(colnames(term.predictions.left), colnames(term.predictions.right))
-      predictions = rbind(term.predictions.left[,intersection], term.predictions.right[, intersection])
-      self$term.predictions = predictions[order(as.numeric(rownames(predictions))),]
+      
+      predictions = rbind(term.predictions.left[,intersection, drop = FALSE], term.predictions.right[, intersection, drop = FALSE])
+
+      self$term.predictions = predictions[order(as.numeric(rownames(predictions))),, drop = FALSE]
       self$split.effect = calculate_split_effects(self$term.predictions.parent, self$term.predictions, exclude = self$split.feature)
       
       variable.importance.left = round(apply(term.predictions.left, MARGIN = 2, var), 4)

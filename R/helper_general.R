@@ -103,7 +103,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                                              penalization = penalization, 
                                              fit.bsplines = fit.bsplines,
                                              df.spline = df.spline)
-    z = list(interaction_models$z)
+    z = interaction_models$z
 
   }
   
@@ -197,7 +197,6 @@ generate_node_index = function(Y, X, result) {
   # TODO: fix bug if more than one feature have the same best objective
   feature = unique(result$feature[result$best.split])
   split.points = unlist(result$split.points[result$best.split])
-  
   if (is.vector(X))
     xval = X else
       xval = X[, feature]
@@ -614,7 +613,7 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
   if (!is.null(exclude)){
     intersection = intersection[intersection != exclude]
   } 
-  if (length(intersection) == 1){
+  if (length(intersection) == 1 | is.null(interaction)){
     return(intersection)
   } else{
     d = term.predictions.parent[,intersection] - term.predictions[,intersection]
@@ -641,7 +640,6 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, 
       splines = paste0("bs(", numeric.names, ", df = ", .df.spline, ", degree = 1)")  
     }
   }
-  
   fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], poly, splines), collapse = "+")))
   data = cbind(y,x)
   model = lm(fm, data)
@@ -694,13 +692,27 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, ...) {
 
 get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, ...) {
   model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha, .degree.poly = .degree.poly)
+  y = unlist(y)
+  x = x %>% select(where(~ n_distinct(.) > 1))
+  if (.degree.poly > 1) {
+    features = names(x)
+    for(f in features){
+      if (is.numeric(x[[f]])){
+        for(d in 2:.degree.poly){
+          x = cbind(x, "new" = x[[f]]^d)
+          colnames(x)[which(names(x) == "new")] = paste0(f,"_",d)
+        }
+      }
+    }
+  }
   factor.names = names(x)[sapply(x,class) == "factor"]
   if (length(factor.names) > 0){
     xfactors = model.matrix(as.formula(paste("y ~", paste(factor.names, collapse = "+"))), data = cbind(y,x))[, -1]
     x = as.matrix(data.frame(x[which(!(names(x) %in% factor.names))], xfactors))
   } else {
     x = as.matrix(x)
-  }  
+  } 
+  
   predictions = predict.glmnet(model, newx = x, s = model$lambda)
   sse = sum((predictions - y)^2)
   return(sse)

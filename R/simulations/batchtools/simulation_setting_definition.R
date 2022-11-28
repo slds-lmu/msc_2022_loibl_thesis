@@ -1,10 +1,4 @@
-library(mlr3viz)
-library(mlr3learners)
-library(mlr3tuning)
-library(mlr3pipelines)
-# define different simulation settings for slim
-
-create_sim_data_slim = function(n, type, ...){
+create_sim_data = function(job, n, type, ...){
   
   if (type == "basic_linear_smooth"){
     
@@ -143,7 +137,7 @@ create_sim_data_slim = function(n, type, ...){
     x17 = as.factor(sample(c(1:4), size = n, replace = TRUE, prob = c(0.2, 0.2, 0.3, 0.3)))
     x18 = as.factor(sample(c(1:4), size = n, replace = TRUE, prob = c(0.1, 0.1, 0.1, 0.7)))
     x19 = as.factor(sample(c(1:8), size = n, replace = TRUE, prob = c(rep(0.1,6), 0.2, 0.2)))
-
+    
     
     formula = 4*x2 - 4*x4 + 4*x6 - 4*x8 + 4*x10 + 3*x2*x1 + 5*x2*x5 + 7*x2*x8 + ifelse(x13 == 0, I(8*x2),0) + 
       ifelse(x16 == 1, I(4*x2),0) + ifelse(x16 == 2, I(6*x2),0) + ifelse(x19 %in% c(1,2,3), I(4*x2),0) + ifelse(x19 %in% c(4:6), I(6*x2),0) + 
@@ -206,8 +200,8 @@ create_sim_data_slim = function(n, type, ...){
     fm = NULL
     lrn = NULL
     search_space = NULL
-  } else if (type == "selection_bias_independence"){
     
+  } else if (type == "selection_bias_independence"){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = round(runif(n, 0, 1), 1)  
@@ -218,6 +212,8 @@ create_sim_data_slim = function(n, type, ...){
     y = rnorm(n, 0, 1)
     data = data.frame(x1, x2, x3, x4, x5, x6, y)
     fm = NULL
+    lrn = NULL
+    search_space = NULL
     
   } else if (type == "selection_bias_independence_small"){
     
@@ -244,6 +240,7 @@ create_sim_data_slim = function(n, type, ...){
     data = data.frame(x1, x2, x3, x4, y)
     fm = NULL
     lrn = NULL
+    search_space = NULL
     
   } else if (type == "selection_bias_full_interaction"){
     
@@ -290,7 +287,7 @@ create_sim_data_slim = function(n, type, ...){
     
     x1 = as.factor(sample(1:2, n, replace = TRUE))
     x2 = as.factor(sample(1:4, n, replace = TRUE))
-
+    
     # formula = ifelse(x1 == 2, 1,0) + ifelse(x2 %in% c(2,3), 1, 0)  + ifelse(x1 == 2 & x2 == 2, 2 ,
     #                                                                         ifelse(x1 == 2 & x2 == 3, 3 ,
     #                                                                                ifelse(x1 == 2 & x2 == 4, 4 ,0))) 
@@ -304,5 +301,6 @@ create_sim_data_slim = function(n, type, ...){
     
     
   }
+
   return(list(data = data, fm = fm, lrn = lrn, search_space = search_space))
 }

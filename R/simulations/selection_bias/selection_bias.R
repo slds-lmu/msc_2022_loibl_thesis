@@ -2,7 +2,7 @@
 source("R/load_packages.R")
 source("R/tree_splitting_slim.R")
 source("R/helper_general.R")
-source("R/simulations/simulation_setting_definition_slim.R")
+source("R/simulations/batchtools/simulation_setting_definition.R")
 source("R/mob_fitting_functions.R")
 library(partykit)
 library(REdaS)
@@ -19,7 +19,7 @@ run_simulation_selection_bias = function(type = "independence", rep, n, n.quanti
   pb = txtProgressBar(min = 0, max = rep, initial = 0) 
   
   for(i in 1:rep){
-    data = create_sim_data_slim(n, paste0("selection_bias_", type))$data
+    data = create_sim_data(n = n, type = paste0("selection_bias_", type))$data
     x = data[,colnames(data) != "y"]
     y = data$y
     
@@ -58,10 +58,16 @@ run_simulation_selection_bias = function(type = "independence", rep, n, n.quanti
   return(data.frame(split_slim, split_slim_anova, split_slim_R2, split_slim_R2_adj, split_mob, split_ctree))
 }
 
-selection_bias_independence = run_simulation_selection_bias(type = "independence", rep = 1000, n = 500, n.quantiles = NULL)
-selection_bias_independence_small = run_simulation_selection_bias(type = "independence_small", rep = 1000, n = 500, n.quantiles = NULL)
-selection_bias_interaction = run_simulation_selection_bias(type = "interaction", rep = 1000, n = 500, n.quantiles = NULL)
-selection_bias_full_interaction = run_simulation_selection_bias(type = "full_interaction", rep = 1000, n = 500, n.quantiles = NULL)
+selection_bias_independence = run_simulation_selection_bias(type = "independence", rep = 1, n = 500, n.quantiles = NULL)
+selection_bias_independence_small = run_simulation_selection_bias(type = "independence_small", rep = 1, n = 500, n.quantiles = NULL)
+selection_bias_interaction = run_simulation_selection_bias(type = "interaction", rep = 1, n = 500, n.quantiles = NULL)
+selection_bias_full_interaction = run_simulation_selection_bias(type = "full_interaction", rep = 1, n = 500, n.quantiles = NULL)
+selection_bias_interaction_binary = run_simulation_selection_bias(type = "interaction_binary", rep = 1, n = 500, n.quantiles = NULL)
+selection_bias_interaction_categorical = run_simulation_selection_bias(type = "interaction_categorical", rep = 1, n = 500, n.quantiles = NULL)
+selection_bias_interaction_binary_categorical = run_simulation_selection_bias(type = "interaction_binary_categorical", rep = 1, n = 5000, n.quantiles = NULL)
+
+
+
 
 save(selection_bias_independence,  file = "Data/simulations/simulation_study/selection_bias/selection_bias_independence.RData")
 save(selection_bias_independence_small,  file = "Data/simulations/simulation_study/selection_bias/selection_bias_independence_small.RData")

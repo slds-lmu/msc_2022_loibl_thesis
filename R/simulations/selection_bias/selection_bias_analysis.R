@@ -82,3 +82,10 @@ p_int_full = ggplot(stack(selection_bias_full_interaction),
   labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
 ggexport(p_int_full, filename = paste0("Figures/Selection_Bias/interaction_full_frequency.pdf"), width = 8, height = 3.8)
 
+
+
+ggplot(stack(selection_bias_interaction_binary_categorical),
+       aes(x = values, color=ind, fill = ind)) +
+  stat_count(position = "dodge") +
+  ggtitle("Frequency of selection", subtitle = "Interaction binary-categorical 5") +
+  labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
