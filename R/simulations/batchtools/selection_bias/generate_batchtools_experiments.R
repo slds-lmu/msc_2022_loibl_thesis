@@ -1,4 +1,5 @@
 library(batchtools)
+source("load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
 if (!dir.exists("Data/simulations/batchtools")) dir.create("Data/simulations/batchtools", recursive = TRUE)
@@ -37,13 +38,19 @@ summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 
 
+# test jobs
 id1 = head(findExperiments(algo.name = "selection_bias"), 1)
 print(id1)
 
 testJob(id = id1)
 
+
+
+# submit jobs
 submitJobs()
 
+
+# reduce jobs/ summarise results
 reduce = function(res) res
 results = unwrap(reduceResultsDataTable(fun = reduce, reg = reg))
 head(results)
