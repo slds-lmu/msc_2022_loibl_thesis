@@ -1,6 +1,6 @@
-install.packages(c("stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table", "dplyr", 
-                   "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", 
-                   "splines", "partitions", "partykit"))
+# install.packages(c("stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table", "dplyr", 
+#                    "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", 
+#                    "splines", "partitions", "partykit"))
 
 library(stringr)
 library(tidyverse)

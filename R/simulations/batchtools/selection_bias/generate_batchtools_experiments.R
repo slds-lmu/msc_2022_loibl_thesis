@@ -1,5 +1,5 @@
 library(batchtools)
-source("load_packages.R")
+source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
 if (!dir.exists("Data/simulations/batchtools")) dir.create("Data/simulations/batchtools", recursive = TRUE)
