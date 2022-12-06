@@ -89,22 +89,32 @@ extract_models = function(tree){
 # performs one split
 
 split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
-                             objective, fit, approximate, n.quantiles, penalization, 
+                             objective, fit, predict_response,  approximate, n.quantiles, penalization, 
                              fit.bsplines, df.spline, split.method, ...) {
 
   if(split.method == "slim"){
     z = colnames(X)
-  } else if (split.method != "slim"){
+  } else if (split.method %in% c("anova", "R2", "R2_adj")){
     X = X %>% select(where(~ n_distinct(.) > 1))
-    interaction_models = find_split_variable(Y = Y, X = X,
-                                             objective = objective, 
-                                             fit = fit,
-                                             split.method = split.method,
-                                             penalization = penalization, 
-                                             fit.bsplines = fit.bsplines,
-                                             df.spline = df.spline)
+    interaction_models = find_split_variable_anova(Y = Y, X = X,
+                                                   objective = objective, 
+                                                   fit = fit,
+                                                   split.method = split.method,
+                                                   penalization = penalization, 
+                                                   fit.bsplines = fit.bsplines,
+                                                   df.spline = df.spline)
     z = interaction_models$z
 
+  } else if(split.method == "guide"){
+    X = X %>% select(where(~ n_distinct(.) > 1))
+    z = find_split_variable_guide(Y = Y, X = X,
+                                  objective = objective, 
+                                  fit = fit,
+                                  predict_response = predict_response,
+                                  split.method = split.method,
+                                  penalization = penalization, 
+                                  fit.bsplines = fit.bsplines,
+                                  df.spline = df.spline)
   }
   
   split_point = find_split_point(Y = Y, X = X, z = z, n.splits = n.splits,
@@ -120,7 +130,16 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   
 }
 
-find_split_variable = function(Y, X, objective, fit, split.method, penalization, 
+find_split_variable_guide = function(Y, X, objective, fit, predict_response, split.method, penalization, 
+                                     fit.bsplines, df.spline, ...){
+  model = fit(y = Y, x = X)
+  residuals = y - predict_response(model, X)
+  guide_test(x = X, residuals = residuals, xgroups = NULL)
+}
+
+
+
+find_split_variable_anova = function(Y, X, objective, fit, split.method, penalization, 
                                fit.bsplines, df.spline, ...) {
   main_effect_model = fit(y = Y, x = X)
   aov_interaction = lapply(colnames(X), function(z){
@@ -161,6 +180,8 @@ find_split_variable = function(Y, X, objective, fit, split.method, penalization,
 
   return(list(aov_interaction = aov_interaction, z = z))
 }
+
+
 
 find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer,
                             objective, approximate, n.quantiles, penalization, 
