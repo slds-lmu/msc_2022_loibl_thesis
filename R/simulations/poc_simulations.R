@@ -1,21 +1,26 @@
 source("R/load_packages.R")
 source("R/tree_splitting_slim.R")
 source("R/helper_general.R")
-source("R/simulations/simulation_setting_definition_slim.R")
+source("R/helper_guide.R")
+source("R/simulations/batchtools/simulation_setting_definition.R")
 
 set.seed(1234)
 n = 1000
 
 # numeric linear
-# y = x1 + 4*x2 + 3*x2*x3 + 5*x2*x4 + 7*x2*x5 + eps
 
-data_linear = create_sim_data_slim(job = NULL, n = n, type = "numeric_linear")
+data_linear = create_sim_data(job = NULL, n = n, type = "basic_linear_smooth")$data
 X_linear = data_linear[which(names(data_linear)!="y")]
 y_linear = data_linear$y 
 
-tree_linear = compute_tree_slim(y_linear, X_linear, n.split = 7, penalization = NULL, fit.bsplines = TRUE, impr.par = 0.1, min.split = n/100, pruning = "forward",
+tree_linear = compute_tree_slim(y_linear, X_linear, n.split = 2, penalization = NULL, fit.bsplines = TRUE, impr.par = 0.1, min.split = n/100, pruning = "forward",
                                 split.method = "slim")
 res_linear = extract_split_criteria(tree_linear)
+
+tree_linear_guide = compute_tree_slim(y_linear, X_linear, n.split = 2, penalization = NULL, fit.bsplines = TRUE, impr.par = 0.1, min.split = n/100, pruning = "forward",
+                                split.method = "guide")
+res_linear_guide = extract_split_criteria(tree_linear)
+
 
 tree_linear_anova = compute_tree_slim(y_linear, X_linear, n.split = 2, penalization = NULL, degree.poly = 1, impr.par = 0.1, min.split = n/100, pruning = "forward",
                                 split.method = "anova")
@@ -32,7 +37,7 @@ save(tree_linear, res_linear, models_linear, file = "R/simulation_results/linear
 
 # categorical_linear
 # y = 0.2*x1 - 8*x2 + ifelse(x3 == 0, I(16*x2),0) + ifelse(x1 > mean(x1), I(8*x2),0) + eps
-data_categorical = create_sim_data_slim(job = NULL, n = n, type = "categorical_linear")
+data_categorical = create_sim_data(job = NULL, n = n, type = "categorical_linear")$data
 X_categorical = data_categorical[which(names(data_categorical)!="y")]
 
 X_categorical$x3 = as.factor(X_categorical$x3)
@@ -43,6 +48,13 @@ y_categorical = data_categorical$y
 
 tree_categorical = compute_tree_slim(y_categorical, X_categorical, n.split = 3, penalization = NULL, degree.poly = 1, impr.par = 0.01, min.split = n/100, pruning = "forward")
 res_categorical = extract_split_criteria(tree_categorical)
+tree_categorical_guide = compute_tree_slim(y_categorical, X_categorical, n.split = 3, 
+                                           penalization = NULL, degree.poly = 1, 
+                                           impr.par = 0.01, min.split = n/100, pruning = "forward",
+                                           split.method = "guide")
+res_categorical_guide = extract_split_criteria(tree_categorical)
+
+
 models_categorical = extract_models(tree_categorical)
 
 tree_categorical_anova = compute_tree_slim(y_categorical, X_categorical, n.split = 3, impr.par = 0.01, min.split = n/100, 

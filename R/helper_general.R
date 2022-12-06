@@ -106,6 +106,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = interaction_models$z
 
   } else if(split.method == "guide"){
+    # browser()
     X = X %>% select(where(~ n_distinct(.) > 1))
     z = find_split_variable_guide(Y = Y, X = X,
                                   objective = objective, 
@@ -133,8 +134,8 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
 find_split_variable_guide = function(Y, X, objective, fit, predict_response, split.method, penalization, 
                                      fit.bsplines, df.spline, ...){
   model = fit(y = Y, x = X)
-  residuals = y - predict_response(model, X)
-  guide_test(x = X, residuals = residuals, xgroups = NULL)
+  residuals = Y - predict_response(model, X)
+  z = guide_test(x = X, residuals = residuals, xgroups = NULL)$z
 }
 
 

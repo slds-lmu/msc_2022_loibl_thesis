@@ -96,7 +96,7 @@ Node <- R6Class("Node", list(
     self$variable.importance = variable.importance
   },
   
-  computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, pruning, n.quantiles, penalization, fit.bsplines, df.spline, split.method) {
+  computeSplit = function(X, Y, objective, fit, predict_response, impr.par, optimizer, min.split = 10, pruning, n.quantiles, penalization, fit.bsplines, df.spline, split.method) {
     if (length(self$subset.idx) < (2*min.split + 1) | (self$improvement.met == TRUE & pruning == "forward")) {
       self$stop.criterion.met = TRUE
       self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
@@ -107,7 +107,7 @@ Node <- R6Class("Node", list(
       tryCatch({
         split = split_parent_node(Y = Y[self$subset.idx, ,drop = FALSE], X = X[self$subset.idx, ], 
                                   objective = objective, optimizer = optimizer, 
-                                  fit = fit,
+                                  fit = fit, predict_response = predict_response,
                                   min.node.size = min.split, n.quantiles = n.quantiles,
                                   penalization = penalization, 
                                   fit.bsplines = fit.bsplines, df.spline = df.spline,
@@ -314,7 +314,7 @@ compute_tree_slim = function(y,
       
       if (!is.null(node.to.split)) {
         node.to.split$computeSplit(X = input.data$X, Y = input.data$Y, objective = split.objective,
-                                   fit = fit.model, 
+                                   fit = fit.model,predict_response = predict_response,
                                    impr.par = impr.par, optimizer = ifelse(approximate == FALSE, find_best_binary_split, find_best_binary_split_approx), 
                                    min.split = min.split, pruning = pruning, n.quantiles = n.quantiles,
                                    penalization = penalization, fit.bsplines = fit.bsplines, df.spline = df.spline,
