@@ -75,10 +75,11 @@ for (t in unique(tab$type)){
     tab_t_n = tab[type == t & n == n, ]
     result = list(slim = table(tab_t_n$split_slim),
                   mob = table(tab_t_n$split_mob),
-                  ctree = table(tab_t_n$split_ctree))
+                  ctree = table(tab_t_n$split_ctree),
+                  guide = table(tab_t_n$split_guide))
     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n, ".rds"))
     
-    p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree)]),
+    p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree, split_guide)]),
                aes(x = values, color=ind, fill = ind)) +
       stat_count(position = "dodge") +
       ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n)) +
