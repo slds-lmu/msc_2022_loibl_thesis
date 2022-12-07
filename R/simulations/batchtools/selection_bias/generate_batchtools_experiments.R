@@ -5,7 +5,8 @@ source("R/load_packages.R")
 if (!dir.exists("Data/simulations/batchtools")) dir.create("Data/simulations/batchtools", recursive = TRUE)
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias",
-                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
+                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
+                                        "R/mob_fitting_functions.R"),
                              seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
@@ -32,7 +33,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = NULL, 
-  repls = 1000L)
+  repls = 20L)
 
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
@@ -47,7 +48,7 @@ testJob(id = id1)
 
 
 # submit jobs
-submitJobs()
+submitJobs(reg = reg)
 
 
 # reduce jobs/ summarise results
