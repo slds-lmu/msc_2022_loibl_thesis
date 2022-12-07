@@ -89,7 +89,7 @@ extract_models = function(tree){
 # performs one split
 
 split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
-                             objective, fit, predict_response,  approximate, n.quantiles, penalization, 
+                             objective, fit, approximate, n.quantiles, penalization, 
                              fit.bsplines, df.spline, split.method, ...) {
 
   if(split.method == "slim"){
@@ -111,7 +111,6 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = find_split_variable_guide(Y = Y, X = X,
                                   objective = objective, 
                                   fit = fit,
-                                  predict_response = predict_response,
                                   split.method = split.method,
                                   penalization = penalization, 
                                   fit.bsplines = fit.bsplines,
@@ -131,10 +130,10 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   
 }
 
-find_split_variable_guide = function(Y, X, objective, fit, predict_response, split.method, penalization, 
+find_split_variable_guide = function(Y, X, objective, fit, split.method, penalization, 
                                      fit.bsplines, df.spline, ...){
   model = fit(y = Y, x = X)
-  residuals = Y - predict_response(model, X)
+  residuals = Y - predict(model, X)
   z = guide_test(x = X, residuals = residuals, xgroups = NULL)$z
 }
 
@@ -187,6 +186,7 @@ find_split_variable_anova = function(Y, X, objective, fit, split.method, penaliz
 find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer,
                             objective, approximate, n.quantiles, penalization, 
                             fit.bsplines, df.spline, ...) {
+  # browser()
 # find best split point per splitting feature z
   opt.feature = lapply(z, function(feat) {
     t1 = proc.time()

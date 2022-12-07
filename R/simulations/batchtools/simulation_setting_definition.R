@@ -1,4 +1,4 @@
-create_sim_data = function(job, n, type, ...){
+create_sim_data = function(job, n = 1000, type, ...){
   
   if (type == "basic_linear_smooth"){
     

@@ -5,8 +5,8 @@ source("R/load_packages.R")
 if (!dir.exists("Data/simulations/batchtools")) dir.create("Data/simulations/batchtools", recursive = TRUE)
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias",
-                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
-                             seed = 1)
+                                 source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
+                             seed = 1, conf.file = NA)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
@@ -15,9 +15,9 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
 pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence", "selection_bias_independence_small",
-                                          "selection_bias_full_interaction", "selection_bias_interaction_binary",
-                                          "selection_bias_interaction_categorical", 
-                                          "selection_bias_interaction_binary_categorical"), each = 1))
+                                                   "selection_bias_full_interaction", "selection_bias_interaction_binary",
+                                                   "selection_bias_interaction_categorical", 
+                                                   "selection_bias_interaction_binary_categorical"), each = 1))
 pdes = list("selection_bias" = pdes)
 
 
@@ -32,7 +32,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = NULL, 
-  repls = 1000L)
+  repls = 20L)
 
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
@@ -42,7 +42,7 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 id1 = head(findExperiments(algo.name = "selection_bias"), 1)
 print(id1)
 
-testJob(id = id1)
+testJob(id = 41)
 
 
 
@@ -75,11 +75,12 @@ for (t in unique(tab$type)){
     tab_t_n = tab[type == t & n == n, ]
     result = list(slim = table(tab_t_n$split_slim),
                   mob = table(tab_t_n$split_mob),
-                  ctree = table(tab_t_n$split_ctree))
+                  ctree = table(tab_t_n$split_ctree),
+                  guide = table(tab_t_n$split_guide))
     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n, ".rds"))
     
-    p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree)]),
-               aes(x = values, color=ind, fill = ind)) +
+    p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree, split_guide)]),
+           aes(x = values, color=ind, fill = ind)) +
       stat_count(position = "dodge") +
       ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n)) +
       labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
