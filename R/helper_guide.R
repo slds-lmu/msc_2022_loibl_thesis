@@ -8,7 +8,7 @@ guide_test <- function(y, x, residuals, xgroups = NULL, optimizer, objective) {
   # categorize residuals
   # split Y into 2 parts based on whether residuals are positive or non-positive
   # separately for each parameter
-  browser()
+  # browser()
   ybin <- (-1)^((residuals>0)+1)   # -1 or +1
   # browser()
   curv_test = sapply(x, function(xval){
