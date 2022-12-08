@@ -4,11 +4,11 @@
 
 
 
-guide_test <- function(x, residuals, xgroups = NULL) {
+guide_test <- function(y, x, residuals, xgroups = NULL, optimizer, objective) {
   # categorize residuals
   # split Y into 2 parts based on whether residuals are positive or non-positive
   # separately for each parameter
-  # browser()
+  browser()
   ybin <- (-1)^((residuals>0)+1)   # -1 or +1
   # browser()
   curv_test = sapply(x, function(xval){
@@ -38,8 +38,10 @@ guide_test <- function(x, residuals, xgroups = NULL) {
       } 
       # if both variables are numeric, use both as potential split variables
       else if (is.numeric(x[,z_vec[1]]) & is.numeric(x[,z_vec[2]])){
-        z = z_vec
-      } 
+        z_split = find_split_point(Y = y, X = x, z = z_vec, n.splits = 1, min.node.size = 10, optimizer = optimizer,
+                                   objective = objective, n.quantiles = 2)
+        z = z_split$feature[1]
+      }
       # if one is numeric and one is categorical, use the categorical for splitting
       else {
         z = z_vec[sapply(x[,z_vec], is.factor)]
@@ -57,14 +59,16 @@ guide_test <- function(x, residuals, xgroups = NULL) {
           z = z_candidates[is.factor(x[,z_candidates])]
         } else {
           # if all are numerical, use all as possible splitting variables
-          z = z_candidates
+          z_split = find_split_point(Y = y, X = x, z = z_candidates, n.splits = 1, min.node.size = 10, optimizer = optimizer,
+                                     objective = objective, n.quantiles = 2)
+          z = z_split$feature[1]
         }
       }
     }
     
     type = "interaction"
   }
-  
+  print(type)
   return(list(z = z, type = type))
   
 }

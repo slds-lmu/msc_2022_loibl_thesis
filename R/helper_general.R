@@ -111,10 +111,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = find_split_variable_guide(Y = Y, X = X,
                                   objective = objective, 
                                   fit = fit,
-                                  split.method = split.method,
-                                  penalization = penalization, 
-                                  fit.bsplines = fit.bsplines,
-                                  df.spline = df.spline)
+                                  optimizer = optimizer)
   }
   
   split_point = find_split_point(Y = Y, X = X, z = z, n.splits = n.splits,
@@ -130,11 +127,10 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   
 }
 
-find_split_variable_guide = function(Y, X, objective, fit, split.method, penalization, 
-                                     fit.bsplines, df.spline, ...){
+find_split_variable_guide = function(Y, X, objective, fit, optimizer, ...){
   model = fit(y = Y, x = X)
   residuals = Y - predict(model, X)
-  z = guide_test(x = X, residuals = residuals, xgroups = NULL)$z
+  z = guide_test(y = Y, x = X, residuals = residuals, xgroups = NULL, optimizer = optimizer, objective = objective)$z
 }
 
 
@@ -184,8 +180,8 @@ find_split_variable_anova = function(Y, X, objective, fit, split.method, penaliz
 
 
 find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer,
-                            objective, approximate, n.quantiles, penalization, 
-                            fit.bsplines, df.spline, ...) {
+                            objective, approximate = FALSE, n.quantiles, penalization = NULL, 
+                            fit.bsplines = FALSE, df.spline = NULL, ...) {
   # browser()
 # find best split point per splitting feature z
   opt.feature = lapply(z, function(feat) {
