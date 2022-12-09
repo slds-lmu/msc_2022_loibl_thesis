@@ -30,7 +30,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = list(selection_bias = data.frame(tree_methods = "guide")), 
-  repls = 2000L)
+  repls = 1500L)
 
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
@@ -57,19 +57,32 @@ pars = unwrap(getJobPars(reg = reg))
 tab = ijoin(pars, results)
 head(tab)
 
-# ggplot(stack(tab[type == "selection_bias_independence_small" & n == 1000 & test_guide == "curvature",.(split_guide)]),
+# ggplot(stack(tab[type == "selection_bias_independence_small" & n == 2000 & test_guide == "curvature",.(split_guide)]),
 #            aes(x = values, color=ind, fill = ind)) +
 #   stat_count(position = "dodge") +
-#   ggtitle("Frequency of selection", subtitle = "independence small - curvature") +
-#   labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
+#   ggtitle("Frequency of selection", subtitle = "independence small - curvature 2000") +
+#   labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
 # 
-# ggplot(stack(tab[type == "selection_bias_independence_small" & n == 1000 & test_guide == "interaction",.(split_guide)]),
+# ggplot(stack(tab[type == "selection_bias_independence_small" & n == 2000 & test_guide == "interaction",.(split_guide)]),
 #        aes(x = values, color=ind, fill = ind)) +
 #   stat_count(position = "dodge") +
 #   ggtitle("Frequency of selection", subtitle = "independence small - interaction") +
-#   labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
+#   labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
 # 
+# ggplot(stack(tab[type == "selection_bias_full_interaction" & n == 1000 & test_guide == "curvature",.(split_guide)]),
+#        aes(x = values, color=ind, fill = ind)) +
+#   stat_count(position = "dodge") +
+#   ggtitle("Frequency of selection", subtitle = "interaction - curvature 2000") +
+#   labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
 # 
+# ggplot(stack(tab[type == "selection_bias_full_interaction" & n == 1000 & test_guide == "interaction",.(split_guide)]),
+#        aes(x = values, color=ind, fill = ind)) +
+#   stat_count(position = "dodge") +
+#   ggtitle("Frequency of selection", subtitle = "interaction - interaction") +
+#   labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+# 
+
+
 
 
 
