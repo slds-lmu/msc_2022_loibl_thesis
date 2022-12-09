@@ -29,7 +29,7 @@ addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 addExperiments(
   reg = reg, 
   prob.designs = pdes,
-  algo.designs = NULL, 
+  algo.designs = list(selection_bias = data.frame(tree_methods = "guide")), 
   repls = 2000L)
 
 summarizeExperiments()
@@ -40,7 +40,7 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 id1 = head(findExperiments(algo.name = "selection_bias"), 1)
 print(id1)
 
-testJob(id = 41)
+testJob(id = 20)
 
 
 
@@ -84,10 +84,7 @@ if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 for (t in unique(tab$type)){
   for (n in unique(tab[type == t , n])){
     tab_t_n = tab[type == t & n == n, ]
-    result = list(slim = table(tab_t_n$split_slim),
-                  mob = table(tab_t_n$split_mob),
-                  ctree = table(tab_t_n$split_ctree),
-                  guide = table(tab_t_n$split_guide),
+    result = list(guide = table(tab_t_n$split_guide),
                   guide_test = table(tab_t_n$test_guide))
     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n, ".rds"))
     
