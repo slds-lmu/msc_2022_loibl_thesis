@@ -57,6 +57,9 @@ Node <- R6Class("Node", list(
   split.value = NULL,
   split.type = NULL,
   
+  # type of test (GUIDE)
+  test.type = NULL,
+  
   # Append the children of this node
   children = list(),
   
@@ -135,6 +138,10 @@ Node <- R6Class("Node", list(
             self$intImp = intImp
             self$objective.value.parent = objective(y = Y[self$subset.idx, ,drop = FALSE], x = X[self$subset.idx, ])
             self$objective.value = split$objective.value[1]
+            if(split.method == "guide"){
+              self$test.type = split$test.type
+            }
+              
             
           }
         } else {
@@ -153,6 +160,10 @@ Node <- R6Class("Node", list(
             self$intImp = intImp
             self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
             self$objective.value = split$objective.value[1]
+            
+            if(split.method == "guide"){
+              self$test.type = split$test.type
+            }
             
           }
         }

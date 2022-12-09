@@ -34,7 +34,8 @@ extract_split_criteria = function(tree){
                         "split.feature" = "final", 
                         "split.value" = NA,
                         "child.type" = "final",
-                        "size" = NA)
+                        "size" = NA,
+                        "guide.test" = NA)
       } else{
         df = data.frame("depth" = node$depth, "id" = node$id,
                         "id.parent" = ifelse(is.null(node$id.parent), 0, node$id.parent),
@@ -44,7 +45,8 @@ extract_split_criteria = function(tree){
                         "split.feature" = ifelse(is.null(node$split.feature), "leafnode", node$split.feature),
                         "split.value" = ifelse(is.null(node$split.value), NA, node$split.value),
                         "child.type" = ifelse(is.null(node$child.type), "rootnode", node$child.type),
-                        "size" = length(node$subset.idx))
+                        "size" = length(node$subset.idx), 
+                        "guide.test" = ifelse(is.null(node$test.type), NA, node$test.type))
       }
       df
     })
@@ -108,10 +110,12 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   } else if(split.method == "guide"){
     # browser()
     X = X %>% select(where(~ n_distinct(.) > 1))
-    z = find_split_variable_guide(Y = Y, X = X,
-                                  objective = objective, 
-                                  fit = fit,
-                                  optimizer = optimizer)
+    z_guide = find_split_variable_guide(Y = Y, X = X,
+                                        objective = objective, 
+                                        fit = fit,
+                                        optimizer = optimizer)
+    z = z_guide$z
+    guide_type = z_guide$type
   }
   
   split_point = find_split_point(Y = Y, X = X, z = z, n.splits = n.splits,
@@ -123,6 +127,11 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                                  penalization = penalization, 
                                  fit.bsplines = fit.bsplines,
                                  df.spline = df.spline)
+  if(split.method == "guide"){
+    split_point$test.type = guide_type
+  }
+  
+  return(split_point)
   
   
 }
@@ -130,7 +139,8 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
 find_split_variable_guide = function(Y, X, objective, fit, optimizer, ...){
   model = fit(y = Y, x = X)
   residuals = Y - predict(model, X)
-  z = guide_test(y = Y, x = X, residuals = residuals, xgroups = NULL, optimizer = optimizer, objective = objective)$z
+  z_guide = guide_test(y = Y, x = X, residuals = residuals, xgroups = NULL, optimizer = optimizer, objective = objective)
+  return(z_guide)
 }
 
 

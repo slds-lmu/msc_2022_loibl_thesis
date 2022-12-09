@@ -1,17 +1,20 @@
 source("R/mob_fitting_functions.R")
 
 get_sim_results_selection_bias = function(data, job, instance,  ...){
-  data = instance$data
+  if(is.null(data)){
+    data = instance$data
+  } else {
+    data = as.data.frame(data)
+  }
   x = data[,colnames(data) != "y"]
   y = data$y
   
   slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = 50)
-  extract_split_criteria(slim)
   split_slim = slim[[1]][[1]][["split.feature"]]
   
   guide = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = 50, split.method = "guide")
-  extract_split_criteria(guide)
   split_guide = guide[[1]][[1]][["split.feature"]]
+  test_guide = guide[[1]][[1]][["test.type"]]
   
   fm_mob = formula(paste("y ~", paste(colnames(x), collapse = "+"), "|", paste(colnames(x), collapse = "+")))
   
@@ -27,7 +30,7 @@ get_sim_results_selection_bias = function(data, job, instance,  ...){
   split_ctree = str_extract(ctreerule,"^.*(?=( <=| %in))")
   
   
-  return(list("split_slim" = split_slim, "split_mob" = split_mob, "split_ctree" = split_ctree, "split_guide" = split_guide))
+  return(list("split_slim" = split_slim, "split_mob" = split_mob, "split_ctree" = split_ctree, "split_guide" = split_guide, "test_guide" = test_guide))
 }
 
   
