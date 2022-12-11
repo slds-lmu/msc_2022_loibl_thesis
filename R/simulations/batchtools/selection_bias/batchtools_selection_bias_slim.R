@@ -22,7 +22,7 @@ pdes = list("selection_bias" = pdes)
 # add algorithm
 source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
 formals(get_sim_results_selection_bias)$tree_methods = "slim"
-formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 10, 1)
+formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 10, 4, 2)
 
 addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 
@@ -80,7 +80,9 @@ for (t in unique(tab$type)){
     tab_t_n = tab[type == t & n == n, ]
     result = list(slim_exact = table(tab_t_n$split_slim_exact),
                   slim_100 = table(tab_t_n$split_slim_100),
-                  slim_10 = table(tab_t_n$split_slim_100))
+                  slim_10 = table(tab_t_n$split_slim_100),
+                  slim_4 = table(tab_t_n$split_slim_4),
+                  slim_2 = table(tab_t_n$split_slim_2))
     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n, ".rds"))
     
   }
