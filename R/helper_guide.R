@@ -38,6 +38,7 @@ guide_test <- function(y, x, residuals, xgroups = NULL, optimizer, objective) {
       } 
       # if both variables are numeric, use both as potential split variables
       else if (is.numeric(x[,z_vec[1]]) & is.numeric(x[,z_vec[2]])){
+        browser()
         z_split = find_split_point(Y = y, X = x, z = z_vec, n.splits = 1, min.node.size = 10, optimizer = optimizer,
                                    objective = objective, n.quantiles = 2)
         z = z_split$feature[1]

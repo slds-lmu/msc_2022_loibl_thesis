@@ -203,6 +203,7 @@ find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer
     res$runtime = (t2 - t1)[[3]]
     return(res)
   })
+  # browser()
   names(opt.feature) = z
   result = data.table::rbindlist(lapply(opt.feature, as.data.frame), idcol = "feature")
   result$best.split = result$objective.value == min(result$objective.value)
@@ -240,6 +241,7 @@ generate_node_index = function(Y, X, result) {
 
 # performs and evaluates binary splits
 find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, n.quantiles, ...) {
+  # browser()
   if(length(unique(xval)) == 1){
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
   }

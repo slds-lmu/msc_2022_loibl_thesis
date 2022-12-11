@@ -1,6 +1,6 @@
 source("R/mob_fitting_functions.R")
 
-get_sim_results_selection_bias = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"),  ...){
+get_sim_results_selection_bias = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"), n.quantiles = NULL,  ...){
   if(is.null(data)){
     data = instance$data
   } else {
@@ -12,9 +12,18 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
   result = list()
   
   if ("slim" %in% tree_methods){
-    slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = 50)
-    split_slim = slim[[1]][[1]][["split.feature"]]
-    result$split_slim = split_slim
+    if(!is.null(n.quantiles)){
+      for(quantiles in n.quantiles){
+        if(is.na(quantiles) | quantiles == 0L){
+          quantiles = NULL
+        }
+        slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = quantiles, min.split = 50)
+        split_slim = slim[[1]][[1]][["split.feature"]]
+        result$split_slim = split_slim
+        names(result)[names(result) == "split_slim"] = paste0("split_slim_",ifelse(is.null(quantiles),"exact",quantiles))
+      }
+    }
+    
   }
   
   if("guide" %in% tree_methods){
