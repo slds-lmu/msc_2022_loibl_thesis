@@ -9,8 +9,9 @@ library(REdaS)
 freqCI(independence_small$slim, level = c(.95))
 freqCI(independence_small$guide, level = c(.95))
 
-# guide selection bias
 
+########
+# guide selection bias
 
 list.files("Data/simulations/batchtools/selection_bias_guide/results/", full.names = TRUE)
 split_data = readRDS("Data/simulations/batchtools/selection_bias_guide/results/selection_bias_guide.rds")
@@ -34,4 +35,11 @@ for(t in c("selection_bias_independence_small", "selection_bias_full_interaction
     }
   }
 }
-nrow(split_data[n == n_data,])
+
+
+
+#####################
+# slim selection bias different values of n.quantiles
+list.files("Data/simulations/batchtools/selection_bias_slim/results/", full.names = TRUE)
+split_data_full_interaction = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction_n1000.rds")
+split_data_independence_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small_n1000.rds")

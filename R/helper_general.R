@@ -246,6 +246,7 @@ find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, 
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
   }
   assert_choice(n.splits, choices = 1)
+  # browser()
   
   # use different split candidates to perform split
   if (is.null(n.quantiles) & !is.factor(xval)){
@@ -281,6 +282,7 @@ find_best_binary_split_approx = function(xval, x, y, n.splits = 1, min.node.size
   
   # use different split candidates to perform split
   q = generate_split_candidates(xval, n.quantiles = n.quantiles, min.node.size = min.node.size)
+  
   # assign intervalnr. according to split points
   if (is.numeric(xval)){
     node.number = findInterval(x = xval, vec = q, rightmost.closed = TRUE) + 1
@@ -320,10 +322,10 @@ generate_split_candidates = function(xval, n.quantiles = NULL, min.node.size = 1
   } else {
     xval = sort.int(xval)
     # try to ensure min.node.size between points (is not guaranteed)
-    chunk.ind = seq.int(min.node.size + 1, length(xval) - min.node.size, by = min.node.size)
-    #xadj = unique(quantile(xval, prob = chunk.ind/length(xval), type = 1))
-    xadj = xval[chunk.ind]
-    
+    # chunk.ind = seq.int(min.node.size + 1, length(xval) - min.node.size, by = min.node.size)
+    # #xadj = unique(quantile(xval, prob = chunk.ind/length(xval), type = 1))
+    # xadj = xval[chunk.ind]
+    xadj = xval[-c(1:min.node.size, (length(xval)-min.node.size):length(xval))]
     if (!is.null(n.quantiles)) {
       if (n.quantiles < 2){
         print(paste0("Minimum value for n.quantiles is 2"))
@@ -604,7 +606,9 @@ get_closest_point = function(split.points, xval, min.node.size = 10) {
   xval = sort.int(xval)
   # try to ensure min.node.size between points (is not guaranteed if many duplicated values exist)
   chunk.ind = seq.int(min.node.size + 1, length(xval) - min.node.size, by = min.node.size)
-  xadj = unique(xval[chunk.ind]) # unique(quantile(xval, prob = chunk.ind/length(xval), type = 1))
+  # xadj = unique(xval[chunk.ind]) # unique(quantile(xval, prob = chunk.ind/length(xval), type = 1))
+  xadj = unique(xval[-c(1:min.node.size, (length(xval)-min.node.size):length(xval))])
+  
   # xval = xval[-c(1, length(xval))]
   split.adj = numeric(length(split.points))
   for (i in seq_along(split.adj)) {
