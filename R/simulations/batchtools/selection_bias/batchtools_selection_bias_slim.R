@@ -76,14 +76,14 @@ if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 saveRDS(tab, paste0(savedir,"selection_bias_slim.rds"))
 
 for (t in unique(tab$type)){
-  for (n in unique(tab[type == t , n])){
-    tab_t_n = tab[type == t & n == n, ]
+  for (n_data in unique(tab[type == t , n])){
+    tab_t_n = tab[type == t & n == n_data, ]
     result = list(slim_exact = table(tab_t_n$split_slim_exact),
                   slim_100 = table(tab_t_n$split_slim_100),
                   slim_10 = table(tab_t_n$split_slim_100),
                   slim_4 = table(tab_t_n$split_slim_4),
                   slim_2 = table(tab_t_n$split_slim_2))
-    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n, ".rds"))
+    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
     
   }
 }
