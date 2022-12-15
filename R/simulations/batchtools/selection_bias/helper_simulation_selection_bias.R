@@ -22,6 +22,10 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
         result$split_slim = split_slim
         names(result)[names(result) == "split_slim"] = paste0("split_slim_",ifelse(is.null(quantiles),"exact",quantiles))
       }
+    } else{
+      slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = 50)
+      split_slim = slim[[1]][[1]][["split.feature"]]
+      result$split_slim = split_slim
     }
     
   }
