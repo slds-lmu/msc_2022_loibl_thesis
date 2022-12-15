@@ -19,8 +19,8 @@ split_data = readRDS("Data/simulations/batchtools/selection_bias_guide/results/s
 nrow(split_data)
 nrow(split_data[n == 1000 & type == "selection_bias_full_interaction"])
 nrow(split_data[n == 2000 & type == "selection_bias_full_interaction"])
-table(split_data[n == 2000 & type == "selection_bias_full_interaction", .(split_guide)])
-sum(table(split_data[n == 2000 & type == "selection_bias_full_interaction", .(split_guide)]))
+table(split_data[n == 1000 & type == "selection_bias_full_interaction", .(split_guide)])
+sum(table(split_data[n == 1000 & type == "selection_bias_full_interaction", .(split_guide)]))
 
 figuredir = "Figures/simulations/batchtools/selection_bias_guide/"
 savedir ="Data/simulations/batchtools/selection_bias_guide/results/"
@@ -30,7 +30,7 @@ if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 
 
 for(t in c("selection_bias_independence_small", "selection_bias_full_interaction")){
-  for(n_data in c(1000, 2000)){
+  for(n_data in c(1000)){
     tab_t_n = split_data[type == t & n == n_data ,.(split_guide, test_guide)]
 
     saveRDS(tab_t_n, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
