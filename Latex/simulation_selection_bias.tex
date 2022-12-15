@@ -62,6 +62,24 @@ An algorithm for recursive partitionig is called unbiased when, under the condit
 \end{frame}
 
 
+\begin{frame}{GUIDE}
+Algorithm \citep{.2002}
+\begin{enumerate}
+    \item Fit regression model and determine signs of the residuals
+    \item For each numerical variable divide data in 4 quartiles and construct a 2 × 4 contingency table with the signs of the residuals. For categorical variables the categories of the variable form the columns of the table. Calculate the p-value of the  $\chi^2$ independence test. (curvature test)
+    \item For each pair of numerical variables divide the space of the two variables in four quadrants (use categories instead for categorical variables). Calculate the p-value of the  $\chi^2$ independence test. (interaction test)
+    \item If the smallest p-value is from a curvature test, use the associated variable for splitting.
+    \item If the smallest p-value is from an interaction test 
+    \begin{enumerate}
+        \item if both variables are numeric, perform splits at the mean value of both variables and use the variable, that yields to a smaller SSE
+        \item if only one variable is categorical, use it as splitting variable
+        \item if both are categorical, choose the one with the smaller curvature p-value.
+    \end{enumerate}
+\end{enumerate}
+    
+\end{frame}
+
+
 \begin{frame}{Scenario Independence}
 $X_{1}, X_{2} \sim U(0,1)$; 
 $X_{3} \sim U(0,1)$ and rounded to one digit;
@@ -94,6 +112,59 @@ $Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X
 \end{figure}
 \end{frame}
 
+\begin{frame}{SLIM value of n.quantiles}
+
+\begin{table}
+
+\caption{frequency of selecting variable $x_i$ as splitting variable independence scenario}
+\centering
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+n.quantiles  & exact & 100 & 10 & 4 & 2\\
+\hline
+$x_1$ & 340 & 292 & 246 & 237 & 245\\
+\hline
+$x_2$ & 363 & 331 & 284 & 261 & 255\\
+\hline
+$x_3$ & 70 & 83 & 202 & 234 & 256\\
+\hline
+$x_4$ & 227 & 294 & 268 & 268 & 244\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}
+\caption{frequency of selecting variable $x_i$ as splitting variable interaction scenario}
+\centering
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+n.quantiles  & exact & 100 & 10 & 4 & 2\\
+\hline
+$x_1$ & 286 & 275 & 235 & 259 & 290\\
+\hline
+$x_2$ & 274 & 253 & 248 & 274 & 297\\
+\hline
+$x_3$ & 182 & 200 & 283 & 190 & 115\\
+\hline
+$x_4$ & 258 & 272 & 234 & 277 & 298\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\end{frame}
+    
+
+
+\begin{frame}{Bibliography}
+    \bibliography{bibliography}
+    \bibliographystyle{dcu}
+
+\end{frame}
+\end{document}
 
 
 \end{document}
+
+
