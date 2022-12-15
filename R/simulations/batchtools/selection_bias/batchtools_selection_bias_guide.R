@@ -14,7 +14,7 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
-pdes = expand.grid(n = c(1000,2000), type = rep(c("selection_bias_independence_small",
+pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence_small",
                                                    "selection_bias_full_interaction"), each = 1))
 pdes = list("selection_bias" = pdes)
 
