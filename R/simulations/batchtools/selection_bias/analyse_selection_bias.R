@@ -59,3 +59,34 @@ slim_full_interaction = readRDS("Data/simulations/batchtools/selection_bias_slim
 sapply(slim_full_interaction, sum)
 slim_independence_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small_n1000.rds")
 sapply(slim_independence_small, sum)
+
+
+library(kableExtra)
+library(tidyr)
+library(REdaS)
+
+
+df_slim_full_interaction = lapply(slim_full_interaction, function(el){
+  as.vector(el)
+}) %>% as.data.frame()
+
+df_slim_independence_small = lapply(slim_independence_small, function(el){
+  as.vector(el)
+}) %>% as.data.frame()
+
+
+df_slim_full_interaction %>%
+  kbl(caption="frequency of selecting covariate Xi as splitting variable",
+      format="latex",
+      row.names = TRUE,
+      align="r") %>%
+  kable_minimal(full_width = F)
+
+df_slim_independence_small %>%
+  kbl(caption="frequency of selecting covariate Xi as splitting variable",
+      format="latex",
+      row.names = TRUE,
+      align="r") %>%
+  kable_minimal(full_width = F)
+
+

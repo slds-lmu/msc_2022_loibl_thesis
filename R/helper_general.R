@@ -190,14 +190,14 @@ find_split_variable_anova = function(Y, X, objective, fit, split.method, penaliz
 
 
 find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer,
-                            objective, approximate = FALSE, n.quantiles, penalization = NULL, 
+                            objective, approximate = FALSE, n.quantiles, splitpoints = "quantiles", penalization = NULL, 
                             fit.bsplines = FALSE, df.spline = NULL, ...) {
   # browser()
 # find best split point per splitting feature z
   opt.feature = lapply(z, function(feat) {
     t1 = proc.time()
     res = optimizer(xval = X[,feat], x = X, y = Y, n.splits = n.splits, min.node.size = min.node.size,
-                    objective = objective, n.quantiles = n.quantiles, penalization = penalization, 
+                    objective = objective, n.quantiles = n.quantiles, splitpoints = splitpoints, penalization = penalization, 
                     fit.bsplines = fit.bsplines, df.spline = df.spline, ...)
     t2 = proc.time()
     res$runtime = (t2 - t1)[[3]]
@@ -240,7 +240,7 @@ generate_node_index = function(Y, X, result) {
 
 
 # performs and evaluates binary splits
-find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, n.quantiles, ...) {
+find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, n.quantiles, splitpoints = "quantiles", ...) {
   # browser()
   if(length(unique(xval)) == 1){
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
@@ -248,12 +248,17 @@ find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, 
   assert_choice(n.splits, choices = 1)
   # browser()
   
-  # use different split candidates to perform split
-  if (is.null(n.quantiles) & !is.factor(xval)){
-    q = unique(xval)
-  } else{
-    q = generate_split_candidates(xval, n.quantiles = n.quantiles, min.node.size = min.node.size)
+  if(splitpoints == "quantiles"){
+    # use different split candidates to perform split
+    if (is.null(n.quantiles) & !is.factor(xval)){
+      q = unique(xval)
+    } else{
+      q = generate_split_candidates(xval, n.quantiles = n.quantiles, min.node.size = min.node.size)
+    }
+  } else if(splitpoints == "mean"){
+    q = mean(xval)
   }
+
   splits = vapply(q, FUN = function(i) {
     perform_split(i, xval = xval, x = x, y = y, min.node.size = min.node.size,
                   objective = objective, ...)
