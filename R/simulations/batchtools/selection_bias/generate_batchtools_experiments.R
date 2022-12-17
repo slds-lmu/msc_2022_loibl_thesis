@@ -15,8 +15,9 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
-pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence", "selection_bias_independence_small",
-                                          "selection_bias_full_interaction"
+pdes = expand.grid(n = c(1000,2000), type = rep(c("selection_bias_independence", "selection_bias_independence_small",
+                                          "selection_bias_full_interaction",
+                                          "selection_bias_interaction"
                                           # , "selection_bias_interaction_binary",
                                           # "selection_bias_interaction_categorical", 
                                           # "selection_bias_interaction_binary_categorical"
@@ -67,7 +68,7 @@ library(ggplot2)
 library(ggpubr)
 library(stringr)
 
-savedir = "Data/simulations/batchtools/selection_bias_general/results"
+savedir = "Data/simulations/batchtools/selection_bias_general/results/"
 figuredir = "Figures/simulations/batchtools/selection_bias_general/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)

@@ -1,9 +1,16 @@
 # load results
 
-list.files("Data/simulations/batchtools/selection_bias_results/", full.names = TRUE)
+list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
 
-independence_small = readRDS("Data/simulations/batchtools/selection_bias_results/independence_small_n1000.rds")
-full_interaction = readRDS("Data/simulations/batchtools/selection_bias_results/full_interaction_n1000.rds") 
+independence_small = readRDS("Data/simulations/batchtools/selection_bias_general/results/independence_small_n1000.rds")
+lapply(independence_small, function(table){
+  chisq.test(table, p = rep(0.25,4))
+})
+
+full_interaction = readRDS("Data/simulations/batchtools/selection_bias_general/results/full_interaction_n1000.rds") 
+lapply(full_interaction, function(table){
+  chisq.test(table, p = rep(0.25,4))
+})
 
 library(REdaS)
 
@@ -20,7 +27,9 @@ nrow(split_data)
 nrow(split_data[n == 1000 & type == "selection_bias_full_interaction"])
 nrow(split_data[n == 2000 & type == "selection_bias_full_interaction"])
 table(split_data[n == 1000 & type == "selection_bias_full_interaction", .(split_guide)])
+
 sum(table(split_data[n == 1000 & type == "selection_bias_full_interaction", .(split_guide)]))
+
 
 figuredir = "Figures/simulations/batchtools/selection_bias_guide/"
 savedir ="Data/simulations/batchtools/selection_bias_guide/results/"
