@@ -61,7 +61,7 @@ guide_test <- function(y, x, residuals, xgroups = NULL, optimizer, objective) {
         } else {
           # if all are numerical, use all as possible splitting variables
           z_split = find_split_point(Y = y, X = x, z = z_candidates, n.splits = 1, min.node.size = 10, optimizer = optimizer,
-                                     objective = objective, n.quantiles = 2)
+                                     objective = objective, splitpoints = "mean")
           z = z_split$feature[1]
         }
       }
