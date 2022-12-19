@@ -31,7 +31,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = list(selection_bias = data.frame(tree_methods = "guide", exclude.categoricals = c(TRUE, FALSE))), 
-  repls = 200L)
+  repls = 1000L)
 
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type", "exclude.categoricals"))

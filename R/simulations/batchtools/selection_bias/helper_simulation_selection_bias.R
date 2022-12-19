@@ -1,7 +1,7 @@
 source("R/mob_fitting_functions.R")
 
 get_sim_results_selection_bias = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"), n.quantiles = NULL,
-                                          exclude.categoricals = FALSE,...){
+                                          exclude.categoricals = FALSE, get.objective = FALSE,...){
   if(is.null(data)){
     data = instance$data
   } else {
@@ -22,11 +22,20 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
         split_slim = slim[[1]][[1]][["split.feature"]]
         result$split_slim = split_slim
         names(result)[names(result) == "split_slim"] = paste0("split_slim_",ifelse(is.null(quantiles),"exact",quantiles))
+        if(get.objective){
+          sse_slim = slim[[1]][[1]][["objective.value"]]
+          result$sse_slim = sse_slim
+          names(result)[names(result) == "sse_slim"] = paste0("sse_slim_",ifelse(is.null(quantiles),"exact",quantiles))
+        }
       }
     } else{
       slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = 50)
       split_slim = slim[[1]][[1]][["split.feature"]]
       result$split_slim = split_slim
+      if(get.objective){
+        sse_slim = slim[[1]][[1]][["objective.value"]]
+        result$sse_slim = sse_slim
+      }
     }
     
   }

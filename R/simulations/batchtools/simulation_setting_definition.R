@@ -272,7 +272,6 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     
   } else if (type == "selection_bias_interaction_binary"){
-    
     x1 = runif(n, 0, 1)
     x2 = as.factor(rbinom(n, 1, 0.5))
     formula = x1 + as.numeric(x2) + ifelse(x2 == 1, x1, 0)
@@ -284,8 +283,17 @@ create_sim_data = function(job, n = 1000, type, ...){
     search_space = NULL
     
     
-  } else if (type == "selection_bias_interaction_categorical"){
+  }else if (type == "selection_bias_independence_binary"){
+    x1 = runif(n, 0, 1)
+    x2 = as.factor(rbinom(n, 1, 0.5))
+    formula = x1 + as.numeric(x2) + ifelse(x2 == 1, x1, 0)
+    y =  rnorm(n, 0, 1)
+    data = data.frame(x1, x2, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
     
+  } else if (type == "selection_bias_interaction_categorical"){
     x1 = runif(n, 0, 1)
     x2 = as.factor(sample(1:4, n, replace = TRUE))
     formula = x1 + ifelse(x2 %in% c(2,3), 1, 0)  + ifelse(x2 == 2, x1 ,0) 
