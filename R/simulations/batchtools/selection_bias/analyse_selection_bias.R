@@ -39,15 +39,14 @@ if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 
 
 for(t in c("selection_bias_independence_small", "selection_bias_full_interaction")){
-  for(n_data in c(1000)){
-    tab_t_n = split_data[type == t & n == n_data ,.(split_guide, test_guide)]
-
-    saveRDS(tab_t_n, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
+  for (exclude in unique(tab[type == t, exclude.categoricals])){
+    tab_small = split_data[type == t & exclude.categoricals == exclude, ]
+    
+    saveRDS(tab_small, file = paste0(savedir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), ".rds"))
     
     for(test in c("curvature", "interaction")){
       
-      
-      p = ggplot(stack(split_data[type == t & n == n_data & test_guide == test,.(split_guide)]),
+      p = ggplot(stack(tab_small[test_guide == test,.(split_guide)]),
                  aes(x = values, color=ind, fill = ind)) +
         stat_count(position = "dodge") +
         ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n_data, test)) +
@@ -57,6 +56,8 @@ for(t in c("selection_bias_independence_small", "selection_bias_full_interaction
       
     }
   }
+
+  
 }
 
 

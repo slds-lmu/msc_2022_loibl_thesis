@@ -228,7 +228,21 @@ create_sim_data = function(job, n = 1000, type, ...){
     lrn = NULL
     search_space = NULL
     
-  }else if (type == "selection_bias_interaction"){
+  } else if (type == "selection_bias_guide"){
+    
+    x1 = runif(n, 1, 3)
+    x2 = rexp(n, 1)
+    x3 = rnorm(n)  
+    x4 = as.factor(sample(1:5, n, replace = TRUE))
+    x5 = as.factor(sample(1:8, n, replace = TRUE))
+    
+    y =  rnorm(n, 0, 1)
+    data = data.frame(x1, x2, x3, x4, x5, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+  } else if (type == "selection_bias_interaction"){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)

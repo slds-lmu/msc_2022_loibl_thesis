@@ -176,7 +176,7 @@ Node <- R6Class("Node", list(
     }
   },
   
-  computeChildren = function(X, Y, objective, fit, predict_response, pruning) {
+  computeChildren = function(X, Y, objective, fit, predict.response, pruning) {
 
     if (self$stop.criterion.met|(self$improvement.met & pruning == "forward")) {
       # no further split is performed
@@ -203,8 +203,8 @@ Node <- R6Class("Node", list(
       
       model.left = fit(y = Y[idx.left, ,drop = FALSE], x = X[idx.left, ])
       model.right = fit(y = Y[idx.right, ,drop = FALSE], x = X[idx.right, ])
-      term.predictions.left = predict_response(model.left, x = X[idx.left, ])
-      term.predictions.right = predict_response(model.right, x = X[idx.right, ])
+      term.predictions.left = predict.response(model.left, x = X[idx.left, ])
+      term.predictions.right = predict.response(model.right, x = X[idx.right, ])
       intersection = intersect(colnames(term.predictions.left), colnames(term.predictions.right))
       
       predictions = rbind(term.predictions.left[,intersection, drop = FALSE], term.predictions.right[, intersection, drop = FALSE])
@@ -252,7 +252,8 @@ compute_tree_slim = function(y,
                              fit.bsplines = FALSE,
                              fit.gam = FALSE,
                              df.spline = 15,
-                             penalization = NULL) {
+                             penalization = NULL,
+                             exclude.categoricals = FALSE) {
   time.start = Sys.time()
   input.data = list(X=as.data.frame(x), Y=as.data.frame(y))
 
@@ -262,13 +263,13 @@ compute_tree_slim = function(y,
     if (fit.gam){
       split.objective = get_objective_gam
       fit.model = get_model_gam
-      predict_response = get_prediction_gam
+      predict.response = get_prediction_gam
       
     } else {
       if (is.null(penalization)){
         split.objective = get_objective_lm
         fit.model = get_model_lm
-        predict_response = get_prediction_lm
+        predict.response = get_prediction_lm
 
       } else if (penalization %in% c("L1", "L2")){
         alpha = ifelse(penalization == "L1", 1, 0)
@@ -276,7 +277,7 @@ compute_tree_slim = function(y,
         formals(split.objective)$.alpha = alpha
         fit.model = get_model_glmnet
         formals(fit.model)$.alpha = alpha
-        predict_response = get_prediction_glmnet
+        predict.response = get_prediction_glmnet
 
       } else {
         stop(paste("penalization", penalization, "is not supported."))
@@ -291,27 +292,32 @@ compute_tree_slim = function(y,
   else {
     stop(paste("objective", objective, "is not supported."))
   } 
-  
+  # browser()
   # set arguments of objective and splitting function
   formals(split.objective) = list(y = data.frame(), x = data.frame(), 
                                   .degree.poly = degree.poly,
                                   .df.spline = df.spline,
                                   .fit.bsplines = fit.bsplines,
                                   .family = family,
-                                  .alpha = alpha)
+                                  .alpha = alpha,
+                                  .exclude.categoricals = exclude.categoricals)
   
   formals(fit.model) = list(y = data.frame(), x = data.frame(), 
                             .degree.poly = degree.poly,
                             .df.spline = df.spline,
                             .fit.bsplines = fit.bsplines,
                             .family = family,
-                            .alpha = alpha)
+                            .alpha = alpha,
+                            .exclude.categoricals = exclude.categoricals)
+  
+  formals(predict.response)$.exclude.categoricals = exclude.categoricals
+  
   
 
 
   # Initialize the parent node of the tree
   model.parent = fit.model(y = input.data$Y, x = input.data$X)
-  term.predictions.parent = predict_response(model.parent, input.data$X)
+  term.predictions.parent = predict.response(model.parent, input.data$X)
   parent = Node$new(id = 0, depth = 1, subset.idx = seq_len(nrow(input.data$X)), improvement.met = FALSE, intImp = 0, model.fit = model.parent, 
                     term.predictions.parent = term.predictions.parent, variable.importance = round(apply(term.predictions.parent, MARGIN = 2, var), 4))
   
@@ -334,7 +340,7 @@ compute_tree_slim = function(y,
                                    penalization = penalization, fit.bsplines = fit.bsplines, df.spline = df.spline,
                                    split.method = split.method)
         node.to.split$computeChildren(input.data$X, input.data$Y, objective = split.objective,
-                                      fit = fit.model, predict_response = predict_response, 
+                                      fit = fit.model, predict.response = predict.response, 
                                       pruning = pruning)
         tree[[depth + 1]] = c(tree[[depth + 1]], node.to.split$children)    
 

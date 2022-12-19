@@ -108,7 +108,6 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = interaction_models$z
 
   } else if(split.method == "guide"){
-    # browser()
     X = X %>% select(where(~ n_distinct(.) > 1))
     z_guide = find_split_variable_guide(Y = Y, X = X,
                                         objective = objective, 
@@ -246,8 +245,7 @@ find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, 
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
   }
   assert_choice(n.splits, choices = 1)
-  # browser()
-  
+
   if(splitpoints == "quantiles"){
     # use different split candidates to perform split
     if (is.null(n.quantiles) & !is.factor(xval)){
@@ -665,8 +663,12 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
 
 # objectives and fitting functions
 
-get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, ...) {
+get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
+                        .exclude.categoricals, ...) {
   x = x %>% select(where(~ n_distinct(.) > 1))
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
   numeric.names = c()
   poly = c()
   splines = c()
@@ -685,21 +687,31 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline, 
   return(model)
 }
 
-get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15, ...) {
+get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15,
+                            .exclude.categoricals, ...) {
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
   model = get_model_lm(y, x, .degree.poly = .degree.poly, 
-                       .fit.bsplines = .fit.bsplines, .df.spline = .df.spline)
+                       .fit.bsplines = .fit.bsplines, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals)
   sse = crossprod(model$residuals)
   return(sse)
 }
 
-get_prediction_lm= function(model, x, ...) {
+get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
   prediction = predict.lm(model, x, type = "terms")
   return(prediction)
 }
 
-get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, ...) {
+get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.categoricals, ...) {
   y = unlist(y)
   x = x %>% select(where(~ n_distinct(.) > 1))
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
   if (.degree.poly > 1) {
     features = names(x)
     for(f in features){
@@ -729,10 +741,14 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, ...) {
   return(model)
 }
 
-get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, ...) {
-  model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha, .degree.poly = .degree.poly)
+get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclude.categoricals, ...) {
+  model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha,
+                           .degree.poly = .degree.poly, .exclude.categoricals, .exclude.categoricals = .exclude.categoricals)
   y = unlist(y)
   x = x %>% select(where(~ n_distinct(.) > 1))
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
   if (.degree.poly > 1) {
     features = names(x)
     for(f in features){
@@ -757,7 +773,10 @@ get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, ...) {
   return(sse)
 }
 
-get_prediction_glmnet = function(model, x, ...) {
+get_prediction_glmnet = function(model, x, .exclude.categoricals, ...) {
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
   factor.names = names(x)[sapply(x,class) == "factor"]
   if (length(factor.names) > 0){
     xfactors = model.matrix(as.formula(paste("y ~", paste(factor.names, collapse = "+"))), data = cbind(y,x))[, -1]
@@ -769,23 +788,29 @@ get_prediction_glmnet = function(model, x, ...) {
   return(prediction)
 }
 
-get_model_lad = function(y, x, ...){
+get_model_lad = function(y, x, .exclude.categoricals, ...){
   x = x %>% select(where(~ n_distinct(.) > 1))
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
   fm = as.formula(paste("y~", paste(names(x), collapse = "+")))
   data = cbind(y,x)
   model = rq(fm, data = data, tau = 0.5)
   return(model)
 }
 
-get_objective_lad = function(y, x,  ...){
-  model = get_model_lad(y, x)
+get_objective_lad = function(y, x, .exclude.categoricals,  ...){
+  if (.exclude.categoricals){
+    x = x %>% select(where(~ !is.factor(.)))
+  }
+  model = get_model_lad(y, x, .exclude.categoricals = .exclude.categoricals)
   sae = sum(abs(model$residuals))
   return(sae)
 }
 
 
 
-get_model_gam = function(y, x, .family, .df.spline, ...) {
+get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, ...) {
   x = x %>% select(where(~ n_distinct(.) > 1))
   term = c()
   for (n in names(x)){
@@ -808,13 +833,13 @@ get_model_gam = function(y, x, .family, .df.spline, ...) {
   return(model)
 }
 
-get_objective_gam = function(y, x, .family, .df.spline,  ...) {
-  model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline)
+get_objective_gam = function(y, x, .family, .df.spline, .exclude.categoricals,  ...) {
+  model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals)
   sse = crossprod(residuals(model))
   return(sse)
 }
 
-get_prediction_gam = function(model, x, ...) {
+get_prediction_gam = function(model, x, .exclude.categoricals, ...) {
   prediction = predict.gam(model, x, type = "terms")
   return(prediction)
 }
