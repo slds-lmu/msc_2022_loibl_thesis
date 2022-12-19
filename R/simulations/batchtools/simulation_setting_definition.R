@@ -234,7 +234,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     x2 = rexp(n, 1)
     x3 = rnorm(n)  
     x4 = as.factor(sample(1:5, n, replace = TRUE))
-    x5 = as.factor(sample(1:8, n, replace = TRUE))
+    x5 = as.factor(sample(1:10, n, replace = TRUE))
     
     y =  rnorm(n, 0, 1)
     data = data.frame(x1, x2, x3, x4, x5, y)

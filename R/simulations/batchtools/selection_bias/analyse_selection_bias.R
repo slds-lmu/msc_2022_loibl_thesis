@@ -38,21 +38,29 @@ if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 
 
 
-for(t in c("selection_bias_independence_small", "selection_bias_full_interaction")){
+for(t in unique(split_data$type)){
   for (exclude in unique(tab[type == t, exclude.categoricals])){
     tab_small = split_data[type == t & exclude.categoricals == exclude, ]
     
     saveRDS(tab_small, file = paste0(savedir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), ".rds"))
+    
+    p = ggplot(stack(tab_small[,.(split_guide)]),
+               aes(x = values, color=ind, fill = ind)) +
+      stat_count(position = "dodge") +
+      ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), ifelse(exclude, "categoricals excl", "categoricals incl"))) +
+      labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+    
+    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"),".pdf"), width = 8, height = 3.8)
     
     for(test in c("curvature", "interaction")){
       
       p = ggplot(stack(tab_small[test_guide == test,.(split_guide)]),
                  aes(x = values, color=ind, fill = ind)) +
         stat_count(position = "dodge") +
-        ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n_data, test)) +
+        ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), ifelse(exclude, "categoricals excl", "categoricals incl"), test)) +
         labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
       
-      ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), "_n", n_data, "_", test,".pdf"), width = 8, height = 3.8)
+      ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), "_", test,".pdf"), width = 8, height = 3.8)
       
     }
   }
