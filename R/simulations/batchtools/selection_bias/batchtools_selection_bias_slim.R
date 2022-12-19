@@ -6,7 +6,7 @@ if (!dir.exists("Data/simulations/batchtools/selection_bias_slim")) dir.create("
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_slim/batchtools",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
-                             seed = )
+                             seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
