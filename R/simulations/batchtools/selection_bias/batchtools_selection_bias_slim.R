@@ -17,7 +17,10 @@ addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
 pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence_small",
                                           "selection_bias_interaction",
                                           "selection_bias_full_interaction",
-                                          "selection_bias_guide"), each = 1))
+                                          "selection_bias_guide",
+                                          "selection_bias_full_interaction_three",
+                                          "selection_bias_interaction_binary_numeric",
+                                          "selection_bias_interaction_categorical_numeric"), each = 1))
 pdes = list("selection_bias" = pdes)
 
 
@@ -25,7 +28,7 @@ pdes = list("selection_bias" = pdes)
 source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
 formals(get_sim_results_selection_bias)$tree_methods = "slim"
 formals(get_sim_results_selection_bias)$get.objective = TRUE
-formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 75, 50, 25, 10, 8, 6, 4, 2)
+formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 150, 125, 100, 75, 50, 25, 10, 8, 6, 4, 2)
 
 addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 
@@ -43,10 +46,10 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 
 
 # test jobs
-id1 = head(findExperiments(algo.name = "selection_bias"), 1)
+id1 = head(findExperiments(algo.name = "selection_bias"), 10)
 print(id1)
 
-testJob(id = 20)
+testJob(id = 6)
 
 
 
@@ -78,20 +81,3 @@ if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
 saveRDS(tab, paste0(savedir,"selection_bias_slim.rds"))
 
-for (t in unique(tab$type)){
-  for (n_data in unique(tab[type == t , n])){
-    tab_t_n = tab[type == t & n == n_data, ]
-    result = list(slim_exact = list(split = table(tab_t_n$split_slim_exact), sse = summary(tab_t_n$sse_slim_exact)),
-                  slim_100 = list(split = table(tab_t_n$split_slim_100), sse = summary(tab_t_n$sse_slim_100)),
-                  slim_75 = list(split = table(tab_t_n$split_slim_75), sse = summary(tab_t_n$sse_slim_75)),
-                  slim_50 = list(split = table(tab_t_n$split_slim_50), sse = summary(tab_t_n$sse_slim_50)),
-                  slim_25 = list(split = table(tab_t_n$split_slim_25), sse = summary(tab_t_n$sse_slim_25)),
-                  slim_10 = list(split = table(tab_t_n$split_slim_10), sse = summary(tab_t_n$sse_slim_10)),
-                  slim_8 = list(split = table(tab_t_n$split_slim_8), sse = summary(tab_t_n$sse_slim_8)),
-                  slim_6 = list(split = table(tab_t_n$split_slim_6), sse = summary(tab_t_n$sse_slim_6)),
-                  slim_4 = list(split = table(tab_t_n$split_slim_4), sse = summary(tab_t_n$sse_slim_4)),
-                  slim_2 = list(split = table(tab_t_n$split_slim_2), sse = summary(tab_t_n$sse_slim_2)))
-    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), ".rds"))
-    
-  }
-}
