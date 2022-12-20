@@ -58,8 +58,14 @@ Comparison of different versions of SLIM, MOB, CTree and GUIDE with respect to s
 An algorithm for recursive partitionig is called unbiased when, under the conditions of the null hypothesis of independence between a response $Y$ an covariates $X_{1},...X_{m}$ the probability of selecting covariate $X_{j}$ is $1/m$ for all $j = 1,...,m$ regardless of the measurement scales of number of missing values. \citep{Hothorn.2006}
 \vspace{0.5cm}
 
+\textbf{Measure:} p-value of a $\chi^2$ goodnes of fit test\\
+H0: the probabilities of the population are all equal (or are equal to an assumed probability distribution p)
+\vspace{0.5cm}
+
 \textbf{Simulation Setting:} $1000$ simulation runs with $n= 1000$
 \end{frame}
+
+
 
 
 \begin{frame}{GUIDE}
@@ -89,7 +95,7 @@ $X_{6}$ categorical with 8 levels\\
 $Y \sim N(0,1)$
 
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/selection_bias_results/independence_n1000.pdf}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/selection_bias_general/independence_n1000.pdf}
 \end{figure}
 \end{frame}
 
@@ -98,8 +104,19 @@ $Y \sim N(0,1)$
 All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
 $Y \sim N(0,1)$
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/selection_bias_results/independence_small_n1000.pdf}
+    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_general/independence_small_n1000.pdf}
 \end{figure}
+
+\begin{table}
+\begin{tabular}[t]{r|r|r|r}
+\hline
+slim & mob & ctree & guide\\
+\hline
+$< 0.0001$ & $0.4767$ & $0.6598$ & $0.0995$\\
+\hline
+\end{tabular}
+\caption{p-values of $X_^2$ goodness-of-fit test}
+\end{table}
 
 \end{frame}
 
@@ -108,8 +125,20 @@ $Y \sim N(0,1)$
 All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
 $Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X_3 X_4 + eps$
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/selection_bias_results/full_interaction_n1000.pdf}
+    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_general/full_interaction_n1000.pdf}
 \end{figure}
+
+\begin{table}
+\centering
+\begin{tabular}[t]{r|r|r|r}
+\hline
+slim & mob & ctree & guide\\
+\hline
+0.0001 & 0.9849 & 0.0622 & 0.4841\\
+\hline
+\end{tabular}
+\caption{p-values of $X_^2$ goodness-of-fit test}
+\end{table}
 \end{frame}
 
 \begin{frame}{SLIM value of n.quantiles}
@@ -154,6 +183,18 @@ $x_4$ & 258 & 272 & 234 & 277 & 298\\
 
 
 \end{frame}
+
+
+\begin{frame}{Next Steps}
+\begin{enumerate}
+    \item Writing of the first three chapters (Introduction, Related Work, Methodology)
+    \item Implementation of Guide bootstrap correction bias 
+    \item Finishing simulations regarding selection bias (possibly write down results)
+    \item Definition of a stability measure and implementation of its calculation
+    \item Definition of scenarios for the comparison of performance, stability and interpretability
+\end{enumerate}
+    
+\end{frame}
     
 
 
@@ -165,6 +206,5 @@ $x_4$ & 258 & 272 & 234 & 277 & 298\\
 \end{document}
 
 
-\end{document}
 
 
