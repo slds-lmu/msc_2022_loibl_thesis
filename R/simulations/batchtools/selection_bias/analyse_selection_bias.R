@@ -2,15 +2,27 @@
 
 list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
 
+independence = readRDS("Data/simulations/batchtools/selection_bias_general/results/independence_n1000.rds")
+
 independence_small = readRDS("Data/simulations/batchtools/selection_bias_general/results/independence_small_n1000.rds")
-lapply(independence_small, function(table){
-  chisq.test(table, p = rep(0.25,4))
-})
+p_general_independence_small = lapply(independence_small, function(table){
+  round(chisq.test(table, p = rep(0.25,4))[["p.value"]],4)
+}) %>% as.data.frame()
+
+
 
 full_interaction = readRDS("Data/simulations/batchtools/selection_bias_general/results/full_interaction_n1000.rds") 
-lapply(full_interaction, function(table){
-  chisq.test(table, p = rep(0.25,4))
-})
+p_general_full_interaction = lapply(full_interaction, function(table){
+  round(chisq.test(table, p = rep(0.25,4))[["p.value"]],4)
+}) %>% as.data.frame()
+
+p_general_full_interaction %>%
+  kbl(caption="p-values of $X_^2$ goodness-of-fit test",
+      format="latex",
+      row.names = FALSE,
+      align="r") %>%
+  kable_minimal(full_width = F)
+
 
 library(REdaS)
 
@@ -36,10 +48,8 @@ savedir ="Data/simulations/batchtools/selection_bias_guide/results/"
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 
-
-
 for(t in unique(split_data$type)){
-  for (exclude in unique(tab[type == t, exclude.categoricals])){
+  for (exclude in unique(split_data[type == t, exclude.categoricals])){
     tab_small = split_data[type == t & exclude.categoricals == exclude, ]
     
     saveRDS(tab_small, file = paste0(savedir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), ".rds"))
@@ -83,7 +93,7 @@ for(t in unique(selection_bias_slim$type)){
   cols_sse = str_detect(names(data), "sse")
   data_long_sse = stack(data[, cols_sse, with = FALSE])
   data_long_sse$ind = str_remove_all(data_long_sse$ind, "sse_slim_")
-  p_sse = ggplot(data_long_sse, mapping = aes(x = factor(ind, level=c("exact", "150", "125" ,"100", "75", "50", "25", "10", "8", "6", "4", "2")), y=values)) + 
+  p_sse = ggplot(data_long_sse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "8", "6", "4", "2")), y=values)) + 
     geom_point(stat='summary', fun='mean') +
     ggtitle("SSE for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
     labs(x="number of quantiles", y = "SSE")
@@ -109,7 +119,7 @@ for(t in unique(selection_bias_slim$type)){
   data_chi2 = data.frame(p_value = chi2, n.quantile = names(chi2))
   
   p_chi2 = ggplot(data_chi2) +
-    geom_point(aes(x = factor(n.quantile, level = c("exact", "150", "125", "100", "75", "50", "25", "10", "8", "6", "4", "2")), y = chi2)) +
+    geom_point(aes(x = factor(n.quantile, level = c("exact", "100", "75", "50", "25", "10", "8", "6", "4", "2")), y = chi2)) +
     ggtitle("Selection bias for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
     labs(x="number of quantiles", y = "p value")
   
