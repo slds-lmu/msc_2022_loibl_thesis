@@ -275,7 +275,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = round(runif(n, 0, 1), 2) 
+    x3 = sample(seq(0,1,length.out = 25), n, replace = TRUE) 
     formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps

@@ -14,13 +14,14 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
-pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence_small",
-                                          "selection_bias_interaction",
-                                          "selection_bias_full_interaction",
-                                          "selection_bias_guide",
-                                          "selection_bias_full_interaction_three",
-                                          "selection_bias_interaction_binary_numeric",
-                                          "selection_bias_interaction_categorical_numeric"), each = 1))
+pdes = expand.grid(n = 1000, type = rep(c(
+  # "selection_bias_independence_small",
+  # "selection_bias_interaction",
+  # "selection_bias_full_interaction",
+  # "selection_bias_guide",
+  "selection_bias_full_interaction_three",
+  "selection_bias_interaction_binary_numeric",
+  "selection_bias_interaction_categorical_numeric"), each = 1))
 pdes = list("selection_bias" = pdes)
 
 
@@ -28,7 +29,7 @@ pdes = list("selection_bias" = pdes)
 source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
 formals(get_sim_results_selection_bias)$tree_methods = "slim"
 formals(get_sim_results_selection_bias)$get.objective = TRUE
-formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 150, 125, 100, 75, 50, 25, 10, 8, 6, 4, 2)
+formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 75, 50, 25, 10, 8, 6, 4, 2)
 
 addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 
