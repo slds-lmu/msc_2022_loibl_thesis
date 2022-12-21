@@ -19,9 +19,11 @@ pdes = expand.grid(n = 1000, type = rep(c(
   # "selection_bias_interaction",
   # "selection_bias_full_interaction",
   # "selection_bias_guide",
-  "selection_bias_full_interaction_three",
+  "selection_bias_full_interaction_25",
+  "selection_bias_full_interaction_50",
   "selection_bias_interaction_binary_numeric",
-  "selection_bias_interaction_categorical_numeric"), each = 1))
+  "selection_bias_interaction_categorical_numeric"
+  ), each = 1))
 pdes = list("selection_bias" = pdes)
 
 
