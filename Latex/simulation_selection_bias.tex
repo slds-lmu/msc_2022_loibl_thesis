@@ -146,17 +146,68 @@ All $X_j \sim U(0,1)$; $X_3$ rounded to one digit (10 possible quantiles), $X_4$
 $Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X_3 X_4 + eps$
 
 \begin{figure}
-    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_slim/sse_full_interaction.pdf}
+    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_slim/full_interaction.pdf}
 \end{figure}
 
 \end{frame}
 
 
 \begin{frame}{Influence of n.quantiles in SLIM on selection bias and performance}
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit, $X_4$ rounded to two digits\\
+$Y \sim N(0,1)$
 \begin{figure}
-    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_slim/sse_independence_small.pdf}
+    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_slim/independence_small.pdf}
 \end{figure}
 \end{frame}
+
+\begin{frame}{Influence of n.quantiles in SLIM on selection bias and performance}
+$X_1$ and $X_2 \sim U(0,1)$; $X_3$ binary\\
+$Y = X_1 + X_2 + X_2 + 0.01X_1X_2 + \epsilon$
+
+\begin{table}
+
+\caption{frequency of selecting covariate Xi as splitting variable}
+\centering
+\begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r|r}
+\hline
+  & exact & 100 & 75 & 50 & 25 & 10 & 8 & 6 & 4 & 2\\
+\hline
+x1 & 502 & 487 & 504 & 510 & 494 & 502 & 505 & 480 & 502 & 483\\
+\hline
+x2 & 497 & 511 & 494 & 488 & 504 & 495 & 491 & 512 & 485 & 433\\
+\hline
+x3 & 1 & 2 & 2 & 2 & 2 & 3 & 4 & 8 & 13 & 84\\
+\hline
+\end{tabular}
+\end{table}
+
+$\Rightarrow$ When n.quantiles is very small, the binary variable without actual interaction effect is more often mistakenly chosen as splitting variable
+
+\end{frame}
+
+\begin{frame}{Influence of n.quantiles in SLIM on selection bias and performance}
+$X_1$ and $X_2 \sim U(0,1)$; $X_3$ categorical with 5 classes\\
+$Y = X_1 + X_2 + X_2 + 0.01X_1X_2 + \epsilon$
+
+\begin{table}
+
+\caption{frequency of selecting covariate Xi as splitting variable}
+\centering
+\begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r|r}
+\hline
+  & exact & 100 & 75 & 50 & 25 & 10 & 8 & 6 & 4 & 2\\
+\hline
+x1 & 507 & 507 & 510 & 509 & 518 & 492 & 490 & 489 & 466 & 442\\
+\hline
+x2 & 493 & 493 & 490 & 491 & 481 & 504 & 507 & 504 & 521 & 440\\
+\hline
+x3 & 0 & 0 & 0 & 0 & 1 & 4 & 3 & 7 & 13 & 118\\
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+
 
 
 \begin{frame}{Next Steps}
