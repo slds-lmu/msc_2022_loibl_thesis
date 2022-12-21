@@ -105,7 +105,12 @@ for(t in unique(selection_bias_slim$type)){
   cols_freq = str_detect(names(data), "split_slim")
   data_freq = data[, cols_freq, with = FALSE]
   
-  table_list = sapply(data_freq, table)
+  table_empty = rep(0, length(unique(unlist(data_freq))))
+  names(table_empty) = sort(unique(unlist(data_freq)))
+  
+  table_list = sapply(data_freq, function(el){
+    res = tapply(c(table_empty, table(el)), names(c(table_empty, table(el))), sum)
+  })
   saveRDS(table_list, paste0(savedir_slim, str_remove(t, "selection_bias_"),".rds"))
   options = length(unique(unlist(data_freq)))
   
@@ -144,7 +149,8 @@ slim_independence_small = readRDS("Data/simulations/batchtools/selection_bias_sl
 slim_independence_guide = readRDS("Data/simulations/batchtools/selection_bias_slim/results/guide.rds")
 slim_interaction_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction.rds")
 
-slim_full_interaction_three = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction_three.rds")
+slim_full_interaction_25 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction_25.rds")
+slim_full_interaction_50 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction_50.rds")
 slim_interaction_binary_numeric = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_binary_numeric.rds")
 slim_interaction_categorical_numeric = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_categorical_numeric.rds")
 

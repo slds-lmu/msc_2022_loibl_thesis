@@ -230,7 +230,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     
   } else if (type == "selection_bias_guide"){
     
-    x1 = runif(n, 1, 3)
+    x1 = sample(c(-3,-1,1,3), n, replace = TRUE) 
     x2 = rexp(n, 1)
     x3 = rnorm(n)  
     x4 = as.factor(sample(1:5, n, replace = TRUE))
@@ -260,7 +260,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = round(runif(n, 0, 1), 1)  
+    x3 = sample(seq(0,1,length.out = 11), n, replace = TRUE) 
     x4 = round(runif(n, 0, 1), 2) 
     formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
     eps = rnorm(n, 0, sd(formula)*0.1)
@@ -275,7 +275,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = sample(seq(0,1,length.out = 25), n, replace = TRUE) 
+    x3 = sample(seq(0,1,length.out = 26), n, replace = TRUE) 
     x4 = round(runif(n, 0, 1), 2) 
     formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
     eps = rnorm(n, 0, sd(formula)*0.1)
@@ -290,7 +290,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = sample(seq(0,1,length.out = 50), n, replace = TRUE) 
+    x3 = sample(seq(0,1,length.out = 51), n, replace = TRUE) 
     x4 = round(runif(n, 0, 1), 2) 
     formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
     eps = rnorm(n, 0, sd(formula)*0.1)

@@ -87,16 +87,21 @@ test_curvature = function(xval, ybin, xgroups){
   # categorize split variable
   
   if(is.numeric(xval)){
-    if(is.null(xgroups)) xgroups <- 4
-    if(length(xgroups)>1) {
-      xbreaks <- xgroups
-    } else {
-      xbreaks <- quantile(xval, c(0:xgroups)/xgroups)
+    if(length(unique(xval)) <= 4){
+      x_cat = as.factor(xval)
+    } else{
+      if(is.null(xgroups)) xgroups = 4
+      if(length(xgroups)>1) {
+        xbreaks = xgroups
+      } else {
+        xbreaks = unique(quantile(xval, c(0:xgroups)/xgroups))
+      }
+      x_cat = cut(xval, breaks = xbreaks, labels = c(1:(length(xbreaks)-1)), 
+                  include.lowest = TRUE)
     }
-    x_cat <- cut(xval, breaks = xbreaks, labels = c(1:xgroups), 
-                 include.lowest = TRUE)
+    
   } else {
-    x_cat <- xval
+    x_cat = xval
   }
   
   if(length(unique(x_cat)) == 1) return(list(p.value = log(1-1), statistic = log(0)))
