@@ -112,7 +112,7 @@ $Y \sim N(0,1)$
 \hline
 slim & mob & ctree & guide\\
 \hline
-$< 0.0001$ & $0.4767$ & $0.6598$ & $0.0995$\\
+$< 0.0001$ & $0.629 $ & $0.7954$ & $0.2914$\\
 \hline
 \end{tabular}
 \caption{p-values of $X_^2$ goodness-of-fit test}
@@ -134,18 +134,28 @@ $Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X
 \hline
 slim & mob & ctree & guide\\
 \hline
-0.0001 & 0.9849 & 0.0622 & 0.4841\\
+$ < 0.0001$ & $0.4833 $ & $0.0289$ & $0.3759$\\
 \hline
 \end{tabular}
-\caption{p-values of $X_^2$ goodness-of-fit test}
+\caption{p-values of $\chi_^2$ goodness-of-fit test}
 \end{table}
 \end{frame}
 
-\begin{frame}{SLIM value of n.quantiles}
+\begin{frame}{Influence of n.quantiles in SLIM on selection bias and performance}
+All $X_j \sim U(0,1)$; $X_3$ rounded to one digit (10 possible quantiles), $X_4$ rounded to two digits (100 possible quantiles)\\
+$Y = X_1 + X_2 + X_3 + X_4 + X_1 X_2 + X_1 X_3 + X_1 X_4 + X_2 X_3 + X_2 X_4 + X_3 X_4 + eps$
+
+\begin{figure}
+    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_slim/sse_full_interaction.pdf}
+\end{figure}
+
+\end{frame}
 
 
-
-
+\begin{frame}{Influence of n.quantiles in SLIM on selection bias and performance}
+\begin{figure}
+    \includegraphics[width=10cm]{Figures/simulations/batchtools/selection_bias_slim/sse_independence_small.pdf}
+\end{figure}
 \end{frame}
 
 
