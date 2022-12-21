@@ -271,21 +271,37 @@ create_sim_data = function(job, n = 1000, type, ...){
     search_space = NULL
     
     
-  } else if (type == "selection_bias_full_interaction_three"){
+  } else if (type == "selection_bias_full_interaction_25"){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = sample(seq(0,1,length.out = 25), n, replace = TRUE) 
-    formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    x4 = round(runif(n, 0, 1), 2) 
+    formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
-    data = data.frame(x1, x2, x3, y)
+    data = data.frame(x1, x2, x3, x4, y)
     fm = NULL
     lrn = NULL
     search_space = NULL
     
     
-  }else if (type == "selection_bias_interaction_binary_numeric"){
+  } else if (type == "selection_bias_full_interaction_50"){
+    
+    x1 = runif(n, 0, 1)
+    x2 = runif(n, 0, 1)
+    x3 = sample(seq(0,1,length.out = 50), n, replace = TRUE) 
+    x4 = round(runif(n, 0, 1), 2) 
+    formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    data = data.frame(x1, x2, x3, x4, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+    
+  } else if (type == "selection_bias_interaction_binary_numeric"){
     # x1 and x2 should be chosen equally often, x3 should never be selected
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)

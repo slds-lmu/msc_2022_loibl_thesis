@@ -16,7 +16,7 @@ p_general_full_interaction = lapply(full_interaction, function(table){
   round(chisq.test(table, p = rep(0.25,4))[["p.value"]],4)
 }) %>% as.data.frame()
 
-p_general_full_interaction %>%
+p_general_independence_small %>%
   kbl(caption="p-values of $X_^2$ goodness-of-fit test",
       format="latex",
       row.names = FALSE,
@@ -83,9 +83,12 @@ for(t in unique(split_data$type)){
 #####################
 # slim selection bias different values of n.quantiles
 list.files("Data/simulations/batchtools/selection_bias_slim/results/", full.names = TRUE)
-selection_bias_slim = readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds")
+selection_bias_slim = rbind(readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds"),
+                            readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim_additional.rds"))
 
 figuredir_slim = "Figures/simulations/batchtools/selection_bias_slim/"
+savedir_slim = "Data/simulations/batchtools/selection_bias_slim/results/"
+
 if (!dir.exists(figuredir_slim)) dir.create(figuredir_slim, recursive = TRUE)
 
 for(t in unique(selection_bias_slim$type)){
@@ -95,22 +98,24 @@ for(t in unique(selection_bias_slim$type)){
   data_long_sse$ind = str_remove_all(data_long_sse$ind, "sse_slim_")
   p_sse = ggplot(data_long_sse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "8", "6", "4", "2")), y=values)) + 
     geom_point(stat='summary', fun='mean') +
-    ggtitle("SSE for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
+    ggtitle("mean SSE for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
     labs(x="number of quantiles", y = "SSE")
   
   
   cols_freq = str_detect(names(data), "split_slim")
   data_freq = data[, cols_freq, with = FALSE]
-  table_list = lapply(data_freq, table)
+  
+  table_list = sapply(data_freq, table)
+  saveRDS(table_list, paste0(savedir_slim, str_remove(t, "selection_bias_"),".rds"))
   options = length(unique(unlist(data_freq)))
   
   if(t %in% c("selection_bias_interaction_binary_numeric", "selection_bias_interaction_categorical_numeric") ){
-    prob = c(0.5,0.5,0)
+    prob = c(0.45,0.45,0.1)
   } else{
     prob = rep(1/options, options)
   }
     
-  chi2 = sapply(table_list, function(table){
+  chi2 = apply(table_list, 2, function(table){
     chisq.test(table, p = prob)[["p.value"]]
   }) 
   
@@ -124,7 +129,7 @@ for(t in unique(selection_bias_slim$type)){
     labs(x="number of quantiles", y = "p value")
   
   ggarrange(p_chi2, p_sse, nrow = 2) %>%
-    ggexport(filename = paste0(figuredir_slim, "sse_", str_remove(t, "selection_bias_"),".pdf"),
+    ggexport(filename = paste0(figuredir_slim, str_remove(t, "selection_bias_"),".pdf"),
            width = 8, height = 3.8)
   
   
@@ -139,33 +144,32 @@ slim_independence_small = readRDS("Data/simulations/batchtools/selection_bias_sl
 slim_independence_guide = readRDS("Data/simulations/batchtools/selection_bias_slim/results/guide.rds")
 slim_interaction_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction.rds")
 
+slim_full_interaction_three = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction_three.rds")
+slim_interaction_binary_numeric = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_binary_numeric.rds")
+slim_interaction_categorical_numeric = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_categorical_numeric.rds")
+
+slim_interaction_categorical_numeric = sapply(slim_interaction_categorical_numeric, function(el){
+  if(length(el) == 2){
+    res = c(el,0)
+  } else{
+    res = el
+  }
+})
+
+
 library(kableExtra)
 library(tidyr)
 library(REdaS)
 
 
-sb_slim_full_interaction = lapply(slim_full_interaction, function(el){
-  as.vector(el[[1]])
-}) %>% as.data.frame()
-
-perf_slim_full_interaction = lapply(slim_full_interaction, function(el){
-  as.vector(el[[2]])
-}) %>% as.data.frame()
-
-sb_slim_independence_small = lapply(slim_independence_small, function(el){
-  as.vector(el[[1]])
-}) %>% as.data.frame()
-
-sb_slim_interaction_small = lapply(slim_interaction_small, function(el){
-  as.vector(el[[1]])
-}) %>% as.data.frame()
-
-sb_slim_independence_guide = lapply(slim_independence_guide, function(el){
-  as.vector(el[[1]])
-}) %>% as.data.frame()
 
 
-df_slim_full_interaction %>%
+colnames(slim_full_interaction_three) = str_remove(colnames(slim_full_interaction_three), "split_slim_")
+colnames(slim_interaction_binary_numeric) = str_remove(colnames(slim_interaction_binary_numeric), "split_slim_")
+colnames(slim_interaction_categorical_numeric) = str_remove(colnames(slim_interaction_categorical_numeric), "split_slim_")
+
+
+slim_interaction_categorical_numeric %>%
   kbl(caption="frequency of selecting covariate Xi as splitting variable",
       format="latex",
       row.names = TRUE,
