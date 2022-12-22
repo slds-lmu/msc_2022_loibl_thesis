@@ -16,14 +16,22 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
 pdes = expand.grid(n = 1000, type = rep(c(
   "selection_bias_independence_small_25",
-  "selection_bias_independence_small_50"
-  # "selection_bias_interaction",
-  # "selection_bias_full_interaction",
-  # "selection_bias_guide",
-  # "selection_bias_full_interaction_25",
-  # "selection_bias_full_interaction_50",
-  # "selection_bias_interaction_binary_numeric",
-  # "selection_bias_interaction_categorical_numeric"
+  "selection_bias_independence_small_50",
+  "selection_bias_independence_10",
+  "selection_bias_independence_25",
+  "selection_bias_independence_50",
+  "selection_bias_independence_100",
+  "selection_bias_interaction",
+  "selection_bias_interaction_10",
+  "selection_bias_interaction_25",
+  "selection_bias_interaction_50",
+  "selection_bias_interaction_100",
+  "selection_bias_full_interaction",
+  "selection_bias_guide",
+  "selection_bias_full_interaction_25",
+  "selection_bias_full_interaction_50",
+  "selection_bias_interaction_binary_numeric",
+  "selection_bias_interaction_categorical_numeric"
   ), each = 1))
 pdes = list("selection_bias" = pdes)
 
