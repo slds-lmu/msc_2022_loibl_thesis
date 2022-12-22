@@ -265,7 +265,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x4 = round(runif(n, 0, 1), 2) 
+    x3 = round(runif(n, 0, 1), 2) 
     y =  rnorm(n, 0, 1)
     data = data.frame(x1, x2, x3, y)
     fm = NULL
@@ -308,7 +308,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, y)
+    data = data.frame(x1, x2, x3, y)
     fm = NULL
     lrn = NULL
     search_space = NULL
@@ -321,7 +321,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, y)
+    data = data.frame(x1, x2, x3, y)
     fm = NULL
     lrn = NULL
     search_space = NULL
@@ -334,7 +334,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, y)
+    data = data.frame(x1, x2, x3, y)
     fm = NULL
     lrn = NULL
     search_space = NULL
@@ -347,12 +347,15 @@ create_sim_data = function(job, n = 1000, type, ...){
     formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, y)
+    data = data.frame(x1, x2, x3, y)
     fm = NULL
     lrn = NULL
     search_space = NULL
     
-  } else if (type == "selection_bias_full_interaction"){
+  }
+  
+  
+  else if (type == "selection_bias_full_interaction"){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
