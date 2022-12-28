@@ -1,1 +1,27 @@
+Motivation:
+\begin{itemize}
+    \item Performance of complex black box models vs. increasing importance of interpretability.
+    \item Approach: use (well interpretable) surrogate models to explain the predictions of black box models. 
+\end{itemize}
+
+
 Goal: additive decomposition of a black box function by combining decision rules and additive models.
+Find subregions in the feature space so that the global blackbox model can be replaced by subregional main effect models.
+
+
+
+requirements:
+\begin{itemize}
+    \item main effect models should be chosen as flexibly as possible (e.g. simple linear models, splines, penalized models, choice of a different loss function (e.g. least absolute deviations regression).
+    \item Possible interactions should be handled by the splits, so that the models in the leafnodes are as free as possible from interaction effects.
+\end{itemize}
+
+Approaches:
+\begin{itemize}
+    \item an approach that allows great flexibility in model selection is slim \citep{Hu.2020} (exhaustive search for the best splitting point through all possible splitting variables)
+    \item This method is contrasted with three common algorithms for creating model-based trees (MOB, CTree, GUIDE). These differ from SLIM mainly in that the search for the best split point is a two-step process. First, the best split variable is selected by a hypothesis test. Then, in a second step, the best split point for this variable is searched. The three methods differ from each other again mainly in the respective hypothesis test.
+\end{itemize}
+
+Comparison of methods with respect to selection bias, performance, stability, interpretability and flexibility
+
+The thesis is structured as follows:

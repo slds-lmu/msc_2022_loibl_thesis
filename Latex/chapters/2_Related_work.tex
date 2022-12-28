@@ -1,5 +1,20 @@
-\subsection{Global surrogate models}
+Surrogate models are one possibility to explain complex black box models. According to \citet{Molnar.2019} the purpose of (interpretable) surrogate models is to approximate the predictions of the underlying model as accurately as possible and to be interpretable at the same time.
+Depending on whether the goal is to achieve a global interpretation of a black box model (model explanation) or only to explain the results of individual input instances (outcome explanation), global or local surrogate models can be used \citep{.2021b}
+An advantage of using a surrogate models as iml-method is, that it is a model-agnostic approach, i.e., it does not require any information about the inner workings of the black box model \citep{Molnar.2019}.
 
-\subsection{Local surrogate model}
+The concept of global surrogate models is very simple. To explain the underlying model, the predictions for input data are first calculated using this black box model. Then, an arbitrarily interpretable surrogate model is trained on these data and the predictions. Finally, it can be measured how well the surrogate model reproduces the black-box predictions \citep{Molnar.2019}. \citet{Molnar.2019} cites the flexibility in choosing the surrogate model and the simplicity of the approach as advantages of this method. However, he also points out that it must not be neglected that a surrogate model can only explain the behavior of the underlying black box model, but not the actual data generation process.
 
-\subsection{Sub-regional surrogate models}
+If only a single prediction is to be explained instead of the entire model, local interpretable model-agnostic explanations (LIME) can be used \citep{Ribeiro.2016}. The idea is to observe how the predictions of the black-box model behave when small variations of the instance of intereset are introduced into the model. For this purpose, LIME first generates pertubated samples and calculates the predictions of the black box model for them. A weighted interpretable surrogate model is then trained on these data. The weights are computed from the proximity measures of the pertubated data with respect to the instance of interest. 
+LIME offers the same advantages described above for global surrogate models. However, an additional difficulty is to choose an appropriat neighborhood of the instance of interest for pertubation.
+\citep{Molnar.2019}
+
+
+
+
+
+
+% \subsection{Global surrogate models}
+
+% \subsection{Local surrogate model}
+
+% \subsection{Sub-regional surrogate models}
