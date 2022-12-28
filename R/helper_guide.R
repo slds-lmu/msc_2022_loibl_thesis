@@ -193,7 +193,7 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 50){
     return(1)
   } else {
     
-    r_grid = seq(0.5, 3, length.out = 100)
+    r_grid = seq(0.5, 3, 0.05)
     x_factor = colnames(x)[sapply(x, is.factor)]
     
     # Target frequency of a numerical variable
@@ -246,8 +246,7 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 50){
       names(z_type) = r_grid
       return(z_type)
     })
-    browser()
-    
+
     # for each grid.point calculate the observed frequency of a numerical splitting varible
     z_bootstrap = as.data.frame(z_bootstrap)
     colnames(z_bootstrap) = 1:n.bootstrap

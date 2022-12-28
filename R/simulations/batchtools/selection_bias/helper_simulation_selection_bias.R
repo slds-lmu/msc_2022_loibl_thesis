@@ -1,7 +1,7 @@
 source("R/mob_fitting_functions.R")
 
 get_sim_results_selection_bias = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"), n.quantiles = NULL,
-                                          exclude.categoricals = FALSE, get.objective = FALSE, min.split = 50,...){
+                                          exclude.categoricals = FALSE, get.objective = FALSE, min.split = 50, correct.bias = FALSE,...){
   if(is.null(data)){
     data = instance$data
   } else {
@@ -42,11 +42,12 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
   
   if("guide" %in% tree_methods){
     guide = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = min.split, 
-                              split.method = "guide", exclude.categoricals = exclude.categoricals)
+                              split.method = "guide", exclude.categoricals = exclude.categoricals, correct.bias = correct.bias)
     split_guide = guide[[1]][[1]][["split.feature"]]
     test_guide = guide[[1]][[1]][["test.type"]]
     result$split_guide = split_guide
     result$test_guide = test_guide
+    
   }
   
   

@@ -14,9 +14,10 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
-pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence_small",
-                                          "selection_bias_full_interaction", 
-                                          "selection_bias_guide"), each = 1))
+pdes = expand.grid(n = 1000, type = c(
+  # "selection_bias_independence_small",
+  # "selection_bias_full_interaction",
+  "selection_bias_guide"))
 pdes = list("selection_bias" = pdes)
 
 
@@ -30,11 +31,13 @@ addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 addExperiments(
   reg = reg, 
   prob.designs = pdes,
-  algo.designs = list(selection_bias = data.frame(tree_methods = "guide", exclude.categoricals = c(TRUE, FALSE))), 
+  algo.designs = list(selection_bias = expand.grid(tree_methods = "guide", 
+                                                   exclude.categoricals = c(TRUE, FALSE),
+                                                   correct.bias = c(TRUE,FALSE))), 
   repls = 1000L)
 
 summarizeExperiments()
-summarizeExperiments(by = c("problem", "algorithm", "n", "type", "exclude.categoricals"))
+summarizeExperiments(by = c("problem", "algorithm", "n", "type", "exclude.categoricals", "correct.bias"))
 
 
 # test jobs
