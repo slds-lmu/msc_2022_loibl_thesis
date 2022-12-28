@@ -92,7 +92,7 @@ extract_models = function(tree){
 
 split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                              objective, fit, approximate, n.quantiles, penalization, 
-                             fit.bsplines, df.spline, split.method, ...) {
+                             fit.bsplines, df.spline, split.method, correction.factor, ...) {
 
   if(split.method == "slim"){
     z = colnames(X)
@@ -112,7 +112,8 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z_guide = find_split_variable_guide(Y = Y, X = X,
                                         objective = objective, 
                                         fit = fit,
-                                        optimizer = optimizer)
+                                        optimizer = optimizer, 
+                                        correction.factor = correction.factor)
     z = z_guide$z
     guide_type = z_guide$type
   }
@@ -135,10 +136,11 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
   
 }
 
-find_split_variable_guide = function(Y, X, objective, fit, optimizer, ...){
+find_split_variable_guide = function(Y, X, objective, fit, optimizer, correction.factor, ...){
   model = fit(y = Y, x = X)
   residuals = Y - predict(model, X)
-  z_guide = guide_test(y = Y, x = X, residuals = residuals, xgroups = NULL, optimizer = optimizer, objective = objective)
+  z_guide = guide_test(y = Y, x = X, residuals = residuals, xgroups = NULL, 
+                       optimizer = optimizer, objective = objective, correction.factor = correction.factor)
   return(z_guide)
 }
 
@@ -240,7 +242,7 @@ generate_node_index = function(Y, X, result) {
 
 # performs and evaluates binary splits
 find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, n.quantiles, splitpoints = "quantiles", ...) {
-  browser()
+  # browser()
   if(length(unique(xval)) == 1){
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
   }

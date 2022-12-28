@@ -100,7 +100,7 @@ Node <- R6Class("Node", list(
     self$variable.importance = variable.importance
   },
   
-  computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, pruning, n.quantiles, penalization, fit.bsplines, df.spline, split.method) {
+  computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, pruning, n.quantiles, penalization, fit.bsplines, df.spline, split.method, correction.factor) {
     if (length(self$subset.idx) < (2*min.split + 1) | (self$improvement.met == TRUE & pruning == "forward")) {
       self$stop.criterion.met = TRUE
       self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
@@ -115,7 +115,7 @@ Node <- R6Class("Node", list(
                                   min.node.size = min.split, n.quantiles = n.quantiles,
                                   penalization = penalization, 
                                   fit.bsplines = fit.bsplines, df.spline = df.spline,
-                                  split.method = split.method)
+                                  split.method = split.method, correction.factor = correction.factor)
 
         if(is.null(self$intImp)) {
           #self$rsqrt = 0 
@@ -253,7 +253,8 @@ compute_tree_slim = function(y,
                              fit.gam = FALSE,
                              df.spline = 15,
                              penalization = NULL,
-                             exclude.categoricals = FALSE) {
+                             exclude.categoricals = FALSE,
+                             correct.bias = FALSE) {
   time.start = Sys.time()
   input.data = list(X=as.data.frame(x), Y=as.data.frame(y))
 
@@ -312,12 +313,17 @@ compute_tree_slim = function(y,
   
   formals(predict.response)$.exclude.categoricals = exclude.categoricals
   
-  
+  # only important for guide: find best bias correction factor r
+  if(split.method == "guide" & correct.bias == TRUE){
+    correction.factor = bias_correction(y = input.data$Y, x = input.data$X, xgroups = NULL, fit = fit.model, n.bootstrap = 50)
+  } else {correction.factor = 1}
 
 
   # Initialize the parent node of the tree
   model.parent = fit.model(y = input.data$Y, x = input.data$X)
   term.predictions.parent = predict.response(model.parent, input.data$X)
+  
+  
   parent = Node$new(id = 0, depth = 1, subset.idx = seq_len(nrow(input.data$X)), improvement.met = FALSE, intImp = 0, model.fit = model.parent, 
                     term.predictions.parent = term.predictions.parent, variable.importance = round(apply(term.predictions.parent, MARGIN = 2, var), 4))
   
@@ -338,7 +344,7 @@ compute_tree_slim = function(y,
                                    impr.par = impr.par, optimizer = ifelse(approximate == FALSE, find_best_binary_split, find_best_binary_split_approx), 
                                    min.split = min.split, pruning = pruning, n.quantiles = n.quantiles,
                                    penalization = penalization, fit.bsplines = fit.bsplines, df.spline = df.spline,
-                                   split.method = split.method)
+                                   split.method = split.method, correction.factor = correction.factor)
         node.to.split$computeChildren(input.data$X, input.data$Y, objective = split.objective,
                                       fit = fit.model, predict.response = predict.response, 
                                       pruning = pruning)
