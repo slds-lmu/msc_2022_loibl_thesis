@@ -1,7 +1,7 @@
 source("R/mob_fitting_functions.R")
 
 get_sim_results_selection_bias = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"), n.quantiles = NULL,
-                                          exclude.categoricals = FALSE, get.objective = FALSE,...){
+                                          exclude.categoricals = FALSE, get.objective = FALSE, min.split = 50,...){
   if(is.null(data)){
     data = instance$data
   } else {
@@ -18,7 +18,7 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
         if(is.na(quantiles) | quantiles == 0L){
           quantiles = NULL
         }
-        slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = quantiles, min.split = 50)
+        slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = quantiles, min.split = min.split)
         split_slim = slim[[1]][[1]][["split.feature"]]
         result$split_slim = split_slim
         names(result)[names(result) == "split_slim"] = paste0("split_slim_",ifelse(is.null(quantiles),"exact",quantiles))
@@ -29,7 +29,7 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
         }
       }
     } else{
-      slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = 50)
+      slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = min.split)
       split_slim = slim[[1]][[1]][["split.feature"]]
       result$split_slim = split_slim
       if(get.objective){
@@ -41,7 +41,7 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
   }
   
   if("guide" %in% tree_methods){
-    guide = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = 50, 
+    guide = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = min.split, 
                               split.method = "guide", exclude.categoricals = exclude.categoricals)
     split_guide = guide[[1]][[1]][["split.feature"]]
     test_guide = guide[[1]][[1]][["test.type"]]
@@ -53,7 +53,7 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
   if("mob" %in% tree_methods){
     fm_mob = formula(paste("y ~", paste(colnames(x), collapse = "+"), "|", paste(colnames(x), collapse = "+")))
     
-    mob = lmtree(fm_mob, data = data, minsize = 50, maxdepth = 2, alpha = 1)
+    mob = lmtree(fm_mob, data = data, minsize = min.split, maxdepth = 2, alpha = 1)
     mobrule = partykit:::.list.rules.party(mob)[1]
     split_mob = str_extract(mobrule,"^.*(?=( <=| %in))")
     result$split_mob = split_mob

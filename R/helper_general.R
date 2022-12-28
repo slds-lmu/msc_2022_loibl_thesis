@@ -240,7 +240,7 @@ generate_node_index = function(Y, X, result) {
 
 # performs and evaluates binary splits
 find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, n.quantiles, splitpoints = "quantiles", ...) {
-  # browser()
+  browser()
   if(length(unique(xval)) == 1){
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
   }

@@ -83,8 +83,7 @@ for(t in unique(split_data$type)){
 #####################
 # slim selection bias different values of n.quantiles
 list.files("Data/simulations/batchtools/selection_bias_slim/results/", full.names = TRUE)
-selection_bias_slim = rbind(readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds"),
-                            readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim_additional.rds"))
+selection_bias_slim = rbind(readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds"))
 
 figuredir_slim = "Figures/simulations/batchtools/selection_bias_slim/"
 savedir_slim = "Data/simulations/batchtools/selection_bias_slim/results/"
@@ -146,11 +145,16 @@ ggplot(data, mapping=aes(x = ind, y=values))+geom_boxplot()
 
 slim_full_interaction = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction.rds")
 slim_independence_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small.rds")
+slim_independence_small_25 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small_25.rds")
+slim_independence_small_50 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small_50.rds")
+
 slim_independence_guide = readRDS("Data/simulations/batchtools/selection_bias_slim/results/guide.rds")
 slim_interaction_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction.rds")
 
-slim_full_interaction_25 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction_25.rds")
-slim_full_interaction_50 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction_50.rds")
+slim_interaction_25 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_25.rds")
+slim_interaction_50 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_50.rds")
+slim_interaction_10 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_25.rds")
+slim_interaction_100 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_50.rds")
 slim_interaction_binary_numeric = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_binary_numeric.rds")
 slim_interaction_categorical_numeric = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction_categorical_numeric.rds")
 
