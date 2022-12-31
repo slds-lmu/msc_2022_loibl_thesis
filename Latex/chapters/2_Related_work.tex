@@ -1,20 +1,26 @@
 Surrogate models are one possibility to explain complex black box models. According to \citet{Molnar.2019} the purpose of (interpretable) surrogate models is to approximate the predictions of the underlying model as accurately as possible and to be interpretable at the same time.
 Depending on whether the goal is to achieve a global interpretation of a black box model (model explanation) or only to explain the results of individual input instances (outcome explanation), global or local surrogate models can be used \citep{.2021b}
-An advantage of using a surrogate models as iml-method is, that it is a model-agnostic approach, i.e., it does not require any information about the inner workings of the black box model \citep{Molnar.2019}.
+An advantage of using surrogate models as iml-method is, that it is a model-agnostic approach, i.e., it does not require any information about the inner workings of the black box model \citep{Molnar.2019}.
 
-The concept of global surrogate models is very simple. To explain the underlying model, the predictions for input data are first calculated using this black box model. Then, an arbitrarily interpretable surrogate model is trained on these data and the predictions. Finally, it can be measured how well the surrogate model reproduces the black-box predictions \citep{Molnar.2019}. \citet{Molnar.2019} cites the flexibility in choosing the surrogate model and the simplicity of the approach as advantages of this method. However, he also points out that it must not be neglected that a surrogate model can only explain the behavior of the underlying black box model, but not the actual data generation process.
+%\subsection{Global surrogate models}
 
-If only a single prediction is to be explained instead of the entire model, local interpretable model-agnostic explanations (LIME) can be used \citep{Ribeiro.2016}. The idea is to observe how the predictions of the black-box model behave when small variations of the instance of intereset are introduced into the model. For this purpose, LIME first generates pertubated samples and calculates the predictions of the black box model for them. A weighted interpretable surrogate model is then trained on these data. The weights are computed from the proximity measures of the pertubated data with respect to the instance of interest. 
-LIME offers the same advantages described above for global surrogate models. However, an additional difficulty is to choose an appropriat neighborhood of the instance of interest for pertubation.
+The concept of global surrogate models is very simple. To explain the underlying model, the predictions for some input data are first calculated using this black box model. Then, an arbitrarily interpretable surrogate model is trained on the input data and the predictions. Finally, it can be measured how well the surrogate model reproduces the black-box predictions \citep{Molnar.2019}. If the performance is good enough, the interpretation can be made according to the chosen surrogate model.
+
+\citet{Molnar.2019} cites the flexibility in choosing the surrogate model and the simplicity of the approach as advantages of this method. However, this flexibility is also a challenge, as the choice of an appropriate surrogate model is a trade-off between better performance due to the potentially higher complexity of the model class and its interpretability. For example, linear models are relatively easy to interpret, but cannot uncover nonlinear relationships that may have been modeled in the underlying black box model. \citet{Molnar.2019} provides an overview of interpretable models and their strengths and weaknesses, such as generalized additive models (GAM), decision trees, or sparse linear models (e.g. LASSO). 
+
+In addition, other promising high-performance models that can be interpreted to a certain degree are also being developed. Generalized additive models plus interactions (GA2M) of \citet{Lou.2013} are an example of an extension of generalized additive models that allow a small number of two-way interactions to be efficiently modeled in addition to the nonlinear main effects.
+
+
+One aspect that must not be forgotten when using global surrogate models is that only conclusions about the underlying black box model can be drawn, not about the actual data generating process \citep{Molnar.2019}.
+
+%\subsection{Local surrogate model}
+
+If only a single prediction is to be explained instead of the entire model, local interpretable model-agnostic explanations (LIME) can be used \citep{Ribeiro.2016}. Instead of having to find a (possibly highly complex) interpretable model on the entire feature space, only a surrogate model for a small neighborhood around the instance of interest is trained. This is realized by observing how the predictions of the black-box model behave when small variations of the instance of interest are introduced into the model. For this purpose, LIME first generates perturbed samples and calculates the predictions of the black box model for them. A weighted interpretable surrogate model is then trained on these data. The weights are computed from the proximity measures of the perturbed data with respect to the instance of interest. 
+Like globale surrogates, Lime is very flexible in the choice of an appropriate surrogate model. The advantage over global replacement models is that it is easier to find a good compromise between model complexity and interpretability, since the model only needs to fit a very small range of the feature space. Even sparse main effect models could imitate the black box model well in the small area of the feature space, for example. One difficulty, however, is choosing an appropriate neighborhood for the instance of interest to which the model is to be fitted.
 \citep{Molnar.2019}
 
 
-
-
-
-
-% \subsection{Global surrogate models}
-
-% \subsection{Local surrogate model}
-
-% \subsection{Sub-regional surrogate models}
+%\subsection{Sub-regional surrogate models}
+A possible approach to combine the advantages of global and local surrogate methods, i.e., to obtain models that are easy to understand on the one hand, but at the same time cover the entire feature space without sacrificing performance, is summarized here under the term subregional surrogate model.
+The idea is to subdivide the feature space into appropriate subregions where fitting easy-to-interpret models is sufficient.
+\citet{Hall.2017}
