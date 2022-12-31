@@ -1,17 +1,26 @@
 # Helper functions
 
-predict_slim = function(tree, newdata){
+predict_slim = function(tree, newdata, type = "response"){
+  if(type == "response"){
+    models = extract_models(tree)
+  }
   nodes = extract_split_criteria(tree)
   nodes = nodes[nodes$split.feature == "leafnode",c("child.type", "id.node")]
-  models = extract_models(tree)
   newdata = as.data.table(newdata)
   newdata$row_id = 1:nrow(newdata)
+  
   predictions = c()
-  for(n in 1:nrow(nodes)){
+  for (n in 1:nrow(nodes)){
     node_data = as.data.frame(newdata[eval(parse(text = nodes[n, "child.type"])),])
     node_id = as.character(nodes[n,"id.node"])
-    if(nrow(node_data) > 0){
-      y_hat = predict(models[[node_id]]$model, newdata = subset(node_data, select = -c(row_id)))
+    if (nrow(node_data) > 0){
+      
+      if (type == "response"){
+        y_hat = predict(models[[node_id]]$model, newdata = subset(node_data, select = -c(row_id)))
+      }
+      else if (type == "node"){
+        y_hat = node_id
+      }
       
       predictions = rbind(predictions, cbind(node_data, y_hat))
     }
