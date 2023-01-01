@@ -146,6 +146,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
 }
 
 find_split_variable_guide = function(Y, X, objective, fit, optimizer, correction.factor, ...){
+  # browser()
   model = fit(y = Y, x = X)
   residuals = Y - predict(model, X)
   z_guide = guide_test(y = Y, x = X, residuals = residuals, xgroups = NULL, 

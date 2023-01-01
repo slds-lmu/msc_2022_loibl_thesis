@@ -7,7 +7,7 @@ guide_test <- function(y, x, residuals, xgroups = NULL, optimizer, objective, co
   # separately for each parameter
   x_factor = colnames(x)[sapply(x, is.factor)]
   ybin <- (-1)^((residuals>0)+1)   # -1 or +1
-  
+  # browser()
   curv_test = sapply(x, function(xval){
     test_curvature(xval = xval, ybin = ybin, xgroups = xgroups)
   })
@@ -45,7 +45,7 @@ test_curvature = function(xval, ybin, xgroups){
   # if all values of the selected covariate are equal return highest possible p.value 
   # and Teststatistic = 0
   if(length(unique(xval))<2) return(list(z.value = log(1-1), statistic = log(0)))
-  
+  # browser()
   
   # categorize split variable
   
@@ -53,12 +53,12 @@ test_curvature = function(xval, ybin, xgroups){
     if(length(unique(xval)) <= 4){
       x_cat = as.factor(xval)
     } else{
-      if(is.null(xgroups)) xgroups = 4
-      if(length(xgroups)>1) {
-        xbreaks = xgroups
-      } else {
-        xbreaks = unique(quantile(xval, c(0:xgroups)/xgroups))
+      if(is.null(xgroups)){
+        xgroups = 4
       }
+      
+      xbreaks = unique(quantile(xval, c(0:xgroups)/xgroups))
+      
       x_cat = cut(xval, breaks = xbreaks, labels = c(1:(length(xbreaks)-1)), 
                   include.lowest = TRUE)
     }
@@ -72,7 +72,8 @@ test_curvature = function(xval, ybin, xgroups){
   
   
   # compute curvature test (for each parameter separately)
-  tst_curv = chisq.test(x = x_cat, y = ybin)
+  # browser()
+  tst_curv = chisq.test(x = ybin, y = x_cat)
   ret = c(z.value = qnorm(1 - as.numeric(tst_curv$p.value)/2), statistic = log(as.numeric(tst_curv$statistic)))
   return(ret)
 }
@@ -94,11 +95,8 @@ test_interaction = function(x, xvals, ybin, xgroups){
   } 
   
   if(is.numeric(xval1)){
-    if(length(xgroups)>1) {
-      x1breaks = xgroups
-    } else {
-      x1breaks = quantile(xval1, c(0:xgroups)/xgroups)
-    }
+    x1breaks = quantile(xval1, c(0:xgroups)/xgroups)
+
     x1_cat = cut(xval1, breaks = x1breaks, labels = c(1:xgroups), 
                  include.lowest = TRUE)
   } else {
@@ -130,7 +128,9 @@ test_interaction = function(x, xvals, ybin, xgroups){
   
   
   # compute interaction test 
-  tst_int = chisq.test(x = x_cat_int, y = ybin)
+  # browser()
+
+  tst_int = chisq.test(x = ybin, y = x_cat_int, correct = FALSE)
   ret = c(z1 = xvals[1], z2 = xvals[2], z.value = qnorm(1 - as.numeric(tst_int$p.value)/2), 
           statistic = log(as.numeric(tst_int$statistic)))
   return(ret)
@@ -193,7 +193,7 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 50){
     return(1)
   } else {
     
-    r_grid = seq(0.5, 3, 0.05)
+    r_grid = seq(1, 5, length.out = 40)
     x_factor = colnames(x)[sapply(x, is.factor)]
     
     # Target frequency of a numerical variable
