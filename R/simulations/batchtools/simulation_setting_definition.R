@@ -305,7 +305,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = round(runif(n, 0, 1), 1)  
-    formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    formula = x1*x2 + x1*x3 + x2*x3
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, y)
@@ -318,7 +320,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = sample(seq(0,1,length.out = 26), n, replace = TRUE) 
-    formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    formula = x1*x2 + x1*x3 + x2*x3
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, y)
@@ -331,7 +335,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = sample(seq(0,1,length.out = 51), n, replace = TRUE) 
-    formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    formula = x1*x2 + x1*x3 + x2*x3
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, y)
@@ -344,7 +350,8 @@ create_sim_data = function(job, n = 1000, type, ...){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = round(runif(n, 0, 1), 2)  
-    formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
+    formula = x1*x2 + x1*x3 + x2*x3    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, y)
@@ -361,7 +368,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x2 = runif(n, 0, 1)
     x3 = sample(seq(0,1,length.out = 11), n, replace = TRUE) 
     x4 = round(runif(n, 0, 1), 2) 
-    formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    # formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    formula = x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, x4, y)
@@ -376,7 +385,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x2 = runif(n, 0, 1)
     x3 = sample(seq(0,1,length.out = 26), n, replace = TRUE) 
     x4 = round(runif(n, 0, 1), 2) 
-    formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    # formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    formula = x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, x4, y)
@@ -391,7 +402,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x2 = runif(n, 0, 1)
     x3 = sample(seq(0,1,length.out = 51), n, replace = TRUE) 
     x4 = round(runif(n, 0, 1), 2) 
-    formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    # formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    formula = x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, x4, y)
@@ -405,7 +418,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = as.factor(rbinom(n, 1, 0.5))
-    formula = x1 + x2 + as.numeric(x3) + 0.01*x1*x2
+    # formula = x1 + x2 + as.numeric(x3) + 0.01*x1*x2
+    formula = 0.01*x1*x2
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, y)
@@ -419,7 +434,9 @@ create_sim_data = function(job, n = 1000, type, ...){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = as.factor(sample(1:5, n, replace = TRUE))
-    formula = x1 + x2 + as.numeric(x3) + 0.01*x1*x2
+    # formula = x1 + x2 + as.numeric(x3) + 0.01*x1*x2
+    formula = as.numeric(x3) + 0.01*x1*x2
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, x3, y)
@@ -431,7 +448,9 @@ create_sim_data = function(job, n = 1000, type, ...){
   } else if (type == "selection_bias_interaction_binary"){
     x1 = runif(n, 0, 1)
     x2 = as.factor(rbinom(n, 1, 0.5))
-    formula = x1 + as.numeric(x2) + ifelse(x2 == 1, x1, 0)
+    # formula = x1 + as.numeric(x2) + ifelse(x2 == 1, x1, 0)
+    formula = ifelse(x2 == 1, x1, 0)
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, y)
@@ -443,7 +462,9 @@ create_sim_data = function(job, n = 1000, type, ...){
   }else if (type == "selection_bias_independence_binary"){
     x1 = runif(n, 0, 1)
     x2 = as.factor(rbinom(n, 1, 0.5))
-    formula = x1 + as.numeric(x2) + ifelse(x2 == 1, x1, 0)
+    # formula = x1 + as.numeric(x2) + ifelse(x2 == 1, x1, 0)
+    formula = ifelse(x2 == 1, x1, 0)
+    
     y =  rnorm(n, 0, 1)
     data = data.frame(x1, x2, y)
     fm = NULL
@@ -453,7 +474,9 @@ create_sim_data = function(job, n = 1000, type, ...){
   } else if (type == "selection_bias_interaction_categorical"){
     x1 = runif(n, 0, 1)
     x2 = as.factor(sample(1:4, n, replace = TRUE))
-    formula = x1 + ifelse(x2 %in% c(2,3), 1, 0)  + ifelse(x2 == 2, x1 ,0) 
+    # formula = x1 + ifelse(x2 %in% c(2,3), 1, 0)  + ifelse(x2 == 2, x1 ,0) 
+    formula = ifelse(x2 %in% c(2,3), 1, 0)  + ifelse(x2 == 2, x1 ,0) 
+    
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     data = data.frame(x1, x2, y)

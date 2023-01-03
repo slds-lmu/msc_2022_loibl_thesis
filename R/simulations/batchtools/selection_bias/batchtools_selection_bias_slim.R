@@ -39,7 +39,7 @@ pdes = list("selection_bias" = pdes)
 source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
 formals(get_sim_results_selection_bias)$tree_methods = "slim"
 formals(get_sim_results_selection_bias)$get.objective = TRUE
-formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 75, 50, 25, 10, 8, 6, 4, 2)
+formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 75, 50, 25, 10, 6, 2)
 
 addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 

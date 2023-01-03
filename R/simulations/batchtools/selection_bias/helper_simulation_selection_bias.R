@@ -19,22 +19,30 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
           quantiles = NULL
         }
         slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = quantiles, min.split = min.split)
-        split_slim = slim[[1]][[1]][["split.feature"]]
+        split_criteria_slim = extract_split_criteria(slim)
+        
+        split_slim = split_criteria_slim[1,"split.feature"]
         result$split_slim = split_slim
         names(result)[names(result) == "split_slim"] = paste0("split_slim_",ifelse(is.null(quantiles),"exact",quantiles))
         if(get.objective){
-          sse_slim = slim[[1]][[1]][["objective.value"]]
+          impr_slim = split_criteria_slim[1,"intImp"]
+          result$impr_slim = impr_slim
+          names(result)[names(result) == "impr_slim"] = paste0("impr_slim_",ifelse(is.null(quantiles),"exact",quantiles))
+          
+          sse_slim = split_criteria_slim[1, "objective.value"]
           result$sse_slim = sse_slim
           names(result)[names(result) == "sse_slim"] = paste0("sse_slim_",ifelse(is.null(quantiles),"exact",quantiles))
         }
       }
     } else{
       slim = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = n.quantiles, min.split = min.split)
-      split_slim = slim[[1]][[1]][["split.feature"]]
+      split_slim = split_criteria_slim[1,"split.feature"]
       result$split_slim = split_slim
       if(get.objective){
-        sse_slim = slim[[1]][[1]][["objective.value"]]
+        sse_slim = split_criteria_slim[1,"objective.value"]
         result$sse_slim = sse_slim
+        impr_slim = split_criteria_slim[1,"intImp"]
+        result$impr_slim = impr_slim
       }
     }
     
