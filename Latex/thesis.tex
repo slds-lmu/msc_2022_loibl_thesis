@@ -18,6 +18,7 @@ bindingoffset = 0mm]{geometry}
 \newcommand{\changefont}{%
     \fontsize{8}{11}\selectfont
 }
+\usepackage{amsmath}
 \usepackage{hyperref}
 \hypersetup{
   colorlinks = true,
@@ -32,6 +33,8 @@ bindingoffset = 0mm]{geometry}
 \setlength{\headheight}{14.5pt}
 \setlength{\parindent}{0pt}
 \interfootnotelinepenalty = 10000
+\DeclareMathOperator*{\argmin}{arg\,min}
+
 
 % ------------------------------------------------------------------------------
 % MAIN -------------------------------------------------------------------------
@@ -124,7 +127,7 @@ culpa qui officia deserunt mollit anim id est laborum.
 \newpage
 
 \section{Background}
-\label{tbsm}
+\label{background}
 \input{Latex/chapters/3_Methodology}
 \newpage
 

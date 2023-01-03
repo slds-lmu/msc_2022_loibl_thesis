@@ -1,9 +1,49 @@
 \subsection{Model}
+Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((Y, \mathbf{X}), \theta)$ be a parametric model, that describes the response $Y$ as a function of a feature matrix $X$  and a vector of parameters $\theta$. If the model is used as a surrogate model, $Y$ is the prediction of the black box model that should be explained. Given $n$ observations $Y_i(i = 1,...,n)$ the model can be fitted by minimizing some objective function $\Psi((Y, X), \theta)$ yielding the parameter estimate $\hat{\theta}$
+\begin{align}
+    \hat{\theta} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(Y_{i}, \mathbf{X}_{i}, \theta).
+\end{align}
+
+In this paper, $\mathcal{M}((Y, X), \theta)$ is restricted to regression models, which include only main-effect models. However, if the data includes interactions, a single global model is not sufficient to fit all n observations well.  To deal with the interactions, one can partition the feature space $X$ into subregions $\{\mathcal{B}_b\}_{b = 1,...,B}$ and search for locally well fitting main-effect models in these regions. The global objective function thus expands to
+\begin{align}
+    \sum_{b=1}^B\sum_{i \in I_b}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_b)
+\end{align}
+and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with corresponding indexes $i_b, b = 1,...,B$) and local optimal parameter $\theta_b$ for each partitions. As \citep{Zeileis.2008} points out, it is very difficult to find the optimal partition, because the number of possible partitions quickly becomes too large for an exhaustive search.
+
+
+
+
 
 \subsection{Model-based Trees}
+In this chapter, four algorithms are described that aim to find a partition that is close to the optimal one and the associated estimators for $\theta_b$ through binary recursive partitioning. This approach involves a greedy forward search to optimize the objective function $\Psi$ locally in each step \citep{Zeileis.2008}.  
+The resulting global models are called Model-based Trees (MBT)
+
+
+
+A recursive partitioning algorithm for MBTs can generally be divided into the following steps:
+\begin{enumerate}
+    \item Start with the partition (node) $I_0 = 1,...,n$
+    \item Fit the model to all observations in the current node $\{y_{i}, \mathbf{x}_{i}\}, i \in I_b$ by estimating $\hat{\theta}$ via minimization of the objective function $\Psi$
+    \item Find the local optimal splitpoint for this node (This is where the biggest differences between the methods lie)
+    \item If no stop criterion is met (e.g. depth of the tree, improvement of the objective through split, significance of parameter instability) split the node in two child nodes and repeat the steps 2-4.
+\end{enumerate}
+
 \subsubsection{SLIM}
-Avoid selection bias by using MOB, CTree or GUIDE to split.
-Comparison of the methods in \citep{Schlosser.24.06.2019}
+\citep{Hu.2020} pursue exactly the goal of this paper with the Surrogate locally interpretable models (SLIM) method, that is: Using predictions of a blackbox models to train a MBT surrogate model, that contains only main effect effect models in the leafnodes. Interactions between variables are taken into account by splitting. In addition, SLIM is generally flexible in its choice of objective function, although the computation is not always computationally efficient.
+
+After fitting the model to all observations in step 2 the loss function or a performance metric is calculated, e.g. SSE.
+In step 3 SLIM performs an exhaustive search to find the optimal splitpoint.  
+For this purpose, a set of potential split points (e.g., quantiles) is selected for numeric variables. For categorical variables, each possible binary split of the categories is used as a potential split point.
+To find the best split point, for each potential split point two models are fitted to the corresponding child nodes and their joint performance is measured. The split point that leads to the greatest improvement in performance is then selected as the optimal split point in this iteration step.
+
+Since the computational effort for estimating all possible child models becomes very large as the number of possible partitioning variables increases, \citep{Hu.2020} have developed an efficient algorithm for estimating them for the case of linear regression, GAMS and ridge regression. A detailed description of this algorithm can be found in \citep{Hu.2020}.
+
+\begin{itemize}
+    \item Indication of a possible problem with selection bias with reference to chapter 4
+\end{itemize}
+
+
+
 
 \subsubsection{MOB}
 Score based M-Fluctuation Test \\
