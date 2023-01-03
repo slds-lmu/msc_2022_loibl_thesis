@@ -29,16 +29,33 @@ terms to a human
 
 Number of leafnodes to reach the same performance
 
-\subsection{Linear Models in the leafnodes}
-Comparison of SLIM, MOB, CTree and GUIDE
 
-Simulation Scenarios:
+\subsection{Simulation Scenarios}
+
+\subsubsection{Basic scenarios}
+\textbf{Linear smooth}
+Numerical features with linear effects on y and smooth interactions
+
+
+\textbf{Linear abrupt}
+Numerical and binary features with linear effects and abrupt interactions
+
+\textbf{Linear mixed}
+Numerical and binary features with linear effects, abrupt and smooth interactions
+
+\subsubsection{Correlated features}
+
+\subsubsection{Big number of noisy features}
+Linear mixed + many noise variables
+SLIM and GUIDE with LASSO
+MOB and CTree standard lm
+
+\subsubsection{Non-linear Effects}
 \begin{itemize}
-    \item numerical or/and categorical features
-    \item abrupt vs smooth vs mixed interactions
-    \item different correlation patterns between features
+    \item Linear mixed with non-linear main effects
+    \item Linear mixed with non-linear main effect + nonlinear interactions
 \end{itemize}
 
+SLIM and GUIDE with GAMs and penalized polynomial regression
 
-\subsection{Sparse (spline-based) models in the leafnodes}
-Comparison of SLIM and GA2M (EBM)
+
