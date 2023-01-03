@@ -42,42 +42,48 @@ savedir ="Data/simulations/batchtools/selection_bias_guide/results/"
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 
-for(t in unique(split_data$type)){
-  for (exclude in unique(split_data[type == t, exclude.categoricals])){
-    for (correct in unique(split_data[type == t, correct.bias])){
-      tab_small = split_data[type == t & exclude.categoricals == exclude & correct.bias == correct, ]
-      
-      saveRDS(tab_small, file = paste0(savedir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), ".rds"))
-      
-      p = ggplot(stack(tab_small[,.(split_guide)]),
-                 aes(x = values, color=ind, fill = ind)) +
-        stat_count(position = "dodge") +
-        ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), 
-                                                           ifelse(exclude, "categoricals excl", "categoricals incl"),
-                                                           ifelse(correct, "_bias_corrected", "_biased"))) +
-        labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-      
-      ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), 
-                                    ifelse(correct, "_bias_corrected", "_biased"), ".pdf"), width = 8, height = 3.8)
-      
-      for(test in c("curvature", "interaction")){
-        
-        p = ggplot(stack(tab_small[test_guide == test,.(split_guide)]),
-                   aes(x = values, color=ind, fill = ind)) +
-          stat_count(position = "dodge") +
-          ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), 
-                                                             ifelse(exclude, "categoricals excl", "categoricals incl"),
-                                                             ifelse(correct, "_bias_corrected", "_biased"), test)) +
-          labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-        
-        ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), 
-                                      ifelse(exclude, "_categoricals_excl", "_categoricals_incl"),
-                                      ifelse(correct, "_bias_corrected", "_biased"), "_", test,".pdf"), width = 8, height = 3.8)
-        
-      }
-    }
-  }
-}
+table(split_data[n==1000, split_guide_excl_catbiased])
+table(split_data[n==1000, split_guide_excl_catcorr])
+table(split_data[n==2000, split_guide_incl_catbiased])
+table(split_data[n==1000, split_guide_incl_catcorr])
+
+
+# for(n.data in unique(split_data$n)){
+#   for (exclude in c(TRUE, FALSE)){
+#     for (correct in c(TRUE, FALSE)){
+#       tab_small = split_data[n == n.data, exclude.categoricals == exclude & correct.bias == correct, ]
+#       
+#       saveRDS(tab_small, file = paste0(savedir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), ".rds"))
+#       
+#       p = ggplot(stack(tab_small[,.(split_guide)]),
+#                  aes(x = values, color=ind, fill = ind)) +
+#         stat_count(position = "dodge") +
+#         ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), 
+#                                                            ifelse(exclude, "categoricals excl", "categoricals incl"),
+#                                                            ifelse(correct, "_bias_corrected", "_biased"))) +
+#         labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+#       
+#       ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), 
+#                                     ifelse(correct, "_bias_corrected", "_biased"), ".pdf"), width = 8, height = 3.8)
+#       
+#       for(test in c("curvature", "interaction")){
+#         
+#         p = ggplot(stack(tab_small[test_guide == test,.(split_guide)]),
+#                    aes(x = values, color=ind, fill = ind)) +
+#           stat_count(position = "dodge") +
+#           ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), 
+#                                                              ifelse(exclude, "categoricals excl", "categoricals incl"),
+#                                                              ifelse(correct, "_bias_corrected", "_biased"), test)) +
+#           labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+#         
+#         ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), 
+#                                       ifelse(exclude, "_categoricals_excl", "_categoricals_incl"),
+#                                       ifelse(correct, "_bias_corrected", "_biased"), "_", test,".pdf"), width = 8, height = 3.8)
+#         
+#       }
+#     }
+#   }
+# }
 
 
 

@@ -45,13 +45,20 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
       for(cor in correct.bias){
         guide = compute_tree_slim(y, x ,n.split = 1, pruning = "none", n.quantiles = NULL, min.split = min.split, 
                                   split.method = "guide", exclude.categoricals = exc, correct.bias = cor)
-        split_guide = guide[[1]][[1]][["split.feature"]]
-        test_guide = guide[[1]][[1]][["test.type"]]
+        split_criteria = extract_split_criteria(guide)
+        
+        split_guide = split_criteria[1,"split.feature"]
+        test_guide = split_criteria[1,"guide.test"]
+        impr_guide = split_criteria[1,"intImp"]
+        
         result$split_guide = split_guide
-        names(result)[names(result) == "split_guide"] = paste0("split_guide_",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "corr", "biased"))
+        names(result)[names(result) == "split_guide"] = paste0("split_guide_",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
         
         result$test_guide = test_guide
         names(result)[names(result) == "test_guide"] = paste0("test_guide_",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
+        
+        result$impr_guide = impr_guide
+        names(result)[names(result) == "impr_guide"] = paste0("impr_guide",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
         
       }
     }
