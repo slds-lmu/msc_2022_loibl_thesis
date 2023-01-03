@@ -42,10 +42,36 @@ savedir ="Data/simulations/batchtools/selection_bias_guide/results/"
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 
-table(split_data[n==1000, split_guide_excl_catbiased])
-table(split_data[n==1000, split_guide_excl_catcorr])
-table(split_data[n==2000, split_guide_incl_catbiased])
-table(split_data[n==1000, split_guide_incl_catcorr])
+table(split_data[impr_guideexcl_cat_biased < 0.01, split_guide_excl_cat_biased])
+table(split_data[impr_guideexcl_cat_corr < 0.01, split_guide_excl_cat_corr])
+table(split_data[impr_guideincl_cat_corr < 0.02, split_guide_incl_cat_corr])
+
+
+ggplot(split_data,
+       aes(x = split_guide_excl_cat_biased, y = impr_guideexcl_cat_biased)) +
+  stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot()
+
+ggplot(split_data,
+       aes(x = split_guide_excl_cat_biased)) +
+  stat_count(position = "dodge") +
+  ggtitle("Frequency of selection") +
+  labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+
+ggplot(split_data,
+       aes(x = split_guide_excl_cat_corr, y = impr_guideexcl_cat_corr)) +
+  stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot()
+
+ggplot(split_data,
+       aes(x = split_guide_incl_cat_corr, y = impr_guideincl_cat_corr)) +
+  stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot()
+
+ggplot(split_data,
+       aes(x = split_guide_incl_cat_biased, y = impr_guideincl_cat_biased)) +
+  stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot()
 
 
 # for(n.data in unique(split_data$n)){
@@ -91,6 +117,8 @@ table(split_data[n==1000, split_guide_incl_catcorr])
 # slim selection bias different values of n.quantiles
 list.files("Data/simulations/batchtools/selection_bias_slim/results/", full.names = TRUE)
 selection_bias_slim = rbind(readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds"))
+
+table(selection_bias_slim[type == ])
 
 figuredir_slim = "Figures/simulations/batchtools/selection_bias_slim/"
 savedir_slim = "Data/simulations/batchtools/selection_bias_slim/results/"

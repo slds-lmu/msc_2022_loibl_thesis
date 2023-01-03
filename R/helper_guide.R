@@ -45,8 +45,7 @@ test_curvature = function(xval, ybin, xgroups){
   # if all values of the selected covariate are equal return highest possible p.value 
   # and Teststatistic = 0
   if(length(unique(xval))<2) return(list(z.value = log(1-1), statistic = log(0)))
-  # browser()
-  
+
   # categorize split variable
   
   if(is.numeric(xval)){
@@ -114,7 +113,7 @@ test_interaction = function(x, xvals, ybin, xgroups){
   } else {
     x2_cat = xval2
   }
-
+  # browser()
   # combine the two categorized variables in one factor variable
   level_comb = as.data.table(expand.grid(unique(x1_cat), unique(x2_cat)))
   colnames(level_comb) = c("x1", "x2")
@@ -130,7 +129,7 @@ test_interaction = function(x, xvals, ybin, xgroups){
   # compute interaction test 
   # browser()
 
-  tst_int = chisq.test(x = ybin, y = x_cat_int, correct = FALSE)
+  tst_int = chisq.test(x = ybin, y = x_cat_int)
   ret = c(z1 = xvals[1], z2 = xvals[2], z.value = qnorm(1 - as.numeric(tst_int$p.value)/2), 
           statistic = log(as.numeric(tst_int$statistic)))
   return(ret)
@@ -187,13 +186,13 @@ find_split_variable_from_tests = function(y, x, curv_test, int_test, optimizer, 
 }
 
 
-bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 50){
+bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 100){
   # if there are only numerical ore only categorical features, no bias correction is needed
   if(sum(sapply(x, is.factor)) %in% c(0L, ncol(x))){
     return(1)
   } else {
     
-    r_grid = seq(1, 5, length.out = 40)
+    r_grid = seq(0.5, 5, length.out = 151)
     x_factor = colnames(x)[sapply(x, is.factor)]
     
     # Target frequency of a numerical variable
