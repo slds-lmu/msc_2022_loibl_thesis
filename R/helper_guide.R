@@ -73,7 +73,12 @@ test_curvature = function(xval, ybin, xgroups){
   # compute curvature test (for each parameter separately)
   # browser()
   tst_curv = chisq.test(x = ybin, y = x_cat)
-  ret = c(z.value = qnorm(1 - as.numeric(tst_curv$p.value)/2), statistic = log(as.numeric(tst_curv$statistic)))
+  
+  # ret = c(z.value = qnorm(1 - as.numeric(tst_curv$p.value)/2), statistic = log(as.numeric(tst_curv$statistic)))
+  # browser()
+  p_value = pchisq(tst_curv$statistic, 3, lower.tail = FALSE)
+  ret = c(z.value = qnorm(1 - as.numeric(p_value)/2), statistic = log(as.numeric(tst_curv$statistic)))
+  
   return(ret)
 }
 
@@ -130,8 +135,18 @@ test_interaction = function(x, xvals, ybin, xgroups){
   # browser()
 
   tst_int = chisq.test(x = ybin, y = x_cat_int)
-  ret = c(z1 = xvals[1], z2 = xvals[2], z.value = qnorm(1 - as.numeric(tst_int$p.value)/2), 
+  
+  
+  
+  # ret = c(z1 = xvals[1], z2 = xvals[2], z.value = qnorm(1 - as.numeric(tst_int$p.value)/2), 
+  #         statistic = log(as.numeric(tst_int$statistic)))
+  
+  p_value = pchisq(tst_int$statistic, 3, lower.tail = FALSE)
+  ret = c(z1 = xvals[1], z2 = xvals[2], z.value = qnorm(1 - as.numeric(p_value)/2), 
           statistic = log(as.numeric(tst_int$statistic)))
+  
+  
+
   return(ret)
   
 }
