@@ -74,38 +74,59 @@ ggplot(split_data,
   geom_boxplot()
 
 
+library(ggplot2)
+library(ggpubr)
+library(stringr)
+
+col_split = str_subset(colnames(split_data), "split")
+
+for (split in col_split){
+  split_small = split_data[, split, with = FALSE]
+  
+  saveRDS(split_small, file = paste0(savedir, split, ".rds"))
+  
+  p = ggplot(stack(split_data[, split, with = FALSE]),
+             aes(x = values)) +
+    stat_count(position = "dodge") +
+    ggtitle("Frequency of selection", subtitle = split) +
+    labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+  
+  ggexport(p, filename = paste0(figuredir, split, ".pdf"), width = 8, height = 3.8)
+
+}
+
 # for(n.data in unique(split_data$n)){
 #   for (exclude in c(TRUE, FALSE)){
 #     for (correct in c(TRUE, FALSE)){
 #       tab_small = split_data[n == n.data, exclude.categoricals == exclude & correct.bias == correct, ]
-#       
+# 
 #       saveRDS(tab_small, file = paste0(savedir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), ".rds"))
-#       
+# 
 #       p = ggplot(stack(tab_small[,.(split_guide)]),
 #                  aes(x = values, color=ind, fill = ind)) +
 #         stat_count(position = "dodge") +
-#         ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), 
+#         ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "),
 #                                                            ifelse(exclude, "categoricals excl", "categoricals incl"),
 #                                                            ifelse(correct, "_bias_corrected", "_biased"))) +
 #         labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-#       
-#       ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), 
+# 
+#       ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"),
 #                                     ifelse(correct, "_bias_corrected", "_biased"), ".pdf"), width = 8, height = 3.8)
-#       
+# 
 #       for(test in c("curvature", "interaction")){
-#         
+# 
 #         p = ggplot(stack(tab_small[test_guide == test,.(split_guide)]),
 #                    aes(x = values, color=ind, fill = ind)) +
 #           stat_count(position = "dodge") +
-#           ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), 
+#           ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "),
 #                                                              ifelse(exclude, "categoricals excl", "categoricals incl"),
 #                                                              ifelse(correct, "_bias_corrected", "_biased"), test)) +
 #           labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-#         
-#         ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), 
+# 
+#         ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"),
 #                                       ifelse(exclude, "_categoricals_excl", "_categoricals_incl"),
 #                                       ifelse(correct, "_bias_corrected", "_biased"), "_", test,".pdf"), width = 8, height = 3.8)
-#         
+# 
 #       }
 #     }
 #   }
@@ -130,7 +151,7 @@ for(t in unique(selection_bias_slim$type)){
   cols_sse = str_detect(names(data), "sse")
   data_long_sse = stack(data[, cols_sse, with = FALSE])
   data_long_sse$ind = str_remove_all(data_long_sse$ind, "sse_slim_")
-  p_sse = ggplot(data_long_sse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "8", "6", "4", "2")), y=values)) + 
+  p_sse = ggplot(data_long_sse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "6", "2")), y=values)) + 
     geom_point(stat='summary', fun='mean') +
     ggtitle("mean SSE for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
     labs(x="number of quantiles", y = "SSE")

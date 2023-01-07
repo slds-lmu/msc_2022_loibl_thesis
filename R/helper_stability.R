@@ -126,6 +126,11 @@ RC_jac(m1, m2, W)
 
 F1 = list(c(1,2,3), c(4,5,6), c(7,8,9,10,11,12))
 F2 = list(c(1,2,3), c(4,7,8,12), c(5,6,9,10,11))
+
+m1 = bpa(c(F1, F2), F1)
+m2 = bpa(c(F1, F2), F1)
+
+
 RC(node_ids_1 = NULL, node_ids_2 = NULL, region_set_1 = F1, region_set_2 = F2)
 
 
