@@ -7,7 +7,7 @@ if (!dir.exists("Data/simulations/batchtools/selection_bias_general")) dir.creat
 reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_general/batchtools",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R"),
-                             seed = 1, conf.file = NA)
+                             seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
@@ -16,10 +16,10 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
 pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence", 
-                                                  "selection_bias_independence_small",
-                                                  "selection_bias_full_interaction",
-                                                  "selection_bias_guide",
-                                                  "selection_bias_guide_uniform"), each = 1))
+                                          "selection_bias_independence_small",
+                                          "selection_bias_full_interaction",
+                                          "selection_bias_guide",
+                                          "selection_bias_guide_uniform"), each = 1))
 pdes = list("selection_bias" = pdes)
 
 
@@ -78,25 +78,25 @@ figuredir = "Figures/simulations/batchtools/selection_bias_general/"
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 saveRDS(tab, paste0(savedir,"selection_bias_general.rds"))
 
-# if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
-# 
-# for (t in unique(tab$type)){
-#   for (n_data in unique(tab[type == t , n])){
-#     tab_t_n = tab[type == t & n == n_data, ]
-#     result = list(slim = table(tab_t_n$split_slim),
-#                   mob = table(tab_t_n$split_mob),
-#                   ctree = table(tab_t_n$split_ctree),
-#                   guide = table(tab_t_n$split_guide))
-#     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
-#     
-#     p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree, split_guide)]),
-#                aes(x = values, color=ind, fill = ind)) +
-#       stat_count(position = "dodge") +
-#       ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n_data)) +
-#       labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate") 
-#     
-#     ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), "_n", n_data, ".pdf"), width = 8, height = 3.8)
-#     
-#   }
-# }
+if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
+
+for (t in unique(tab$type)){
+  for (n_data in unique(tab[type == t , n])){
+    tab_t_n = tab[type == t & n == n_data, ]
+    result = list(slim = table(tab_t_n$split_slim),
+                  mob = table(tab_t_n$split_mob),
+                  ctree = table(tab_t_n$split_ctree),
+                  guide = table(tab_t_n$split_guide))
+    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
+
+    p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree, split_guide)]),
+               aes(x = values, color=ind, fill = ind)) +
+      stat_count(position = "dodge") +
+      ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n_data)) +
+      labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+
+    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), "_n", n_data, ".pdf"), width = 8, height = 3.8)
+
+  }
+}
 

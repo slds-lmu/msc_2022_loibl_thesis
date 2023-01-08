@@ -19,5 +19,9 @@ library(splines)
 library(partitions)
 library(partykit)
 library(checkmate)
-
+library(mlr3)
+library(mlr3learners)
+library(mlr3measures)
+library(mlr3pipelines)
+library(mlr3tuning)
 

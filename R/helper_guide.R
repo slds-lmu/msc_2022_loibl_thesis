@@ -257,16 +257,8 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 100){
     prob_n_obs = apply(z_bootstrap,1, function(row){
       prob = sum(row == "n")/n.bootstrap
     })
-    
-    # choose that grid.point r, for which the difference between the expected frequency of n 
-    # splitting variable and the obseverd is the smallest
-    prob_n_diff = abs(prob_n_obs - prob_n_exp)
-    r_candidates = prob_n_obs[prob_n_diff == min(prob_n_diff)]
-    if(length(r_candidates)>1){
-      r = as.numeric(names(r_candidates)[abs(1-as.numeric(names(r_candidates))) == min(abs(1-as.numeric(names(r_candidates))))])
-    } else{
-      r = as.numeric(names(r_candidates))
-    }
+
+    r = approx(as.numeric(prob_n_obs), as.numeric(names(prob_n_obs)), xout = prob_n_exp, method = "linear", ties = "ordered")$y
     return(r)
   }
 }

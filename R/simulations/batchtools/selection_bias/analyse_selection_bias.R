@@ -1,6 +1,50 @@
 # load results
 
 list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
+tab = readRDS("Data/simulations/batchtools/selection_bias_general/results/selection_bias_general.rds")
+
+savedir = "Data/simulations/batchtools/selection_bias_general/results/"
+figuredir = "Figures/simulations/batchtools/selection_bias_general/"
+
+if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
+
+if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
+
+for (t in unique(tab$type)){
+  for (n_data in unique(tab[type == t , n])){
+    tab_t_n = tab[type == t & n == n_data, ]
+    result = list(slim = table(tab_t_n$split_slim_exact),
+                  slim_100 = table(tab_t_n$split_slim_100),
+                  slim_10 = table(tab_t_n$split_slim_10),
+                  mob = table(tab_t_n$split_mob),
+                  ctree = table(tab_t_n$split_ctree),
+                  guide_corr_inclcat = table(tab_t_n$impr_guideincl_cat_corr),
+                  guide_corr_excllcat = table(tab_t_n$impr_guide_excl_cat_corr),
+                  guide_biased_inclcat = table(tab_t_n$impr_guideincl_cat_biased),
+                  guide_biased_excllcat = table(tab_t_n$impr_guide_excl_cat_biased)
+                  
+                  )
+    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), ".rds"))
+    
+    
+    cols_split = str_detect(colnames(tab_t_n), "split")
+    
+    p = ggplot(stack(tab_t_n[,cols_split, with = FALSE]),
+               aes(x = values, color=ind, fill = ind)) +
+      stat_count(position = "dodge") +
+      ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "))) +
+      labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+    
+    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ".pdf"), width = 8, height = 3.8)
+    
+  }
+}
+
+
+
+
+
+
 
 independence = readRDS("Data/simulations/batchtools/selection_bias_general/results/independence_n1000.rds")
 

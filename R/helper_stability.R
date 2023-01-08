@@ -76,7 +76,7 @@ RC = function(node_ids_1, node_ids_2, region_set_1 = NULL, region_set_2 = NULL){
     region_set_1 = create_index_list(node_ids_1)
     region_set_2 = create_index_list(node_ids_2)
   }
-  browser()
+  # browser()
   m1 = bpa(c(region_set_1, region_set_2), region_set_1)
   m2 = bpa(c(region_set_1, region_set_2), region_set_2)
   rc_id = RC_id(m1, m2)
@@ -88,25 +88,32 @@ RC = function(node_ids_1, node_ids_2, region_set_1 = NULL, region_set_2 = NULL){
 
 
 
+source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/helper_general.R")
+source("R/helper_guide.R")
+source("R/tree_splitting_slim.R")
+
 
 
 data_linear = create_sim_data(n = 1000, type = "basic_linear_smooth")$data
 
-sample1 = sample(1:nrow(data_linear), 900, replace = FALSE)
+sample1 = sample(1:nrow(data_linear), 700, replace = FALSE)
 data_linear_1  = data_linear[sample1, ]
 x_linear_1 = data_linear_1[,colnames(data_linear_1) != "y"]
 y_linear_1 = data_linear_1$y
-slim_linear_1 = compute_tree_slim(y = y_linear_1, x = x_linear_1, n.split = 3, split.method = "slim")
-regions_1 = predict_slim(slim_linear_1, x_linear, type = "node")
+slim_linear_1 = compute_tree_slim(y = y_linear_1, x = x_linear_1, n.split = 4, split.method = "slim", impr.par = 0.2)
+split_slim_linear_1 = extract_split_criteria(slim_linear_1)
+regions_1 = predict_slim(slim_linear_1, data_linear, type = "node")
+# table(regions_1)
 
-
-sample2 = sample(1:nrow(data_linear), 900, replace = FALSE)
+sample2 = sample(1:nrow(data_linear), 700, replace = FALSE)
 data_linear_2  = data_linear[sample2, ]
 x_linear_2 = data_linear_2[,colnames(data_linear_2) != "y"]
 y_linear_2 = data_linear_2$y
-slim_linear_2 = compute_tree_slim(y = y_linear_2, x = x_linear_2, n.split = 3, split.method = "slim")
-regions_2 = predict_slim(slim_linear_2, x_linear, type = "node")
-
+slim_linear_2 = compute_tree_slim(y = y_linear_2, x = x_linear_2, n.split = 4, split.method = "slim", impr.par = 0.2)
+split_slim_linear_2 = extract_split_criteria(slim_linear_2)
+regions_2 = predict_slim(slim_linear_2, data_linear, type = "node")
+# table(regions_2)
 
 index_list_1 = create_index_list(regions_1)
 index_list_2 = create_index_list(regions_2)
@@ -119,6 +126,15 @@ W = jaccard_matrix(c(index_list_1,index_list_2))
 RC_jac(m1, m2, W)
 
 
+
+RC(regions_1, regions_2)$RC_jac
+adj.rand.index(regions_1, regions_2)
+
+rep_1 = c(1,1,1, 2,2,2, 3,3,3)
+rep_2 = c(1,1,1, 2,2,5, 3,3,4)
+
+RC(rep_1, rep_2)$RC_jac
+adj.rand.index(rep_1, rep_2)
 
 
 
