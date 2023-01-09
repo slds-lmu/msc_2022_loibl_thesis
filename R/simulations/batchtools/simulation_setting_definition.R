@@ -444,22 +444,46 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     
   } else if (type == "selection_bias_interaction_categorical_numeric"){
-    # x1 and x2 should be chosen equally often, x3 should never be selected
+    # x1 and x2 should be chosen equally often, the rest should never be selected
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = as.factor(sample(1:5, n, replace = TRUE))
-    # formula = x1 + x2 + as.numeric(x3) + 0.01*x1*x2
-    formula = as.numeric(x3) + 0.01*x1*x2
+    x4 = as.factor(sample(1:2, n, replace = TRUE))
+    x5 = as.factor(sample(1:5, n, replace = TRUE))
+    x6 = as.factor(sample(1:8, n, replace = TRUE))
+    
+    formula = 0.01*x1*x2
     
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
-    data = data.frame(x1, x2, x3, y)
+    data = data.frame(x1, x2, x3, x4, x5, x6, y)
     fm = NULL
     lrn = NULL
     search_space = NULL
     
     
-  } else if (type == "selection_bias_interaction_binary"){
+  } else if (type == "selection_bias_interaction_numeric"){
+    # x1 and x2 should be chosen equally often, the rest should never be selected
+    x1 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)    
+    x2 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
+    x4 = runif(n,0,1)
+    x5 = runif(n,0,1)
+    x6 = runif(n,0,1)
+    
+    formula = 0.01*x1*x2
+    
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    data = data.frame(x1, x2, x3, x4, x5, x6, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+    
+  }
+  
+  
+  
+  else if (type == "selection_bias_interaction_binary"){
     x1 = runif(n, 0, 1)
     x2 = as.factor(rbinom(n, 1, 0.5))
     # formula = x1 + as.numeric(x2) + ifelse(x2 == 1, x1, 0)

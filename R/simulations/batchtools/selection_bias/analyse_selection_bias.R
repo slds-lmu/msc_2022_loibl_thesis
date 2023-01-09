@@ -122,7 +122,24 @@ library(ggplot2)
 library(ggpubr)
 library(stringr)
 
-col_split = str_subset(colnames(split_data), "split")
+
+for (t in unique(split_data$type)){
+  for (n_data in unique(split_data[type == t , n])){
+    tab_t_n = split_data[type == t & n == n_data, ]
+
+    
+    cols_split = str_detect(colnames(tab_t_n), "split")
+    
+    p = ggplot(stack(tab_t_n[,cols_split, with = FALSE]),
+               aes(x = values, color=ind, fill = ind)) +
+      stat_count(position = "dodge") +
+      ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "))) +
+      labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+    
+    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ".pdf"), width = 8, height = 3.8)
+    
+  }
+}
 
 for (split in col_split){
   split_small = split_data[, split, with = FALSE]

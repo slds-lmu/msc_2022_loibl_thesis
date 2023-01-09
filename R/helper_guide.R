@@ -7,7 +7,6 @@ guide_test <- function(y, x, residuals, xgroups = NULL, optimizer, objective, co
   # separately for each parameter
   x_factor = colnames(x)[sapply(x, is.factor)]
   ybin <- (-1)^((residuals>0)+1)   # -1 or +1
-  # browser()
   curv_test = sapply(x, function(xval){
     test_curvature(xval = xval, ybin = ybin, xgroups = xgroups)
   })
@@ -45,7 +44,6 @@ test_curvature = function(xval, ybin, xgroups){
   # if all values of the selected covariate are equal return highest possible p.value 
   # and Teststatistic = 0
   if(length(unique(xval))<2) return(list(z.value = log(1-1), statistic = log(0)))
-
   # categorize split variable
   
   if(is.numeric(xval)){
@@ -71,8 +69,9 @@ test_curvature = function(xval, ybin, xgroups){
   
   
   # compute curvature test (for each parameter separately)
-  # browser()
   tst_curv = chisq.test(x = ybin, y = x_cat)
+  
+  
   
   ret = c(z.value = qnorm(1 - as.numeric(tst_curv$p.value)/2), statistic = log(as.numeric(tst_curv$statistic)))
 
@@ -82,6 +81,7 @@ test_curvature = function(xval, ybin, xgroups){
 
 
 test_interaction = function(x, xvals, ybin, xgroups){
+  # browser()
   xval1 = x[,xvals[1]]
   xval2 = x[,xvals[2]]
   
@@ -124,6 +124,7 @@ test_interaction = function(x, xvals, ybin, xgroups){
   x_cat_df = data.frame(x1 = x1_cat, x2 = x2_cat)
   x_cat_df_new = left_join(x_cat_df, level_comb, by = c("x1","x2"), sort = FALSE)
   x_cat_int = x_cat_df_new$id
+  table(x_cat_int)
   
   if(length(unique(x_cat_int)) == 1) return(list(z.value = log(1-1), statistic = log(0)))
   
@@ -131,7 +132,7 @@ test_interaction = function(x, xvals, ybin, xgroups){
   # compute interaction test 
 
   tst_int = chisq.test(x = ybin, y = x_cat_int)
-  
+  chisq.test(table(x_cat_int,ybin))
   
   
   ret = c(z1 = xvals[1], z2 = xvals[2], z.value = qnorm(1 - as.numeric(tst_int$p.value)/2),
@@ -142,6 +143,7 @@ test_interaction = function(x, xvals, ybin, xgroups){
 }
 
 find_split_variable_from_tests = function(y, x, curv_test, int_test, optimizer, objective){
+  # browser()
   if(max(curv_test[,z.value]) > max(int_test[, z.value])){
     z = curv_test[z.value == max(z.value), z]
     type = "curvature"
@@ -191,13 +193,12 @@ find_split_variable_from_tests = function(y, x, curv_test, int_test, optimizer, 
 }
 
 
-bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 100){
+bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 50){
   # if there are only numerical ore only categorical features, no bias correction is needed
   if(sum(sapply(x, is.factor)) %in% c(0L, ncol(x))){
     return(1)
   } else {
-    
-    r_grid = seq(0.5, 5, length.out = 151)
+    r_grid = seq(0.5, 5, length.out = 76)
     x_factor = colnames(x)[sapply(x, is.factor)]
     
     # Target frequency of a numerical variable
@@ -205,7 +206,8 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 100){
     
     z_bootstrap = lapply(1:n.bootstrap, function(r){
       # in each bootstrap iteraction, a new y_b is sampled
-      y_b = sample(unlist(y), size = nrow(y), replace = TRUE)
+
+      y_b = unlist(sample(unlist(y), size = nrow(y), replace = TRUE))
       model_b = fit(y = y_b, x = x)
       residuals_b = y_b - predict(model_b, x)
       ybin_b <- (-1)^((residuals_b>0)+1)   # -1 or +1
@@ -251,6 +253,7 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 100){
       return(z_type)
     })
 
+    # browser()
     # for each grid.point calculate the observed frequency of a numerical splitting varible
     z_bootstrap = as.data.frame(z_bootstrap)
     colnames(z_bootstrap) = 1:n.bootstrap
@@ -258,7 +261,8 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 100){
       prob = sum(row == "n")/n.bootstrap
     })
 
-    r = approx(as.numeric(prob_n_obs), as.numeric(names(prob_n_obs)), xout = prob_n_exp, method = "linear", ties = "ordered")$y
+    # plot(as.numeric(names(prob_n_obs)), as.numeric(prob_n_obs))
+    r = approx(as.numeric(prob_n_obs), as.numeric(names(prob_n_obs)), xout = prob_n_exp, method = "constant", ties = "ordered", f = 1)$y
     return(r)
   }
 }
