@@ -141,20 +141,20 @@ for (t in unique(split_data$type)){
   }
 }
 
-for (split in col_split){
-  split_small = split_data[, split, with = FALSE]
-  
-  saveRDS(split_small, file = paste0(savedir, split, ".rds"))
-  
-  p = ggplot(stack(split_data[, split, with = FALSE]),
-             aes(x = values)) +
-    stat_count(position = "dodge") +
-    ggtitle("Frequency of selection", subtitle = split) +
-    labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-  
-  ggexport(p, filename = paste0(figuredir, split, ".pdf"), width = 8, height = 3.8)
-
-}
+# for (split in col_split){
+#   split_small = split_data[, split, with = FALSE]
+#   
+#   saveRDS(split_small, file = paste0(savedir, split, ".rds"))
+#   
+#   p = ggplot(stack(split_data[, split, with = FALSE]),
+#              aes(x = values)) +
+#     stat_count(position = "dodge") +
+#     ggtitle("Frequency of selection", subtitle = split) +
+#     labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+#   
+#   ggexport(p, filename = paste0(figuredir, split, ".pdf"), width = 8, height = 3.8)
+# 
+# }
 
 # for(n.data in unique(split_data$n)){
 #   for (exclude in c(TRUE, FALSE)){

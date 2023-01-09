@@ -19,13 +19,16 @@ pdes = expand.grid(n = 1000, type = rep(c("selection_bias_independence",
                                           "selection_bias_independence_small",
                                           "selection_bias_full_interaction",
                                           "selection_bias_guide",
-                                          "selection_bias_guide_uniform"), each = 1))
+                                          "selection_bias_interaction_categorical_numeric",
+                                          "selection_bias_interaction_numeric",
+                                          "selection_bias_interaction_numeric_2"
+                                          ), each = 1))
 pdes = list("selection_bias" = pdes)
 
 
 # add algorithm
 source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
-formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 10)
+formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 50, 10)
 formals(get_sim_results_selection_bias)$exclude.categoricals = c(TRUE, FALSE)
 formals(get_sim_results_selection_bias)$correct.bias = c(TRUE, FALSE)
 
@@ -53,9 +56,8 @@ testJob(id = id1)
 
 
 # submit jobs
-submitJobs(ids = 1:10, reg = reg)
-estimateRuntimes()
 submitJobs(reg = reg)
+
 
 
 # reduce jobs/ summarise results
@@ -78,25 +80,25 @@ figuredir = "Figures/simulations/batchtools/selection_bias_general/"
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 saveRDS(tab, paste0(savedir,"selection_bias_general.rds"))
 
-if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
-
-for (t in unique(tab$type)){
-  for (n_data in unique(tab[type == t , n])){
-    tab_t_n = tab[type == t & n == n_data, ]
-    result = list(slim = table(tab_t_n$split_slim),
-                  mob = table(tab_t_n$split_mob),
-                  ctree = table(tab_t_n$split_ctree),
-                  guide = table(tab_t_n$split_guide))
-    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
-
-    p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree, split_guide)]),
-               aes(x = values, color=ind, fill = ind)) +
-      stat_count(position = "dodge") +
-      ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n_data)) +
-      labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-
-    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), "_n", n_data, ".pdf"), width = 8, height = 3.8)
-
-  }
-}
+# if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
+# 
+# for (t in unique(tab$type)){
+#   for (n_data in unique(tab[type == t , n])){
+#     tab_t_n = tab[type == t & n == n_data, ]
+#     result = list(slim = table(tab_t_n$split_slim),
+#                   mob = table(tab_t_n$split_mob),
+#                   ctree = table(tab_t_n$split_ctree),
+#                   guide = table(tab_t_n$split_guide))
+#     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
+# 
+#     p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree, split_guide)]),
+#                aes(x = values, color=ind, fill = ind)) +
+#       stat_count(position = "dodge") +
+#       ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n_data)) +
+#       labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+# 
+#     ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), "_n", n_data, ".pdf"), width = 8, height = 3.8)
+# 
+#   }
+# }
 

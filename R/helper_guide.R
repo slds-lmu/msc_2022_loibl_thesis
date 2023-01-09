@@ -1,12 +1,12 @@
 # functions for finding the best splitting variable with guide
 
 
-guide_test <- function(y, x, residuals, xgroups = NULL, optimizer, objective, correction.factor) {
+guide_test = function(y, x, residuals, xgroups = NULL, optimizer, objective, correction.factor) {
   # categorize residuals
   # split Y into 2 parts based on whether residuals are positive or non-positive
   # separately for each parameter
   x_factor = colnames(x)[sapply(x, is.factor)]
-  ybin <- (-1)^((residuals>0)+1)   # -1 or +1
+  ybin = (-1)^((residuals>0)+1)   # -1 or +1
   curv_test = sapply(x, function(xval){
     test_curvature(xval = xval, ybin = ybin, xgroups = xgroups)
   })
@@ -66,12 +66,8 @@ test_curvature = function(xval, ybin, xgroups){
   
   if(length(unique(x_cat)) == 1) return(list(z.value = log(1-1), statistic = log(0)))
   
-  
-  
   # compute curvature test (for each parameter separately)
   tst_curv = chisq.test(x = ybin, y = x_cat)
-  
-  
   
   ret = c(z.value = qnorm(1 - as.numeric(tst_curv$p.value)/2), statistic = log(as.numeric(tst_curv$statistic)))
 
@@ -81,15 +77,13 @@ test_curvature = function(xval, ybin, xgroups){
 
 
 test_interaction = function(x, xvals, ybin, xgroups){
-  # browser()
   xval1 = x[,xvals[1]]
   xval2 = x[,xvals[2]]
   
   if(length(unique(xval1)) < 2 | length(unique(xval2)) < 2){
     return(list(z1 = xvals[1], z2 = xvals[2], z.value = log(1-1), statistic = log(0)))
   }
-  # browser()
-  
+
   # categorize split variables
   if(is.null(xgroups)){
     xgroups = 2
@@ -115,7 +109,6 @@ test_interaction = function(x, xvals, ybin, xgroups){
   } else {
     x2_cat = xval2
   }
-  # browser()
   # combine the two categorized variables in one factor variable
   level_comb = as.data.table(expand.grid(unique(x1_cat), unique(x2_cat)))
   colnames(level_comb) = c("x1", "x2")
@@ -143,7 +136,6 @@ test_interaction = function(x, xvals, ybin, xgroups){
 }
 
 find_split_variable_from_tests = function(y, x, curv_test, int_test, optimizer, objective){
-  # browser()
   if(max(curv_test[,z.value]) > max(int_test[, z.value])){
     z = curv_test[z.value == max(z.value), z]
     type = "curvature"
@@ -198,7 +190,7 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 50){
   if(sum(sapply(x, is.factor)) %in% c(0L, ncol(x))){
     return(1)
   } else {
-    r_grid = seq(0.5, 5, length.out = 76)
+    r_grid = seq(0.5, 5, length.out = 46)
     x_factor = colnames(x)[sapply(x, is.factor)]
     
     # Target frequency of a numerical variable
@@ -253,16 +245,20 @@ bias_correction = function(y, x, xgroups = NULL, fit, n.bootstrap = 50){
       return(z_type)
     })
 
-    # browser()
-    # for each grid.point calculate the observed frequency of a numerical splitting varible
+    # for each grid.point calculate the observed frequency of a numerical splitting variable
     z_bootstrap = as.data.frame(z_bootstrap)
     colnames(z_bootstrap) = 1:n.bootstrap
     prob_n_obs = apply(z_bootstrap,1, function(row){
       prob = sum(row == "n")/n.bootstrap
     })
 
-    # plot(as.numeric(names(prob_n_obs)), as.numeric(prob_n_obs))
-    r = approx(as.numeric(prob_n_obs), as.numeric(names(prob_n_obs)), xout = prob_n_exp, method = "constant", ties = "ordered", f = 1)$y
+    if(prob_n_obs["1"] > prob_n_exp){
+      f_value = 0
+    } else { 
+      f_value = 1 
+    }
+    r = approx(as.numeric(prob_n_obs), as.numeric(names(prob_n_obs)), xout = prob_n_exp, method = "constant", ties = "ordered", f = f_value)$y
+    
     return(r)
   }
 }
