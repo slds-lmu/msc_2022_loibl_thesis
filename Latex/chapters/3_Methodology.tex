@@ -8,7 +8,7 @@ In this paper, $\mathcal{M}((Y, X), \theta)$ is restricted to regression models,
 \begin{align}
     \sum_{b=1}^B\sum_{i \in I_b}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_b)
 \end{align}
-and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with corresponding indexes $i_b, b = 1,...,B$) and local optimal parameter $\theta_b$ for each partitions. As \citep{Zeileis.2008} points out, it is very difficult to find the optimal partition, because the number of possible partitions quickly becomes too large for an exhaustive search.
+and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with corresponding indexes $i_b, b = 1,...,B$) and local optimal parameter $\theta_b$ for each partition. As \citep{Zeileis.2008} points out, it is very difficult to find the optimal partition, because the number of possible partitions quickly becomes too large for an exhaustive search.
 
 
 
@@ -23,10 +23,23 @@ The resulting global models are called Model-based Trees (MBT)
 A recursive partitioning algorithm for MBTs can generally be divided into the following steps:
 \begin{enumerate}
     \item Start with the partition (node) $I_0 = 1,...,n$
-    \item Fit the model to all observations in the current node $\{y_{i}, \mathbf{x}_{i}\}, i \in I_b$ by estimating $\hat{\theta}$ via minimization of the objective function $\Psi$
+    \item Fit the model to all observations in the current node $\{y_{i}, \mathbf{x}_{i}\}, i \in I_b$ by estimating $\hat{\theta}_b$ via minimization of the objective function $\Psi$
     \item Find the local optimal splitpoint for this node (This is where the biggest differences between the methods lie)
     \item If no stop criterion is met (e.g. depth of the tree, improvement of the objective through split, significance of parameter instability) split the node in two child nodes and repeat the steps 2-4.
 \end{enumerate}
+
+
+The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point. This leads to variables with many possible split points being chosen more often as split variables than variables with few possible split points. This phenomenon is called selection bias and is explained in more detail in Chapter 3 and examined for the algorithms considered here.
+MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of comparing the objective for all possible split points and variables, step 3 of algorithm is split into 2 steps:
+
+\begin{enumerate}
+    \item Select the variable that has the highest association with the response as the splitting variable. The tests to determine the most significant association differ between the methods.
+    \item Search for the best split point only within this variable (e.g. by exhaustive search or again by hypothesis test)
+\end{enumerate}
+
+\citep{Schlosser.2019}
+
+
 
 \subsubsection{SLIM}
 \citep{Hu.2020} pursue exactly the goal of this paper with the Surrogate locally interpretable models (SLIM) method, that is: Using predictions of a blackbox models to train a MBT surrogate model, that contains only main effect effect models in the leafnodes. Interactions between variables are taken into account by splitting. In addition, SLIM is generally flexible in its choice of objective function, although the computation is not always computationally efficient.
@@ -38,22 +51,65 @@ To find the best split point, for each potential split point two models are fitt
 
 Since the computational effort for estimating all possible child models becomes very large as the number of possible partitioning variables increases, \citep{Hu.2020} have developed an efficient algorithm for estimating them for the case of linear regression, GAMS and ridge regression. A detailed description of this algorithm can be found in \citep{Hu.2020}.
 
-\begin{itemize}
-    \item Indication of a possible problem with selection bias with reference to chapter 4
-\end{itemize}
+
+
+
+
+
 
 
 
 
 \subsubsection{MOB}
-Score based M-Fluctuation Test \\
+After an initial model has been fitted in step 2, MOB examines whether the corresponding parameter estimates $\hat{\theta}_b$ are stable. If there is some overall instability, the covariate whose parameter estimate has the most significant instability is  chosen as splitting variable.
+
+To investigate this, the 
+gradient of the objective function regarding the parameter vector $\hat{\theta}_b$, hereafter called score function, is considered. The score function is defined as:
+
+\begin{align}
+    \psi(Y, \mathbf{X}, \theta_b) = \frac{\partial \Psi(Y, \mathbf{X}, \theta_b)}{\partial \theta_b}
+\end{align}
+
+\citep{Zeileis.2008}
+
+If the scores - ordered by the potential split variable - do not flucuate randomly around zero, this indicates that there is parameter instability which could potentially be captured by splitting the data regarding this variable.\citep{Schlosser.2019}
+Systematic deviations from zero are detected by an M-fluctuation test.  \citep{Zeileis.2008}
+
+
+The test assesses whether the scores – when
+ordered by the potential split variable Z – fluctuate randomly around their zero mean or
+differ systematically in certain subgroups
+
+
+
+MOB distinguishes between regressor variables, which are only used to fit the models in the nodes, and pure partitioning variables. In our case, there is no such distinction, as all covariates can fulfil both roles.  They can be used both as main effects in the regression models and as splitting variables for the correction of interactions.
+According to \citep{Zeileis.2008}, MOB can also be used when an overlap between splitting and regressor variables is desired
+
+
+
+
+
+
 \textbf{Advantage}: High Power in detecting structural change points
 
 \subsubsection{CTree}
-Score based Permutation Test \\
-\textbf{Advantage}: High Power in detecting smooth changes
+Ctree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
+CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $g()$ of the response $Y$.
+A common transformation used in MBTs is the score function, but another transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
+
+To test the independence between the scores and the potential partition variables, Ctree uses a linear association test.
+
+
+\citep{Schlosser.2019} state that the linear test used in Ctree has higher power in detecting smooth relationships between the scores and the partition variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
+
 
 \subsubsection{GUIDE}
+GUIDE uses residual-based categorical association tests to detect instabilities. For this purpose, $\chi^2$- independence tests between the dichotomized residuals of the fitted model and the categorized covariates are performed and the p-values of these so-called curvature tests are calculated. In addition to the curvature tests, GUIDE explicitly searches for interactions.  Again, $\chi^2$- independence tests are performed. Instead of categorizing only one variable, a new categorical variable is created by combining covariates for the interaction test. If the smallest p-value comes from a curvature test, the corresponding covariate is chosen as the partitioning variable. If the smallest p-value is from an interaction test, the categorical variable involved, if any, is preferably chosen as the splitting variable. If both potential variables are categorical, the variable for which the p-value of the curvature test is smaller is chosen. In the case of two numerical variables, the choice is made by evaluating the potential child models after splitting with respect to both variables.
+Subsequently, a bootstrap selection bias correction is performed.
+
+
+
+
 Residual based categorical association test\\
 \textbf{Advantage}: Scores do not have to be available\\
 \textbf{Disadvantage}: 
@@ -69,5 +125,19 @@ GUIDE falls in the category "Algorithms with a closed-source, free-of-charge imp
 
 
 \subsection{Comparison}
+\begin{table}[ht]
+\centering
+\begin{tabular}{lllll}
+  \hline
+ & Split point selection & Test & Flexibility & Computational cost  \\ 
+  \hline
+    SLIM & exhaustive search & - & high & low-high  \\ 
+    MOB & two-step & score-based fluctuation & low & low  \\ 
+    CTree & two-step & score-based Permutation & low & low  \\ 
+    GUIDE & two-step & residual-based $\chi^2$  & high & low  \\ 
+   \hline
+\end{tabular}
+\end{table}
+\citep{Schlosser.2019}
 
 

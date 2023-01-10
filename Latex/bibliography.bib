@@ -212,6 +212,14 @@
 }
 
 
+@book{Breiman.1984,
+ author = {Breiman, Leo and Friedman, Jerome and Stone, Charles J. and Olshen, R. A.},
+ year = {1984},
+ title = {Classification and Regression Trees},
+ publisher = {{CRC Press}}
+}
+
+
 @proceedings{Cohen.2008,
  year = {2008},
  title = {Proceedings of the 25th international conference on Machine learning - ICML '08},
@@ -224,13 +232,12 @@
 
 
 @misc{DoshiVelez.2017,
- abstract = {As machine learning systems become ubiquitous, there has been a surge of interest in interpretable machine learning: systems that provide explanation for their outputs. These explanations are often used to qualitatively assess other criteria such as safety or non-discrimination. However, despite the interest in interpretability, there is very little consensus on what interpretable machine learning is and how it should be measured. In this position paper, we first define interpretability and describe when interpretability is needed (and when it is not). Next, we suggest a taxonomy for rigorous evaluation and expose open questions towards a more rigorous science of interpretable machine learning.},
  author = {Doshi-Velez, Finale and Kim, Been},
- date = {2017},
+ year = {2017},
  title = {Towards A Rigorous Science of Interpretable Machine Learning},
  keywords = {iml;interpretability;interpretable machine learning},
  publisher = {arXiv},
- doi = {10.48550/arXiv.1702.08608}
+ doi = {10.48550/ARXIV.1702.08608}
 }
 
 
@@ -244,6 +251,19 @@
  issn = {0960-3174},
  journal = {Statistics and Computing},
  doi = {10.1007/s11222-021-10059-x}
+}
+
+
+@article{Eo.2014,
+ author = {Eo, Soo-Heang and Cho, HyungJun},
+ year = {2014},
+ title = {Tree-Structured Mixed-Effects Regression Modeling for Longitudinal Data},
+ keywords = {GUIDE},
+ pages = {740--760},
+ volume = {23},
+ number = {3},
+ journal = {Journal of Computational and Graphical Statistics},
+ doi = {10.1080/10618600.2013.794732}
 }
 
 
@@ -377,6 +397,21 @@
 }
 
 
+@article{Jousselme.2001,
+ author = {Jousselme, Anne-Laure and Grenier, Dominic and Boss{\'e}, {\'E}loi},
+ year = {2001},
+ title = {A new distance between two bodies of evidence},
+ keywords = {Stability},
+ pages = {91--101},
+ volume = {2},
+ number = {2},
+ issn = {15662535},
+ journal = {Information Fusion},
+ doi = {10.1016/S1566-2535(01)00026-4},
+ file = {IF2001-DistanceBOEs:Attachments/IF2001-DistanceBOEs.pdf:application/pdf}
+}
+
+
 @article{JuliaHerbinger.2022,
  abstract = {REPID: Regional Effect Plots with implicit Interaction Detection Julia Herbinger,~Bernd Bischl,~Giuseppe CasalicchioMachine learning models can au...},
  author = {{Julia Herbinger} and {Bernd Bischl} and {Giuseppe Casalicchio}},
@@ -448,6 +483,20 @@
 }
 
 
+@article{Meila.2007,
+ author = {Meilă, Marina},
+ year = {2007},
+ title = {Comparing clusterings---an information based distance},
+ keywords = {Adjusted Rand Index;Stability},
+ pages = {873--895},
+ volume = {98},
+ number = {5},
+ issn = {0047259X},
+ journal = {Journal of Multivariate Analysis},
+ doi = {10.1016/j.jmva.2006.11.013}
+}
+
+
 @book{Molnar.2019,
  abstract = {This book is about making machine learning models and their decisions interpretable. After exploring the concepts of interpretability, you will learn about simple, interpretable models such as decision trees, decision rules and linear regression. Later chapters focus on general model-agnostic methods for interpreting black box models like feature importance and accumulated local effects and explaining individual predictions with Shapley values and LIME. All interpretation methods are explained in depth and discussed critically. How do they work under the hood? What are their strengths and weaknesses? How can their outputs be interpreted? This book will enable you to select and correctly apply the interpretation method that is most suitable for your machine learning project.},
  author = {Molnar, Christoph},
@@ -471,6 +520,19 @@
  year = {2022},
  doi = {10.1007/978-3-031-04083-2{\textunderscore }4},
  file = {Molnar, K{\"o}nig et al. 2022 - General Pitfalls of Model-Agnostic Interpretation (2):Attachments/Molnar, K{\"o}nig et al. 2022 - General Pitfalls of Model-Agnostic Interpretation (2).pdf:application/pdf}
+}
+
+
+@article{Morgan.1963,
+ author = {Morgan, James and Sonquist, John},
+ year = {1963},
+ title = {Problems in the Analysis of Survey Data, and a Proposal},
+ keywords = {AID;Recursive Partitioning},
+ pages = {415--434},
+ volume = {58},
+ number = {302},
+ journal = {Journal of the American Statistical Association},
+ doi = {10.1080/01621459.1963.10500855}
 }
 
 
@@ -529,6 +591,19 @@
 }
 
 
+@article{Philipp.2018,
+ author = {Philipp, Michel and Rusch, Thomas and Hornik, Kurt and Strobl, Carolin},
+ year = {2018},
+ title = {Measuring the Stability of Results From Supervised Statistical Learning},
+ keywords = {Stability},
+ pages = {685--700},
+ volume = {27},
+ number = {4},
+ journal = {Journal of Computational and Graphical Statistics},
+ doi = {10.1080/10618600.2018.1473779}
+}
+
+
 @misc{Renard.2019,
  abstract = {Interpretable surrogates of black-box predictors trained on high-dimensional tabular datasets can struggle to generate comprehensible explanations in the presence of correlated variables. We propose a model-agnostic interpretable surrogate that provides global and local explanations of black-box classifiers to address this issue. We introduce the idea of concepts as intuitive groupings of variables that are either defined by a domain expert or automatically discovered using correlation coefficients. Concepts are embedded in a surrogate decision tree to enhance its comprehensibility. First experiments on FRED-MD, a macroeconomic database with 134 variables, show improvement in human-interpretability while accuracy and fidelity of the surrogate model are preserved.
 
@@ -572,14 +647,12 @@ presented at 2019 ICML Workshop on Human in the Loop Learning (HILL 2019), Long 
 }
 
 
-@misc{Schlosser.24.06.2019,
- abstract = {A core step of every algorithm for learning regression trees is the selection of the best splitting variable from the available covariates and the corresponding split point. Early tree algorithms (e.g., AID, CART) employed greedy search strategies, directly comparing all possible split points in all available covariates. However, subsequent research showed that this is biased towards selecting covariates with more potential split points. Therefore, unbiased recursive partitioning algorithms have been suggested (e.g., QUEST, GUIDE, CTree, MOB) that first select the covariate based on statistical inference using p-values that are adjusted for the possible split points. In a second step a split point optimizing some objective function is selected in the chosen split variable. However, different unbiased tree algorithms obtain these p-values from different inference frameworks and their relative advantages or disadvantages are not well understood, yet. Therefore, three different popular approaches are considered here: classical categorical association tests (as in GUIDE), conditional inference (as in CTree), and parameter instability tests (as in MOB). First, these are embedded into a common inference framework encompassing parametric model trees, in particular linear model trees. Second, it is assessed how different building blocks from this common framework affect the power of the algorithms to select the appropriate covariates for splitting: observation-wise goodness-of-fit measure (residuals vs. model scores), dichotomization of residuals/scores at zero, and binning of possible split variables. This shows that specifically the goodness-of-fit measure is crucial for the power of the procedures, with model scores without dichotomization performing much better in many scenarios.},
+@article{Schlosser.2019,
  author = {Schlosser, Lisa and Hothorn, Torsten and Zeileis, Achim},
- date = {24.06.2019},
- title = {The Power of Unbiased Recursive Partitioning: A Unifying View of CTree,  MOB, and GUIDE},
- url = {https://arxiv.org/pdf/1906.10179},
- keywords = {CTree;GUIDE;MOB;party;partykit},
- file = {Schlosser, Hothorn et al. 24.06.2019 - The Power of Unbiased Recursive:Attachments/Schlosser, Hothorn et al. 24.06.2019 - The Power of Unbiased Recursive.pdf:application/pdf}
+ year = {2019},
+ title = {The power of unbiased recursive partitioning: A unifying view of CTree, MOB, and GUIDE},
+ keywords = {CTree;GUIDE;M-fluctuation Test;MOB;party;partykit;Permuation Test;Recursive Partitioning},
+ journal = {arXiv preprint arXiv:1906.10179}
 }
 
 
