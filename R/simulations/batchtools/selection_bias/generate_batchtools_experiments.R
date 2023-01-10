@@ -51,14 +51,14 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 id1 = head(findExperiments(algo.name = "selection_bias"), 1)
 print(id1)
 
-testJob(id = id1)
+testJob(id = 5)
 
 
 
 # submit jobs
 submitJobs(reg = reg)
 
-
+# reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools")
 
 # reduce jobs/ summarise results
 reduce = function(res) res
