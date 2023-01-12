@@ -9,6 +9,10 @@ figuredir = "Figures/simulations/batchtools/selection_bias_general/"
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
+cols_split = str_subset(colnames(tab), "split")
+cols_split = c("split_slim_exact", "split_slim_100", "split_guide_excl_cat_corr", 
+               "split_guide_incl_cat_corr", "split_mob", "split_ctree")
+
 
 for (t in unique(tab$type)){
   for (n_data in unique(tab[type == t , n])){
@@ -18,16 +22,16 @@ for (t in unique(tab$type)){
                   slim_10 = table(tab_t_n$split_slim_10),
                   mob = table(tab_t_n$split_mob),
                   ctree = table(tab_t_n$split_ctree),
-                  guide_corr_inclcat = table(tab_t_n$impr_guideincl_cat_corr),
-                  guide_corr_excllcat = table(tab_t_n$impr_guide_excl_cat_corr),
-                  guide_biased_inclcat = table(tab_t_n$impr_guideincl_cat_biased),
-                  guide_biased_excllcat = table(tab_t_n$impr_guide_excl_cat_biased)
+                  guide_inclcat = table(tab_t_n$impr_guideincl_cat_corr),
+                  guide_excllcat = table(tab_t_n$impr_guide_excl_cat_corr)
+                  # ,
+                  # guide_biased_inclcat = table(tab_t_n$impr_guideincl_cat_biased),
+                  # guide_biased_excllcat = table(tab_t_n$impr_guide_excl_cat_biased)
                   
                   )
     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), ".rds"))
     
     
-    cols_split = str_detect(colnames(tab_t_n), "split")
     
     p = ggplot(stack(tab_t_n[,cols_split, with = FALSE]),
                aes(x = values, color=ind, fill = ind)) +

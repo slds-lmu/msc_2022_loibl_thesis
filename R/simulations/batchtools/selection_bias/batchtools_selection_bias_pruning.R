@@ -2,12 +2,11 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/selection_bias_general")) dir.create("Data/simulations/batchtools/selection_bias_general", recursive = TRUE)
+if (!dir.exists("Data/simulations/batchtools/selection_bias_pruning")) dir.create("Data/simulations/batchtools/selection_bias_pruning", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_general/batchtools",
+reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_pruning/batchtools",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R"),
-                             conf.file = NA,
                              seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
@@ -16,18 +15,7 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
-pdes = expand.grid(n = 1000, type = rep(c(
-  # "selection_bias_independence", 
-  # "selection_bias_independence_small",
-  # "selection_bias_full_interaction",
-  # "selection_bias_guide",
-  # "selection_bias_interaction_categorical_numeric",
-  # "selection_bias_interaction_numeric",
-  # "selection_bias_interaction_numeric_2",
-  "selection_bias_interaction_categorical_numeric_small",
-  "selection_bias_interaction_numeric_small",
-  "selection_bias_interaction_numeric_2_small"), each = 1))
-pdes = list("selection_bias" = pdes)
+pdes = list("selection_bias" = data.frame(type = c("selection_bias_guide_steps", "selection_bias_guide_cross")))
 
 
 # add algorithm
@@ -44,25 +32,25 @@ addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 addExperiments(
   reg = reg, 
   prob.designs = pdes,
-  algo.designs = NULL, 
-  repls = 1L)
+  algo.designs = list(selection_bias = data.frame(pruning = c("none", "forward", "forward"),
+                                                  impr.par = c(0, 0.05, 0.1),
+                                                  alpha = c(1, 0.05, 0.01))), 
+  repls = 1000L)
 
 summarizeExperiments()
-summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 
 
 # test jobs
 id1 = head(findExperiments(algo.name = "selection_bias"), 1)
 print(id1)
 
-testJob(id = 5)
+testJob(id = 3)
 
 
 
 # submit jobs
 submitJobs(reg = reg)
 
-# reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools")
 
 # reduce jobs/ summarise results
 reduce = function(res) res
@@ -78,11 +66,11 @@ library(ggplot2)
 library(ggpubr)
 library(stringr)
 
-savedir = "Data/simulations/batchtools/selection_bias_general/results/"
-figuredir = "Figures/simulations/batchtools/selection_bias_general/"
+savedir = "Data/simulations/batchtools/selection_bias_pruning/results/"
+figuredir = "Figures/simulations/batchtools/selection_bias_pruning/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
-saveRDS(tab, paste0(savedir,"selection_bias_general.rds"))
+saveRDS(tab, paste0(savedir,"selection_bias_pruning.rds"))
 
 # if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 # 

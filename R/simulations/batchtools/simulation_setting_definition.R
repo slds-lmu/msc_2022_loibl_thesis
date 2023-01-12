@@ -242,7 +242,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     lrn = NULL
     search_space = NULL
     
-  }else if (type == "selection_bias_guide_uniform"){
+  } else if (type == "selection_bias_guide_uniform"){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
@@ -251,6 +251,38 @@ create_sim_data = function(job, n = 1000, type, ...){
     x5 = as.factor(sample(1:10, n, replace = TRUE))
     
     y =  rnorm(n, 0, 1)
+    data = data.frame(x1, x2, x3, x4, x5, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+  } else if (type == "selection_bias_guide_steps"){
+    
+    x1 = sample(c(-3,-1,1,3), n, replace = TRUE) 
+    x2 = rexp(n, 1)
+    x3 = rnorm(n) 
+    x4 = as.factor(sample(1:5, n, replace = TRUE))
+    x5 = as.factor(sample(1:10, n, replace = TRUE))
+    
+    eps = rnorm(n, 0, 1)
+    
+    y = 0.2*sign(x1*x3) + eps
+    data = data.frame(x1, x2, x3, x4, x5, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+  } else if (type == "selection_bias_guide_cross"){
+    
+    x1 = sample(c(-3,-1,1,3), n, replace = TRUE) 
+    x2 = rexp(n, 1)
+    x3 = rnorm(n) 
+    x4 = as.factor(sample(1:5, n, replace = TRUE))
+    x5 = as.factor(sample(1:10, n, replace = TRUE))
+    
+    eps = rnorm(n, 0, 1)
+    
+    y = 0.2*sign(x1)*x2 + eps
     data = data.frame(x1, x2, x3, x4, x5, y)
     fm = NULL
     lrn = NULL
@@ -461,6 +493,24 @@ create_sim_data = function(job, n = 1000, type, ...){
     search_space = NULL
     
     
+  } else if (type == "selection_bias_interaction_categorical_numeric_small"){
+    # x1 and x2 should be chosen equally often, the rest should never be selected
+    x1 = runif(n, 0, 1)
+    x2 = runif(n, 0, 1)
+    x3 = as.factor(sample(1:2, n, replace = TRUE))
+    x4 = as.factor(sample(1:5, n, replace = TRUE))
+    x5 = as.factor(sample(1:8, n, replace = TRUE))
+    
+    formula = 0.001*x1*x2
+    
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    data = data.frame(x1, x2, x3, x4, x5, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+    
   } else if (type == "selection_bias_interaction_numeric"){
     # x1 and x2 should be chosen equally often, the rest should never be selected
     x1 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)    
@@ -479,7 +529,25 @@ create_sim_data = function(job, n = 1000, type, ...){
     search_space = NULL
     
     
-  } else if (type == "selection_bias_interaction_numeric_2"){
+  } else if (type == "selection_bias_interaction_numeric_small"){
+    # x1 and x2 should be chosen equally often, the rest should never be selected
+    x1 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)    
+    x2 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
+    x3 = runif(n,0,1)
+    x4 = runif(n,0,1)
+    x5 = runif(n,0,1)
+    
+    formula = 0.001*x1*x2
+    
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    data = data.frame(x1, x2, x3, x4, x5, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+    
+  }else if (type == "selection_bias_interaction_numeric_2"){
     # x1 and x2 should be chosen equally often, the rest should never be selected
     x1 = runif(n,0,1)   
     x2 = runif(n,0,1)
@@ -488,6 +556,24 @@ create_sim_data = function(job, n = 1000, type, ...){
     x5 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
     
     formula = 0.01*x1*x2
+    
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    data = data.frame(x1, x2, x3, x4, x5, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+    
+  } else if (type == "selection_bias_interaction_numeric_2_small"){
+    # x1 and x2 should be chosen equally often, the rest should never be selected
+    x1 = runif(n,0,1)   
+    x2 = runif(n,0,1)
+    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
+    x4 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
+    x5 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
+    
+    formula = 0.001*x1*x2
     
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
