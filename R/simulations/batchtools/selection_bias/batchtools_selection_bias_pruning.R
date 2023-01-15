@@ -23,6 +23,7 @@ source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias
 formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 50, 10)
 formals(get_sim_results_selection_bias)$exclude.categoricals = c(TRUE, FALSE)
 formals(get_sim_results_selection_bias)$correct.bias = c(TRUE, FALSE)
+formals(get_sim_results_selection_bias)$get.objective = TRUE
 
 addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
 
@@ -33,7 +34,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = list(selection_bias = data.frame(pruning = c("none", "forward", "forward"),
-                                                  impr.par = c(0, 0.05, 0.1),
+                                                  impr.par = c(0, 0.04, 0.06),
                                                   alpha = c(1, 0.05, 0.01))), 
   repls = 1000L)
 

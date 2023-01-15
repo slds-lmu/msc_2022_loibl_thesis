@@ -1,4 +1,5 @@
 source("R/mob_fitting_functions.R")
+source("R/simulations/batchtools/helper_simulations.R")
 
 get_sim_results_selection_bias = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"), n.quantiles = NULL,
                                           exclude.categoricals = FALSE, get.objective = FALSE, min.split = 50, correct.bias = FALSE,
@@ -35,7 +36,9 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
           result$impr_slim = impr_slim
           names(result)[names(result) == "impr_slim"] = paste0("impr_slim_",ifelse(is.null(quantiles),"exact",quantiles))
           
-          sse_slim = split_criteria_slim[1, "objective.value"]
+          sse_slim = ifelse(is.na(split_criteria_slim[1, "objective.value"]), 
+                            split_criteria_slim[1, "objective.value.parent"], 
+                            split_criteria_slim[1, "objective.value"])
           result$sse_slim = sse_slim
           names(result)[names(result) == "sse_slim"] = paste0("sse_slim_",ifelse(is.null(quantiles),"exact",quantiles))
         }
@@ -45,7 +48,9 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
       split_slim = split_criteria_slim[1,"split.feature"]
       result$split_slim = split_slim
       if(get.objective){
-        sse_slim = split_criteria_slim[1,"objective.value"]
+        sse_slim = ifelse(is.na(split_criteria_slim[1, "objective.value"]), 
+                          split_criteria_slim[1, "objective.value.parent"], 
+                          split_criteria_slim[1, "objective.value"])
         result$sse_slim = sse_slim
         impr_slim = split_criteria_slim[1,"intImp"]
         result$impr_slim = impr_slim
@@ -59,11 +64,11 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
       for(cor in correct.bias){
         guide = compute_tree_slim(y, x ,n.split = 1, n.quantiles = NULL, min.split = min.split, 
                                   split.method = "guide", exclude.categoricals = exc, correct.bias = cor)
-        split_criteria = extract_split_criteria(guide)
+        split_criteria_guide = extract_split_criteria(guide)
         
-        split_guide = split_criteria[1,"split.feature"]
-        test_guide = split_criteria[1,"guide.test"]
-        impr_guide = split_criteria[1,"intImp"]
+        split_guide = split_criteria_guide[1,"split.feature"]
+        test_guide = split_criteria_guide[1,"guide.test"]
+        impr_guide = split_criteria_guide[1,"intImp"]
         
         result$split_guide = split_guide
         names(result)[names(result) == "split_guide"] = paste0("split_guide_",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
@@ -71,13 +76,19 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
         result$test_guide = test_guide
         names(result)[names(result) == "test_guide"] = paste0("test_guide_",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
         
-        result$impr_guide = impr_guide
-        names(result)[names(result) == "impr_guide"] = paste0("impr_guide",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
-        
+        if(get.objective){
+          result$impr_guide = impr_guide
+          names(result)[names(result) == "impr_guide"] = paste0("impr_guide_",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
+          
+          sse_slim = 
+          result$sse_guide = ifelse(is.na(split_criteria_guide[1, "objective.value"]), 
+                                    split_criteria_guide[1, "objective.value.parent"], 
+                                    split_criteria_guide[1, "objective.value"])
+          names(result)[names(result) == "sse_guide"] = paste0("sse_guide_",ifelse(exc,"excl_cat","incl_cat"), ifelse(cor, "_corr", "_biased"))
+          
+        }
       }
     }
-    
-    
   }
   
   
@@ -88,6 +99,9 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
     mobrule = partykit:::.list.rules.party(mob)[1]
     split_mob = str_extract(mobrule,"^.*(?=( <=| %in))")
     result$split_mob = split_mob
+    if(get.objective){
+      result$sse_mob = sum((predict(mob, x)- y)^2)
+    }
   }
   
   if("ctree" %in% tree_methods){
@@ -98,8 +112,12 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
     ctreerule = partykit:::.list.rules.party(ctree)[1]
     split_ctree = str_extract(ctreerule,"^.*(?=( <=| %in))")
     result$split_ctree = split_ctree
+    
+    if(get.objective){
+      fit_ctree = fit_ctree_leaves(ctree, x, y)
+      result$sse_ctree = sum((predict_ctree(ctree, fit_ctree, x)- y)^2)     
+    }
   }
-  
   
   
   return(result)

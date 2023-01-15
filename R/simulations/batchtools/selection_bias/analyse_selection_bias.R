@@ -315,3 +315,67 @@ df_slim_independence_small %>%
   kable_minimal(full_width = F)
 
 
+
+# pruning selection bias
+
+list.files("Data/simulations/batchtools/selection_bias_pruning/results/", full.names = TRUE)
+split_pruning = readRDS("Data/simulations/batchtools/selection_bias_pruning/results/selection_bias_pruning.rds")
+
+savedir = "Data/simulations/batchtools/selection_bias_pruning/results/"
+figuredir = "Figures/simulations/batchtools/selection_bias_pruning/"
+
+if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
+
+if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
+cols_split = str_subset(colnames(tab), "split")
+cols_split = c("split_slim_exact", "split_slim_100", "split_slim_50", "split_slim_10", "split_guide_excl_cat_corr", 
+               "split_guide_incl_cat_corr", "split_mob", "split_ctree")
+
+pruning_pairs = list(c(alpha = 1, impr.par = 0),
+                    c(alpha = 0.05, impr.par = 0.05),
+                    c(alpha = 0.01, impr.par = 0.1))
+
+# replace splitvariable "leafnode" with NA
+
+for(j in seq_along(split_pruning)){
+  set(split_pruning, i=which(split_pruning[[j]]=="leafnode"), j=j, value=NA)
+}
+
+
+for (t in unique(split_pruning$type)){
+  for(i in 1:length(pruning_pairs)){
+    split_t_p = split_pruning[type == t  & alpha == pruning_pairs[[i]]["alpha"] & impr.par == pruning_pairs[[i]]["impr.par"], ]
+    result = list(slim = table(split_t_p$split_slim_exact, useNA = "ifany"),
+                  slim_100 = table(split_t_p$split_slim_100, useNA = "ifany"),
+                  slim_10 = table(split_t_p$split_slim_10, useNA = "ifany"),
+                  mob = table(split_t_p$split_mob, useNA = "ifany"),
+                  ctree = table(split_t_p$split_ctree, useNA = "ifany"),
+                  guide_inclcat = table(split_t_p$split_guide_incl_cat_corr, useNA = "ifany"),
+                  guide_excllcat = table(split_t_p$split_guide_excl_cat_corr, useNA = "ifany")
+                  # ,
+                  # guide_biased_inclcat = table(tab_t_n$impr_guideincl_cat_biased),
+                  # guide_biased_excllcat = table(tab_t_n$impr_guide_excl_cat_biased)
+                  
+    )
+    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_alpha_",pruning_pairs[[i]]["alpha"], ".rds"))
+    
+    
+    
+    p = ggplot(stack(split_t_p[,cols_split, with = FALSE]),
+               aes(x = values, color=ind, fill = ind)) +
+      stat_count(position = "dodge") +
+      ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "))) +
+      labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+    
+    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), "_alpha_",pruning_pairs[[i]]["alpha"], ".pdf"), width = 8, height = 3.8)
+    
+  }
+  
+  
+}
+
+
+
+
+
+
