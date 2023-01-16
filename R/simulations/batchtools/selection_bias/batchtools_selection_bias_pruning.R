@@ -6,7 +6,8 @@ if (!dir.exists("Data/simulations/batchtools/selection_bias_pruning")) dir.creat
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_pruning/batchtools",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
-                                        "R/mob_fitting_functions.R"),
+                                        "R/mob_fitting_functions.R",
+                                        "R/simulations/batchtools/helper_simulations.R"),
                              seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
