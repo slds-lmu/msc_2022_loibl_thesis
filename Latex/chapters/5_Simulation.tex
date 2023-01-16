@@ -27,8 +27,8 @@ For each simulation run
 
 
 \subsubsection{Stability}
-A well-known weakness of recursive partitioning algorithms is that the resulting decision trees are often unstable, meaning that slight fluctuations in the training data can lead to large differences in the models\citep{Fokkema.2020}.
-Depending on whether differences between two decision trees mean different predictions for the same observations or different structural properties of a tree, such as the number of leaf nodes, we speak of semantic or structural instability.\citep{Wang.2018}
+A well-known weakness of recursive partitioning algorithms is that the resulting decision trees are often unstable, meaning that slight fluctuations in the training data can lead to large differences in the models \citep{Fokkema.2020}.
+Depending on whether differences between two decision trees mean different predictions for the same observations or different structural properties of a tree, such as the number of leaf nodes, we speak of semantic or structural instability \citep{Wang.2018}. 
 Since we are looking for MBTs that are easy to interpret, it is not enough for us to look at semantic stability. It would be desirable to have an algorithm in which the subregions found for trees trained on slightly different data are as similar as possible and thus the interpretation is also similar.
 To measure the similarity of subregions of different trees, we use the Adjusted Rand index.
 
