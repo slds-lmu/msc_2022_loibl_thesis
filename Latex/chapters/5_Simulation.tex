@@ -1,12 +1,41 @@
 \subsection{Evaluation measures}
-on training and test data as well as on the original targets (accuracy) and predictions of different black box models (fidelity)
+In this chapter, an empirical comparison of the introduced MBT algorithms is carried out. Different aspects of the MBTs are considered, which are described in the following.
+
 \subsubsection{Performance}
-\begin{itemize}
-    \item MSE
-    \item R squared
-\end{itemize}
+A central aspect in the comparison of the different MBT algorithms is their performance. 
+To determine how well the respective MBT algorithm performs as a surrogate model, i.e. how well the predictions of a black box model will replicate, the fidelity is measured. This is defined here as
+
+In the following, the mean squared error (MSE) and $R^2$ are used as measures of fidelity. $R^2$ is defined as
+\begin{align}
+    R^2 = 
+\end{align}
+Fidelity is measured both on the training data and on the test data in order to be able to make a statement about generalisability.
+In addition to fidelity, accuracy is determined. For this purpose, the MBT is fitted on the original response to investigate whether an MBT algorithm would also work well as a standalone model. Again, MSE and $R^2$ are determined on both the training data and the test data.
+
+\vspace{0.5cm}
+
+\textbf{Procedure:} 
+
+For each simulation run 
+\begin{enumerate}
+    \item Create simulation data and perform train/test split (2/3)
+    \item Fit black box model to the training data and measure performance of the blackbox model on training and test data ($R^2$ and MSE)
+    \item For each MBT Algorithm fit a MBT  to the original training data to measure accuracy (training and generalization) and as surrogate MBT to the blackbox output to measure fidelity (training and generalization)
+\end{enumerate}
+
+\textbf{Note:} All three Methods are forced to generate models with the same terminal node size, i.e. no pruning except fixed tree depth and minimum node size is used
+
 
 \subsubsection{Stability}
+A well-known weakness of recursive partitioning algorithms is that the resulting decision trees are often unstable, meaning that slight fluctuations in the training data can lead to large differences in the models\citep{Fokkema.2020}.
+Depending on whether differences between two decision trees mean different predictions for the same observations or different structural properties of a tree, such as the number of leaf nodes, we speak of semantic or structural instability.\citep{Wang.2018}
+Since we are looking for MBTs that are easy to interpret, it is not enough for us to look at semantic stability. It would be desirable to have an algorithm in which the subregions found for trees trained on slightly different data are as similar as possible and thus the interpretation is also similar.
+To measure the similarity of subregions of different trees, we use the Adjusted Rand index.
+
+
+
+According to \citep{Hu.2020}, the stability problem with SLIM is less if it is used as a surrogate and not on the original data. However, this is not proven in the paper. Therefore, this claim is empirically investigated here for all MBTs presented by comparing the stability of MBTs on the original data with the stability of the surrogate models.
+
 
 \begin{itemize}
     \item Assumption: All methods have a problem with instability \citep{Fokkema.2020}
@@ -14,7 +43,7 @@ on training and test data as well as on the original targets (accuracy) and pred
     \item Definition of stability? A distinction can be made between semantic and structural stability \citep{Wang.2018}
     \item how similar are the found subspaces? (decision region compatibility) \citep{Wang.2018}
 
-    \item According to hu et altera, the stability problem with SLIM is less if it is actually used as a surrogate and not on the original data. However, this is not proven in the paper. Here, this comparison should take place for all methods.
+    \item 
 
 
 
