@@ -10,10 +10,13 @@ on training and test data as well as on the original targets (accuracy) and pred
 
 \begin{itemize}
     \item Assumption: All methods have a problem with instability \citep{Fokkema.2020}
+    \item difference in tree size and depth can be used as indicator \citep{Wang.2018}
     \item Definition of stability? A distinction can be made between semantic and structural stability \citep{Wang.2018}
     \item how similar are the found subspaces? (decision region compatibility) \citep{Wang.2018}
 
-    \item difference in tree size and depth can be used as indicator \citep{Wang.2018}
+    \item According to hu et altera, the stability problem with SLIM is less if it is actually used as a surrogate and not on the original data. However, this is not proven in the paper. Here, this comparison should take place for all methods.
+
+
 
 
 \end{itemize}
@@ -27,8 +30,15 @@ on training and test data as well as on the original targets (accuracy) and pred
 According to \citet{DoshiVelez.2017} Interpretability is deifined as ability to explain or to present in understandable
 terms to a human
 
+
+Comparison of interpretability between the different MBT algorithms:
 Number of leafnodes to reach the same performance
 
+\vspace{0.5cm}
+
+Comparison of interpretability of a flexible MBT algorithm (SLIM) for different objectives, e.g. linear regression vs GAMs:
+
+Measure of interpretability must be a combination between the complexity of the leaf models and the number of leafnodes.
 
 \subsection{Simulation Scenarios}
 

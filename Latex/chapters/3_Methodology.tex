@@ -33,8 +33,8 @@ The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided
 MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of comparing the objective for all possible split points and variables, step 3 of algorithm is split into 2 steps:
 
 \begin{enumerate}
-    \item Select the variable that has the highest association with the response as the splitting variable. The tests to determine the most significant association differ between the methods.
-    \item Search for the best split point only within this variable (e.g. by exhaustive search or again by hypothesis test)
+    \item Select the variable that has the highest association with the response as splitting (partitioning) variable. The tests to determine the most significant association differ between the methods.
+    \item Search for the best split point only within this variable (e.g. by exhaustive search or again by hypothesis testing)
 \end{enumerate}
 
 \citep{Schlosser.2019}
@@ -42,7 +42,7 @@ MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of
 
 
 \subsubsection{SLIM}
-\citep{Hu.2020} pursue exactly the goal of this paper with the Surrogate locally interpretable models (SLIM) method, that is: Using predictions of a blackbox models to train a MBT surrogate model, that contains only main effect effect models in the leafnodes. Interactions between variables are taken into account by splitting. In addition, SLIM is generally flexible in its choice of objective function, although the computation is not always computationally efficient.
+\citep{Hu.2020} pursue exactly the goal of this paper with the Surrogate locally interpretable models (SLIM) method, that is: Using predictions of a blackbox models to train a MBT surrogate model, that contains only main effect effect models in the leafnodes. Interactions between variables are taken into account by splitting. In addition, SLIM is generally flexible in its choice of objective function.
 
 After fitting the model to all observations in step 2 the loss function or a performance metric is calculated, e.g. SSE.
 In step 3 SLIM performs an exhaustive search to find the optimal splitpoint.  
@@ -85,11 +85,6 @@ With MOB, only objective functions can be selected for which the gradient regard
 
 
 
-
-
-
-\textbf{Advantage}: High Power in detecting structural change points
-
 \subsubsection{CTree}
 Ctree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
 CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $g()$ of the response $Y$.
@@ -98,7 +93,7 @@ A common transformation used in MBTs is the score function, but another transfor
 To test the independence between the scores and the potential partition variables, Ctree uses a linear association test.
 
 
-\citep{Schlosser.2019} state that the linear test used in Ctree has higher power in detecting smooth relationships between the scores and the partition variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
+\citep{Schlosser.2019} state that the linear test used in Ctree has higher power in detecting smooth relationships between the scores and the splitting variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
 
 
 \subsubsection{GUIDE}
@@ -107,7 +102,6 @@ Subsequently, a bootstrap selection bias correction is performed.
 In the original GUIDE algorithm developed by \citep{.2002}, numerical variables can be used both as regressor variables and as splitting variables. Categorical variables, on the other hand, can only take on the role of splitting variables. This is justified by the fact that a disproportionately large number of degrees of freedom are consumed in the parameter estimation of categorical variables.
 In the following simulations, both a GUIDE implementation in which categorical variables can only serve as splitting variables and a variant in which categorical variables can also take on both roles are considered. 
 
-Translated with www.DeepL.com/Translator (free version)
 One advantage of GUIDE is that the score function does not have to exist. This makes the choice of objective very flexible and allows, for example, LASSO regression models to be adapted in the nodes.
 
 
