@@ -256,7 +256,26 @@ create_sim_data = function(job, n = 1000, type, ...){
     lrn = NULL
     search_space = NULL
     
-  } else if (type == "selection_bias_cross"){
+  } else if (type == "selection_bias_cross_1"){
+    
+    x1 = runif(n, 0, 1)
+    x2 = runif(n, 0, 1)
+    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)  
+    x4 = sample(seq(0, 1, 0.01), size = n, replace = TRUE)   
+    
+    formula = 0.2*x3*ifelse(x2 <= 0.5, -1, 1)
+    eps = rnorm(n, 0, 4*sd(formula))
+    
+    y = formula + eps
+    
+    data = data.frame(x1, x2, x3, x4, y)
+    fm = NULL
+    lrn = NULL
+    search_space = NULL
+    
+    # plot_ly(x=x2,y=x3,z=y)
+    
+  }else if (type == "selection_bias_cross_2"){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
@@ -275,7 +294,7 @@ create_sim_data = function(job, n = 1000, type, ...){
     
     # plot_ly(x=x2,y=x3,z=y)
     
-  }else if (type == "selection_bias_smooth"){
+  } else if (type == "selection_bias_smooth"){
     
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)

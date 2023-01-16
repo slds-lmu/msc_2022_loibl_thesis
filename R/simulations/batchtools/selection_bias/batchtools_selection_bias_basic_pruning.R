@@ -16,7 +16,7 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
-pdes = list("selection_bias" = data.frame(type = c("selection_bias_cross", "selection_bias_smooth")))
+pdes = list("selection_bias" = data.frame(type = c("selection_bias_cross_1", "selection_bias_cross_2", "selection_bias_smooth")))
 
 
 # add algorithm
@@ -36,7 +36,7 @@ addExperiments(
   algo.designs = list(selection_bias = data.frame(pruning = c("none", "forward"),
                                                   impr.par = c(0, 0.02),
                                                   alpha = c(1, 0.05))), 
-  repls = 250L)
+  repls = 1000L)
 
 summarizeExperiments()
 
@@ -71,4 +71,4 @@ savedir = "Data/simulations/batchtools/selection_bias_basic_pruning/results/"
 figuredir = "Figures/simulations/batchtools/selection_bias_basic_pruning/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
-saveRDS(tab, paste0(savedir,"selection_bias_basic_pruning"))
+saveRDS(tab, paste0(savedir,"selection_bias_basic_pruning.rds"))
