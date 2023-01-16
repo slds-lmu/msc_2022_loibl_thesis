@@ -8,7 +8,7 @@ In this paper, $\mathcal{M}((Y, X), \theta)$ is restricted to regression models,
 \begin{align}
     \sum_{b=1}^B\sum_{i \in I_b}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_b)
 \end{align}
-and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with corresponding indexes $i_b, b = 1,...,B$) and local optimal parameter $\theta_b$ for each partition. As \citep{Zeileis.2008} points out, it is very difficult to find the optimal partition, because the number of possible partitions quickly becomes too large for an exhaustive search.
+and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with corresponding indexes $I_b, b = 1,...,B$) and local optimal parameter $\theta_b$ for each partition. As \citep{Zeileis.2008} points out, it is very difficult to find the optimal partition, because the number of possible partitions quickly becomes too large for an exhaustive search.
 
 
 
@@ -24,12 +24,12 @@ A recursive partitioning algorithm for MBTs can generally be divided into the fo
 \begin{enumerate}
     \item Start with the partition (node) $I_0 = 1,...,n$
     \item Fit the model to all observations in the current node $\{y_{i}, \mathbf{x}_{i}\}, i \in I_b$ by estimating $\hat{\theta}_b$ via minimization of the objective function $\Psi$
-    \item Find the local optimal splitpoint for this node (This is where the biggest differences between the methods lie)
+    \item Find the local optimal splitpoint for this node 
     \item If no stop criterion is met (e.g. depth of the tree, improvement of the objective through split, significance of parameter instability) split the node in two child nodes and repeat the steps 2-4.
 \end{enumerate}
 
 
-The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point. This leads to variables with many possible split points being chosen more often as split variables than variables with few possible split points. This phenomenon is called selection bias and is explained in more detail in Chapter 3 and examined for the algorithms considered here.
+The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in Step 3. This leads to variables with many possible split points being chosen more often as split variables than variables with few possible split points. This phenomenon is called selection bias and is explained in more detail in Chapter 3 and examined for the algorithms considered here.
 MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of comparing the objective for all possible split points and variables, step 3 of algorithm is split into 2 steps:
 
 \begin{enumerate}
@@ -61,25 +61,27 @@ Since the computational effort for estimating all possible child models becomes 
 
 
 \subsubsection{MOB}
-After an initial model has been fitted in step 2, MOB examines whether the corresponding parameter estimates $\hat{\theta}_b$ are stable. If there is some overall instability, the covariate whose parameter estimate has the most significant instability is  chosen as splitting variable.
+After an initial model has been fitted in step 2, MOB examines whether the corresponding parameter estimates $\hat{\theta}_b$ are stable. If there is some overall instability, the variable whose parameter estimate has the most significant instability is  chosen as splitting variable.
 
-To investigate this, the 
-gradient of the objective function regarding the parameter vector $\hat{\theta}_b$, hereafter called score function, is considered. The score function is defined as:
+To investigate this, the so called score $\psi$ function is considered, which is defined as the
+gradient of the objective function regarding the parameter vector $\theta_b$ - provided that it exists:
 
 \begin{align}
-    \psi(Y, \mathbf{X}, \theta_b) = \frac{\partial \Psi(Y, \mathbf{X}, \theta_b)}{\partial \theta_b}
+    \psi(Y, \mathbf{X}, \theta_b) = \frac{\partial \Psi(Y, \mathbf{X}, \theta_b)}{\partial \theta_b}.
 \end{align}
 
 \citep{Zeileis.2008}
 
-If the scores - ordered by the potential split variable - do not flucuate randomly around zero, this indicates that there is parameter instability which could potentially be captured by splitting the data regarding this variable.\citep{Schlosser.2019}
+If the scores - ordered by the potential split variable - do not fluctuate randomly around zero, this indicates that there is parameter instability which could potentially be captured by splitting the data regarding this variable.\citep{Schlosser.2019}
 Systematic deviations from zero are detected by an M-fluctuation test.  \citep{Zeileis.2008}
 
 
 
 
 MOB distinguishes between regressor variables, which are only used to fit the models in the nodes, and pure partitioning variables. In our case, there is no such distinction, as all covariates can fulfil both roles.  They can be used both as main effects in the regression models and as splitting variables for the correction of interactions.
-According to \citep{Zeileis.2008}, MOB can also be used when an overlap between splitting and regressor variables is desired
+According to \citep{Zeileis.2008}, MOB can also be used when an overlap between splitting and regressor variables is desired.
+
+With MOB, only objective functions can be selected for which the gradient regarding $\theta_b$  exists. This means, for example, that it is not possible to adapt LASSO models in the nodes.
 
 
 
@@ -100,14 +102,18 @@ To test the independence between the scores and the potential partition variable
 
 
 \subsubsection{GUIDE}
-GUIDE uses residual-based categorical association tests to detect instabilities. For this purpose, $\chi^2$- independence tests between the dichotomized residuals of the fitted model and the categorized covariates are performed and the p-values of these so-called curvature tests are calculated. In addition to the curvature tests, GUIDE explicitly searches for interactions.  Again, $\chi^2$- independence tests are performed. Instead of categorizing only one variable, a new categorical variable is created by combining covariates for the interaction test. If the smallest p-value comes from a curvature test, the corresponding covariate is chosen as the partitioning variable. If the smallest p-value is from an interaction test, the categorical variable involved, if any, is preferably chosen as the splitting variable. If both potential variables are categorical, the variable for which the p-value of the curvature test is smaller is chosen. In the case of two numerical variables, the choice is made by evaluating the potential child models after splitting with respect to both variables.
+GUIDE \citep{.2002} uses residual-based categorical association tests to detect instabilities. For this purpose, $\chi^2$- independence tests between the dichotomized residuals of the fitted model and the categorized covariates are performed and the p-values of these so-called curvature tests are calculated. In addition to the curvature tests, GUIDE explicitly searches for interactions.  Again, $\chi^2$- independence tests are performed. Instead of categorizing only one variable, a new categorical variable is created by combining covariates for the interaction test. If the smallest p-value comes from a curvature test, the corresponding covariate is chosen as the partitioning variable. If the smallest p-value is from an interaction test, the categorical variable involved, if any, is preferably chosen as the splitting variable. If both potential variables are categorical, the variable for which the p-value of the curvature test is smaller is chosen. In the case of two numerical variables, the choice is made by evaluating the potential child models after splitting with respect to both variables.
 Subsequently, a bootstrap selection bias correction is performed.
+In the original GUIDE algorithm developed by \citep{.2002}, numerical variables can be used both as regressor variables and as splitting variables. Categorical variables, on the other hand, can only take on the role of splitting variables. This is justified by the fact that a disproportionately large number of degrees of freedom are consumed in the parameter estimation of categorical variables.
+In the following simulations, both a GUIDE implementation in which categorical variables can only serve as splitting variables and a variant in which categorical variables can also take on both roles are considered. 
+
+Translated with www.DeepL.com/Translator (free version)
+One advantage of GUIDE is that the score function does not have to exist. This makes the choice of objective very flexible and allows, for example, LASSO regression models to be adapted in the nodes.
 
 
 
 
 Residual based categorical association test\\
-\textbf{Advantage}: Scores do not have to be available\\
 \textbf{Disadvantage}: 
 \begin{itemize}
     \item maybe less Power than the other tests
