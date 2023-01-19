@@ -3,52 +3,74 @@ In this chapter, an empirical comparison of the introduced MBT algorithms is car
 
 \subsubsection{Performance}
 A central aspect in the comparison of the different MBT algorithms is their performance. 
-To determine how well the respective MBT algorithm performs as a surrogate model, i.e. how well the predictions of a black box model will replicate, the fidelity is measured. This is defined here as
-
-In the following, the mean squared error (MSE) and $R^2$ are used as measures of fidelity. $R^2$ is defined as
+To find out how well an MBT algorithm performs as a stand-alone machine learning model, the MBT is fitted to the original response. 
+In the following, the mean squared error ($MSE_{acc}$) and $R^2_{acc}$ are used as performance measures of accuracy, which are defined as
 \begin{align}
-    R^2 = 
+    MSE_{acc} \left( \left\{y, \hat{y}^{MBT}\right\}\right) = \frac{1}{n}\sum_{i = 1}^{n}\left(y_{i}-\hat{y_{i}}^{MBT}\right)^2
 \end{align}
-Fidelity is measured both on the training data and on the test data in order to be able to make a statement about generalisability.
-In addition to fidelity, accuracy is determined. For this purpose, the MBT is fitted on the original response to investigate whether an MBT algorithm would also work well as a standalone model. Again, MSE and $R^2$ are determined on both the training data and the test data.
+\begin{align}
+    R^2_{acc}\left( \left\{y, \hat{y}^{MBT}\right\}\right) = \frac{\sum_{i = 1}^{n}\left(\hat{y_{i}}^{MBT} - \bar{y}\right)^2}{\sum_{i = 1}^{n}\left(y_{i} - \bar{y}\right)^2},
+\end{align}
+where $\hat{y_i}^{MBT}, i = 1,...,n$ are the predictions of the MBT model and $\bar{y}$ is the arithmetic mean of the original response.
+
+
+
+
+To determine how well the respective MBT algorithm works as a surrogate model, i.e. how well the predictions of a black box model are replicated by the MBT, the so called fidelity is measured. 
+$MSE_{fid}$ and $R^2_{fid}$ are defined as
+\begin{align}
+    MSE_{fid} \left( \left\{\hat{y}^{BB}, \hat{y}^{MBT}\right\}\right) = \frac{1}{n}\sum_{i = 1}^{n}\left(\hat{y_{i}}^{BB}-\hat{y_{i}}^{MBT}\right)^2
+\end{align}
+\begin{align}
+    R^2_{fid}\left( \left\{\hat{y}^{BB}, \hat{y}^{MBT}\right\}\right) = \frac{\sum_{i = 1}^{n}\left(\hat{y_{i}}^{MBT} - \bar{\hat{y}}^{BB}\right)^2}{\sum_{i = 1}^{n}\left(\hat{y_{i}}^{BB} - \bar{\hat{y}}^{BB}\right)^2},
+\end{align} 
+where $\hat{y_i}^{BB}, i = 1,...,n$ are the predictions of the underlying black box model.
+
+Accuracy and fidelity are measured on both training and test data in order to make a statement about the generalisation performance of the MBTs.
 
 \vspace{0.5cm}
 
-\textbf{Procedure:} 
-
-For each simulation run 
-\begin{enumerate}
-    \item Create simulation data and perform train/test split (2/3)
-    \item Fit black box model to the training data and measure performance of the blackbox model on training and test data ($R^2$ and MSE)
-    \item For each MBT Algorithm fit a MBT  to the original training data to measure accuracy (training and generalization) and as surrogate MBT to the blackbox output to measure fidelity (training and generalization)
-\end{enumerate}
-
-\textbf{Note:} All three Methods are forced to generate models with the same terminal node size, i.e. no pruning except fixed tree depth and minimum node size is used
-
+\color{blue}
+How to compare the performance of MBTs with different pruning methods?
+\begin{itemize}
+    \item Fixed tree depth for all MBTs: i.e. the question would be, how does the performance of the algorithms differ with the same degree of interpretability of the tree?
+    \item Implement post pruning via AIC or cross-validation for all MBTs (associated with more effort).
+    \item Use different pruning approaches: How do I choose alpha or SSE Improvement?
+\end{itemize}
+\color{black}
 
 \subsubsection{Stability}
 A well-known weakness of recursive partitioning algorithms is that the resulting decision trees are often unstable, meaning that slight fluctuations in the training data can lead to large differences in the models \citep{Fokkema.2020}.
 Depending on whether differences between two decision trees mean different predictions for the same observations or different structural properties of a tree, such as the number of leaf nodes, we speak of semantic or structural instability \citep{Wang.2018}. 
 Since we are looking for MBTs that are easy to interpret, it is not enough for us to look at semantic stability. It would be desirable to have an algorithm in which the subregions found for trees trained on slightly different data are as similar as possible and thus the interpretation is also similar.
-To measure the similarity of subregions of different trees, we use the Adjusted Rand index.
-
-
-
-According to \citep{Hu.2020}, the stability problem with SLIM is less if it is used as a surrogate and not on the original data. However, this is not proven in the paper. Therefore, this claim is empirically investigated here for all MBTs presented by comparing the stability of MBTs on the original data with the stability of the surrogate models.
-
-
-\begin{itemize}
-    \item Assumption: All methods have a problem with instability \citep{Fokkema.2020}
-    \item difference in tree size and depth can be used as indicator \citep{Wang.2018}
-    \item Definition of stability? A distinction can be made between semantic and structural stability \citep{Wang.2018}
-    \item how similar are the found subspaces? (decision region compatibility) \citep{Wang.2018}
-
-    \item 
+To measure the similarity of subregions of different trees, we use the Adjusted Rand index (ARI) \citep{Hubert.1985}.
+This measure was developed to compare two clusterings and is based on the Rand index (RI) \citep{Rand.1971}. The RI defines the similarity of two clusterings by the proportion of observation pairs that were either assigned to the same partition in both clusterings or to different partitions in both clusterings measured against the total set of observation pairs. The ARI is a corrected-for-chance version of the RI, which means that it $0$, if two random clusters are compared. The correction is done by substraction the expected value of the RI from the RI. The ARI is generally defined as
+\begin{align}
+    ARI = \frac{RI - Expected RI}{Maximum RI - Expected RI}
+\end{align}
+By including the maximum RI, one obtains an upper bound of the ARI at the value 1.
+In calculating the expected index, the underlying random model assumes that the partitions in both clusters were randomly selected, with the original number of partitions fixed for both clusters. 
+For details, see \citep{Hubert.1985}.
 
 
 
 
-\end{itemize}
+According to \citep{Hu.2020}, the stability problem with SLIM is less if it is used as a surrogate and not as stand-alone model on the original data. However, this is not proven in the paper. Therefore, this claim is empirically investigated here for all MBTs presented by comparing the stability of MBTs on the original data with the stability of the surrogate models.
+
+
+\vspace{0.5 cm}
+
+\textbf{Procedure:} 
+\begin{enumerate}
+    \item create simulation data and train black box models on the data 
+    \item for each simulation run:
+    \begin{enumerate}
+        \item sample subset of the simulation data (with original response and blackbox prediction)
+        \item For each MBT fit standalone model to the original response of the subset and a surrogate models to the  blackbox predictions of the subset
+        \item get predicted leafnode ids of the whole simulation data for both trees
+    \end{enumerate}
+    \item calculate the ARI for all pairs of standalone trees (leafnode ids) and for all pairs of surrogate trees
+\end{enumerate}
 
 
 
@@ -56,45 +78,121 @@ According to \citep{Hu.2020}, the stability problem with SLIM is less if it is u
 
 
 \subsubsection{Interpretability}
-According to \citet{DoshiVelez.2017} Interpretability is deifined as ability to explain or to present in understandable
-terms to a human
+%According to \citet{DoshiVelez.2017} Interpretability is defined as ability to explain or to present in understandable terms to a human.
 
 
-Comparison of interpretability between the different MBT algorithms:
-Number of leafnodes to reach the same performance
+With regard to interpretability, two different questions are examined here. On the one hand, a comparison of interpretability between the different MBT algorithms takes place, whereby the same objective (or a similar objective) is used in the leafnodes. As a measure of interpretability, we will simply use the number of leafnodes needed to achieve a certain performance ($R^2$).  The assumption underlying this measure is: the fewer leafnodes a tree has, the easier its structure is to understand.
 
 \vspace{0.5cm}
 
-Comparison of interpretability of a flexible MBT algorithm (SLIM) for different objectives, e.g. linear regression vs GAMs:
+On the other hand, it will be investigated how the choice of objective affects the interpretability of a specific MBT. In concrete terms, this means, for example: How does the interpretability of an MBT with many leafnodes but comparatively easy-to-understand regression models in the leafnodes differ from the interpretability of a compact tree with more complex spline-based models in the leafnodes?  Since SLIM is very flexible in the choice of objective, this method is used for the analysis.
 
-Measure of interpretability must be a combination between the complexity of the leaf models and the number of leafnodes.
+\color{blue}
+The complexity of the different models can be quantified by a joint assessment of the number of leaf nodes the average complexity of the leaf models (measured by main effect complexity \citep{Molnar.2020}) and number of features used.
+
+\color{black}
 
 \subsection{Simulation Scenarios}
+In the following, various simulation scenarios are defined with which the properties defined above are to be investigated for different data-generating processes. In addition to the data generating process, two black box models are defined for each scenario to investigate the properties of the MBTs both as standalone models and as surrogate models.
+
 
 \subsubsection{Basic scenarios}
-\textbf{Linear smooth}
-Numerical features with linear effects on y and smooth interactions
+
+The following basic scenarios are used to compare the presented MBTs with respect to all defined evaluation measures.
 
 
-\textbf{Linear abrupt}
-Numerical and binary features with linear effects and abrupt interactions
 
-\textbf{Linear mixed}
-Numerical and binary features with linear effects, abrupt and smooth interactions
+
+\begin{enumerate}
+    \item \textbf{Linear smooth}
+        Numerical features with linear effects on y and smooth interactions
+        \begin{itemize}
+            \item $x_1,..., X_5 \sim U(-1,1)$
+            \item $\epsilon \sim N(0, sd_{data})$
+            \item $ y = x_1 + 4   x_2 + 3   x_2   x_3 + 4  x_4  x_5 + x_5 + \epsilon$
+           
+        \end{itemize}
+    \item \textbf{Linear categorical}
+        Numerical and binary features with linear effects and abrupt interactions
+        \begin{itemize}
+            \item $x_1, x_2 \sim U(-1,1)$, $x_3 \sim Bern(0.5)$,  
+            \item $\epsilon \sim N(0, sd_{data})$
+            \item $ y =  x_{1} - 8  x_2 + 16  x_2  \mathbf{I}_{x_3 = 0} + 8  x_2  \mathbf{I}_{x_1 > mean(x_1)} + \epsilon $
+            
+        \end{itemize}
+    \item \textbf{Linear mixed}
+        Numerical and binary features with linear effects, abrupt and smooth two- and three-way interactions
+        \begin{itemize}
+            \item $x_1, x_2 \sim U(-1,1)$, $x_3, ..., x_5 \sim Bern(0.5)$, $x_6, ... x_{10} \sim N(0,1)$,  \item $\epsilon \sim N(0, sd_{data})$
+            \item \begin{align*}
+            y = & 4   x_2 + 2   x_4 + 2   x_6 + 2   x_8 + 4   x_2   x_1 + 8   x_2   \mathbf{I}_{x_3 = 0} + 10   x_2   X_6    \mathbf{I}_{x_5 = 1} \\
+            & + 8   x_2   x_7 + 3   x_1   x_3 + 3   x_8   x_{10} + 3   x_7   x_9     
+            \end{align*}
+    
+        \end{itemize}
+\end{enumerate}
+
+For each basic scenario two black box models are fitted: One correctly specified linear model and a xgboost model with correctly specified interactions. 
+\color{blue}
+does this change the trend of the results? (e.g. MBT with best performance etc.)
+
+\color{black}
+
 
 \subsubsection{Correlated features}
 
+\begin{enumerate}
+    \item \textbf{Linear smooth with correlated features} set correlation $\rho_{13}$ between  variables $x_1$ and $x_3$ to the values $\{0.1, 0.5, 0.9\}$
+   
+    \item \textbf{Linear categorical with correlated features} set correlation $\rho_{12}$ between  variables $x_1$ and $x_2$ to the values $\{0.1, 0.5, 0.9\}$
+\end{enumerate}
+If SLIM and GUIDE have problems due to the correlation, try if Ridge Regression improves the situation.
+
 \subsubsection{Big number of noisy features}
-Linear mixed + many noise variables
-SLIM and GUIDE with LASSO
-MOB and CTree standard lm
+\begin{enumerate}
+    \item \textbf{Linear mixed with noisy features}
+    Add features $x_{11}, ... x_{20} \sim N(0,1)$, which have no effect on $y$
+\end{enumerate}
+
+For SLIM (and GUIDE) use standard linear regression models and a Lasso Regression and compare performance and Interpretability between these to Variations
 
 \subsubsection{Non-linear Effects}
-\begin{itemize}
-    \item Linear mixed with non-linear main effects
-    \item Linear mixed with non-linear main effect + nonlinear interactions
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{polynomial smooth} Numerical features         with polynomial effects on y and smooth interactions
+        \begin{itemize}
+            \item $x_1,..., x_5 \sim U(-1,1)$
+            \item $\epsilon \sim N(0, sd_{data})$
+            \item $ y = x_1^3 + 4   x_2^2 + 3   x_2   x_3 + 4  x_4  x_5 + x_5 + \epsilon$
+            \item fit polynomial regression models for all MBTs
+            \item fit spline based models for SLIM and GUIDE
+           
+        \end{itemize}
+    \item \textbf{non-linear smooth} Numerical features         with non-linear effects on y and smooth interactions
+        \begin{itemize}
+            \item $x_1,..., x_5 \sim U(-1,1)$
+            \item $\epsilon \sim N(0, sd_{data})$
+            \item $ Y = \pi^{x_1} + 4   x_2^3 + 3   x_2   x_3 + 4  x_4  x_5 + x_5 + \epsilon$
+            \item fit polynomial regression models for all MBTs
+            \item fit spline based models for SLIM (and GUIDE)           
+        \end{itemize}
+    \item \textbf{Non-linear mixed}
+        Numerical and binary features with non-linear effects on $y$ and abrupt and smooth two- and three-way interactions
+        \begin{itemize}
+            \item $x_1, x_2 \sim U(-1,1)$, $x_3, ..., x_5 \sim Bern(0.5)$, $x_6, ... x_{10} \sim N(0,1)$,  \item $\epsilon \sim N(0, sd_{data})$
+            \item \begin{align*}
+            y = & 4   x_2 + exp(-2 x_4^2) + x_6 + 2 x_6^2 + 2   x_8 + 4   x_2   x_1 + 8   x_2   \mathbf{I}_{x_3 = 0} + 10   x_2   X_6    \mathbf{I}_{x_5 = 1} \\
+            & + 8   x_2   x_7 + 3   x_1   x_3 + 3   x_8   x_{10} + 3   x_7   x_9  + \epsilon  
+            \end{align*}
+                \item fit polynomial regression models for all MBTs
+            \item fit spline based models for SLIM (and GUIDE) 
+    
+        \end{itemize}
+\end{enumerate}
 
-SLIM and GUIDE with GAMs and penalized polynomial regression
 
 
+
+\subsection{Results}
+\subsubsection{Performance}
+\subsubsection{Stability}
+\subsubsection{Interpretability}

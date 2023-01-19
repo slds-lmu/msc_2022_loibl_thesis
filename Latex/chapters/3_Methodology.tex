@@ -1,5 +1,5 @@
 \subsection{Model}
-Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((Y, \mathbf{X}), \theta)$ be a parametric model, that describes the response $Y$ as a function of a feature matrix $X$  and a vector of parameters $\theta$. If the model is used as a surrogate model, $Y$ is the prediction of the black box model that should be explained. Given $n$ observations $Y_i(i = 1,...,n)$ the model can be fitted by minimizing some objective function $\Psi((Y, X), \theta)$ yielding the parameter estimate $\hat{\theta}$
+Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((Y, \mathbf{X}), \theta)$ be a parametric model, that describes the response $Y$ as a function of a feature matrix $X$  and a vector of parameters $\theta$. When the model is used as a surrogate model, $Y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, we use the notation $\hat{Y}^{bb}$. Given $n$ observations $Y_i(i = 1,...,n)$ the model can be fitted by minimizing some objective function $\Psi((Y, X), \theta)$ yielding the parameter estimate $\hat{\theta}$
 \begin{align}
     \hat{\theta} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(Y_{i}, \mathbf{X}_{i}, \theta).
 \end{align}
@@ -107,18 +107,8 @@ One advantage of GUIDE is that the score function does not have to exist. This m
 
 
 
-Residual based categorical association test\\
-\textbf{Disadvantage}: 
-\begin{itemize}
-    \item maybe less Power than the other tests
-    \item source code not available \citep{Loh.2014}
-\end{itemize}
-
-Description of algorithm in \citep{Loh.2009} and \citep{.2002}
-
+\subsection{Software Implementation}
 GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}
-
-
 
 \subsection{Comparison}
 \begin{table}[ht]
