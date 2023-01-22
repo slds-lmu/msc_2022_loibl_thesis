@@ -90,22 +90,26 @@ test_interaction = function(x, xvals, ybin, xgroups){
   } 
   
   if(is.numeric(xval1)){
-    x1breaks = quantile(xval1, c(0:xgroups)/xgroups)
-
-    x1_cat = cut(xval1, breaks = x1breaks, labels = c(1:xgroups), 
-                 include.lowest = TRUE)
+    if(length(unique(xval1)) <= 2){
+      x1_cat = as.factor(xval1)
+    } else {
+      x1breaks = quantile(xval1, c(0:xgroups)/xgroups)
+      x1_cat = cut(xval1, breaks = x1breaks, labels = c(1:xgroups), 
+                   include.lowest = TRUE)
+    }
   } else {
     x1_cat = xval1
   }
   
   if(is.numeric(xval2)){
-    if(length(xgroups)>1) {
-      x2breaks = xgroups
+    if(length(unique(xval2)) <= 2){
+      x2_cat = as.factor(xval2)
     } else {
       x2breaks = quantile(xval2, c(0:xgroups)/xgroups)
+      x2_cat = cut(xval2, breaks = x2breaks, labels = c(1:xgroups), 
+                   include.lowest = TRUE)
     }
-    x2_cat = cut(xval2, breaks = x2breaks, labels = c(1:xgroups), 
-                  include.lowest = TRUE)
+   
   } else {
     x2_cat = xval2
   }
@@ -150,7 +154,7 @@ find_split_variable_from_tests = function(y, x, curv_test, int_test, optimizer, 
       } 
       # if both variables are numeric, use both as potential split variables
       else if (is.numeric(x[,z_vec[1]]) & is.numeric(x[,z_vec[2]])){
-        z_split = find_split_point(Y = y, X = x, z = z_vec, n.splits = 1, min.node.size = 10, optimizer = optimizer,
+        z_split = find_split_point(Y = y, X = x, z = z_vec, n.splits = 1, min.node.size = 10, optimizer = find_best_binary_split,
                                    objective = objective, splitpoints = "mean")
         z = z_split$feature[1]
       }
@@ -171,7 +175,7 @@ find_split_variable_from_tests = function(y, x, curv_test, int_test, optimizer, 
           z = z_candidates[is.factor(x[,z_candidates])]
         } else {
           # if all are numerical, use all as possible splitting variables
-          z_split = find_split_point(Y = y, X = x, z = z_candidates, n.splits = 1, min.node.size = 10, optimizer = optimizer,
+          z_split = find_split_point(Y = y, X = x, z = z_candidates, n.splits = 1, min.node.size = 10, optimizer = find_best_binary_split,
                                      objective = objective, splitpoints = "mean")
           z = z_split$feature[1]
         }

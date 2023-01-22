@@ -116,7 +116,6 @@ Node <- R6Class("Node", list(
                                   penalization = penalization, 
                                   fit.bsplines = fit.bsplines, df.spline = df.spline,
                                   split.method = split.method, correction.factor = correction.factor)
-
         if(is.null(self$intImp)) {
           #self$rsqrt = 0 
           self$intImp = 0

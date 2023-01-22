@@ -318,22 +318,27 @@ df_slim_independence_small %>%
 
 # pruning selection bias
 
-list.files("Data/simulations/batchtools/selection_bias_pruning/results/", full.names = TRUE)
-split_pruning = readRDS("Data/simulations/batchtools/selection_bias_pruning/results/selection_bias_pruning.rds")
+list.files("Data/simulations/batchtools/selection_bias_basic_pruning/results/", full.names = TRUE)
+split_pruning = readRDS("Data/simulations/batchtools/selection_bias_basic_pruning/results/selection_bias_basic_pruning.rds")
 
-savedir = "Data/simulations/batchtools/selection_bias_pruning/results/"
-figuredir = "Figures/simulations/batchtools/selection_bias_pruning/"
+savedir = "Data/simulations/batchtools/selection_bias_basic_pruning/results/"
+figuredir = "Figures/simulations/batchtools/selection_bias_basic_pruning/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
-cols_split = str_subset(colnames(tab), "split")
-cols_split = c("split_slim_exact", "split_slim_100", "split_slim_50", "split_slim_10", "split_guide_excl_cat_corr", 
+cols_split = str_subset(colnames(split_pruning), "split")
+cols_split = c("split_slim_exact", "split_slim_100", "split_slim_50", "split_slim_10", 
                "split_guide_incl_cat_corr", "split_mob", "split_ctree")
 
+# pruning_pairs = list(c(alpha = 1, impr.par = 0),
+#                     c(alpha = 0.05, impr.par = 0.04),
+#                     c(alpha = 0.01, impr.par = 0.06))
+
 pruning_pairs = list(c(alpha = 1, impr.par = 0),
-                    c(alpha = 0.05, impr.par = 0.05),
-                    c(alpha = 0.01, impr.par = 0.1))
+                    c(alpha = 0.05, impr.par = 0.02))
+
+
 
 # replace splitvariable "leafnode" with NA
 

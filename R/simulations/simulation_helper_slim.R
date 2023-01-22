@@ -24,9 +24,9 @@ fit_ctree_leaves = function(ctree, x, y){
 
 # calculate r squared
 r_2 = function(y_true, y_hat){
-  rss <- sum((y_hat - y_true) ^ 2)  ## residual sum of squares
+  ess <- sum((y_hat - mean(y_true)) ^ 2)  ## error sum of squares
   tss <- sum((y_true - mean(y_true)) ^ 2)  ## total sum of squares
-  r_2 <- 1 - rss/tss
+  r_2 <- ess/tss
   return(r_2)
 }
 

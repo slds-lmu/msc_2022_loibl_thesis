@@ -102,11 +102,10 @@ extract_models = function(tree){
 split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                              objective, fit, approximate, n.quantiles, penalization, 
                              fit.bsplines, df.spline, split.method, correction.factor, ...) {
-
   if(split.method == "slim"){
     z = colnames(X)
   } else if (split.method %in% c("anova", "R2", "R2_adj")){
-    X = X %>% select(where(~ n_distinct(.) > 1))
+    X = X %>% dplyr::select(where(~ n_distinct(.) > 1))
     interaction_models = find_split_variable_anova(Y = Y, X = X,
                                                    objective = objective, 
                                                    fit = fit,
@@ -117,7 +116,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = interaction_models$z
 
   } else if(split.method == "guide"){
-    X = X %>% select(where(~ n_distinct(.) > 1))
+    X = X %>% dplyr::select(where(~ n_distinct(.) > 1))
     z_guide = find_split_variable_guide(Y = Y, X = X,
                                         objective = objective, 
                                         fit = fit,
@@ -339,7 +338,7 @@ generate_split_candidates = function(xval, n.quantiles = NULL, min.node.size = 1
     # chunk.ind = seq.int(min.node.size + 1, length(xval) - min.node.size, by = min.node.size)
     # #xadj = unique(quantile(xval, prob = chunk.ind/length(xval), type = 1))
     # xadj = xval[chunk.ind]
-    xadj = xval[-c(1:min.node.size, (length(xval)-min.node.size):length(xval))]
+    xadj = xval[-c(1:min.node.size, (length(xval)-min.node.size+1):length(xval))]
     if (!is.null(n.quantiles)) {
       if (n.quantiles < 2){
         print(paste0("Minimum value for n.quantiles is 2"))
@@ -621,7 +620,7 @@ get_closest_point = function(split.points, xval, min.node.size = 10) {
   # try to ensure min.node.size between points (is not guaranteed if many duplicated values exist)
   chunk.ind = seq.int(min.node.size + 1, length(xval) - min.node.size, by = min.node.size)
   # xadj = unique(xval[chunk.ind]) # unique(quantile(xval, prob = chunk.ind/length(xval), type = 1))
-  xadj = unique(xval[-c(1:min.node.size, (length(xval)-min.node.size):length(xval))])
+  xadj = unique(xval[-c(1:min.node.size, (length(xval)-min.node.size+1):length(xval))])
   
   # xval = xval[-c(1, length(xval))]
   split.adj = numeric(length(split.points))
@@ -676,9 +675,11 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
 
 get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
                         .exclude.categoricals, ...) {
-  x = x %>% select(where(~ n_distinct(.) > 1))
+  # browser()
+  x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
+  
   if (.exclude.categoricals){
-    x = x %>% select(where(~ !is.factor(.)))
+    x = x %>% dplyr::select(where(~ !is.factor(.)))
   }
   numeric.names = c()
   poly = c()
@@ -719,7 +720,7 @@ get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
 
 get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.categoricals, ...) {
   y = unlist(y)
-  x = x %>% select(where(~ n_distinct(.) > 1))
+  x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
     x = x %>% select(where(~ !is.factor(.)))
   }
@@ -756,7 +757,7 @@ get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclu
   model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha,
                            .degree.poly = .degree.poly, .exclude.categoricals, .exclude.categoricals = .exclude.categoricals)
   y = unlist(y)
-  x = x %>% select(where(~ n_distinct(.) > 1))
+  x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
     x = x %>% select(where(~ !is.factor(.)))
   }
@@ -800,9 +801,9 @@ get_prediction_glmnet = function(model, x, .exclude.categoricals, ...) {
 }
 
 get_model_lad = function(y, x, .exclude.categoricals, ...){
-  x = x %>% select(where(~ n_distinct(.) > 1))
+  x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
-    x = x %>% select(where(~ !is.factor(.)))
+    x = x %>% dplyr::select(where(~ !is.factor(.)))
   }
   fm = as.formula(paste("y~", paste(names(x), collapse = "+")))
   data = cbind(y,x)
@@ -812,7 +813,7 @@ get_model_lad = function(y, x, .exclude.categoricals, ...){
 
 get_objective_lad = function(y, x, .exclude.categoricals,  ...){
   if (.exclude.categoricals){
-    x = x %>% select(where(~ !is.factor(.)))
+    x = x %>% dplyr::select(where(~ !is.factor(.)))
   }
   model = get_model_lad(y, x, .exclude.categoricals = .exclude.categoricals)
   sae = sum(abs(model$residuals))
@@ -822,7 +823,7 @@ get_objective_lad = function(y, x, .exclude.categoricals,  ...){
 
 
 get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, ...) {
-  x = x %>% select(where(~ n_distinct(.) > 1))
+  x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   term = c()
   for (n in names(x)){
     if (is.numeric(x[,n])){

@@ -8,14 +8,14 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_b
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/batchtools/helper_simulations.R"),
-                             seed = 1)
+                             seed = 1, conf.file = NA)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
 source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
-addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
+addProblem(name = "selection_bias", fun = create_sim_data, reg = reg, seed = 123)
 pdes = list("selection_bias" = data.frame(type = c("selection_bias_cross_1", "selection_bias_cross_2", "selection_bias_smooth")))
 
 
