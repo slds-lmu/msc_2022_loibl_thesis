@@ -12,6 +12,8 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scena
                              seed = 1
                              # , conf.file = NA
                              )
+reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools", writeable = TRUE, conf.file = NA)
+
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
@@ -30,7 +32,7 @@ pdes = list("basic_scenarios" = expand.grid(n = c(1500, 7500, 15000), type = c("
 source("R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R")
 
 addAlgorithm(name = "get_sim_results", fun = get_sim_results)
-ades = list(get_sim_results = data.frame(alpha = c(0.01, 0.05,0.1), impr.par = c(0.2, 0.1, 0.05)))
+ades = list(get_sim_results = data.frame(alpha = c(0.01, 0.05,0.1), impr.par = c(0.15, 0.1, 0.05)))
 
 
 
@@ -39,11 +41,11 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = ades, 
-  repls = 30L)
+  repls = 50L)
 
 summarizeExperiments()
-testJob(10)
-submitJobs()
+testJob(1)
+submitJobs(reg = reg)
 
 
 pars = unwrap(getJobPars(reg = reg))
