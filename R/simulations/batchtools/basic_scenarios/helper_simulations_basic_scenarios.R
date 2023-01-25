@@ -5,8 +5,9 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
                            exclude.categoricals = FALSE, min.split = 50, maxdepth = 7, correct.bias = TRUE, approximate = FALSE,
                            pruning = "forward", impr.par = 0.1, alpha = 0.05, ... ){
   
+  browser()
   # The data used to compare the stability of the trees are identical across all replicates!
-  data_stability = data[[job$prob.pars$type]]
+  data_stability = data[[as.character(job$prob.pars$type)]]
   
   # The data used to train the trees and evaluate their performance is re-simulated with each repetition.
   data = instance$data
@@ -56,6 +57,11 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
                                    pruning = pruning, approximate = approximate, n.quantiles = n.quantiles,
                                    exclude.categoricals = exclude.categoricals, correct.bias = correct.bias, 
                                    tree_methods = tree_methods, data_stability = data_stability)
+  
+  result_surrogate_lm = rbind(result_surrogate_lm, c(mbt = "lm", n_leaves = list(NA), 
+                                                     mse_train = list(mse_train_lm), r2_train = list(r2_train_lm), 
+                                                     mse_test = list(mse_test_lm), r2_test = list(r2_test_lm),
+                                                     stability = list(NA)))
   result_surrogate_lm = cbind(surrogate = "lm", result_surrogate_lm)
   
   
@@ -76,15 +82,21 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   
   y_hat_train_xgboost = as.data.table(pred_xgboost_train)$response
   y_hat_test_xgboost = as.data.table(pred_xgboost_test)$response
+  
   result_surrogate_xgboost  = fit_trees(x_train = x_train, y_train = y_hat_train_xgboost, x_test = x_test, y_test = y_hat_test_xgboost,  
                                         min.split = min.split, maxdepth = maxdepth, impr.par = impr.par, alpha = alpha, 
                                         pruning = pruning, approximate = approximate, n.quantiles = n.quantiles,
                                         exclude.categoricals = exclude.categoricals, correct.bias = correct.bias, 
                                         tree_methods = tree_methods, data_stability = data_stability)
+  
+  result_surrogate_xgboost = rbind(result_surrogate_xgboost, c(mbt = "xgboost", n_leaves = list(NA), 
+                                                     mse_train = list(mse_train_xgboost), r2_train = list(r2_train_xgboost), 
+                                                     mse_test = list(mse_test_xgboost), r2_test = list(r2_test_xgboost),
+                                                     stability = list(NA)))
   result_surrogate_xgboost = cbind(surrogate = "xgboost", result_surrogate_xgboost)
   
   res = rbind(result_original, result_surrogate_lm, result_surrogate_xgboost)
-  res = cbind(type = job$prob.pars$type, n = nrow(data), alpha = alpha, impr = impr.par, res)
+  res = cbind(type = as.character(job$prob.pars$type), n = nrow(data), alpha = alpha, impr = impr.par, res)
   
   return(res)
 }
@@ -207,9 +219,9 @@ fit_ctree_leaves = function(ctree, x, y){
 
 # calculate r squared
 r_2 = function(y_true, y_hat){
-  ess <- sum((y_hat - mean(y_true)) ^ 2)  ## error sum of squares
+  rss <- sum((y_hat - y_true) ^ 2)  ## residual sum of squares
   tss <- sum((y_true - mean(y_true)) ^ 2)  ## total sum of squares
-  r_2 <- ess/tss
+  r_2 <- 1 - rss/tss
   return(r_2)
 }
 

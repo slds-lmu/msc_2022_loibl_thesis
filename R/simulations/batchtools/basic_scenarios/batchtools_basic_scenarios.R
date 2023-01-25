@@ -22,7 +22,9 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 # add problems and setting definitions
 
 set.seed(49)
-data_stability = lapply(c("linear_smooth", "linear_abrupt", "linear_mixed"), function(t){create_sim_data(job = NULL, n = 20000, type = t)$data})
+data_stability = lapply(c(linear_smooth = "linear_smooth", linear_abrupt = "linear_abrupt", linear_mixed = "linear_mixed"),
+                        function(t){create_sim_data(job = NULL, n = 20000, type = t)$data})
+
 
 addProblem(name = "basic_scenarios", data = data_stability, fun = create_sim_data, reg = reg, seed = 123)
 pdes = list("basic_scenarios" = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed")))
@@ -41,7 +43,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = ades, 
-  repls = 50L)
+  repls = 30L)
 
 summarizeExperiments()
 testJob(1)
