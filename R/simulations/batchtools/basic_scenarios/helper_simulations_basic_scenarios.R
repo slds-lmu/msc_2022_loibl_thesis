@@ -5,7 +5,6 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
                            exclude.categoricals = FALSE, min.split = 50, maxdepth = 7, correct.bias = TRUE, approximate = FALSE,
                            pruning = "forward", impr.par = 0.1, alpha = 0.05, ... ){
   
-  browser()
   # The data used to compare the stability of the trees are identical across all replicates!
   data_stability = data[[as.character(job$prob.pars$type)]]
   
