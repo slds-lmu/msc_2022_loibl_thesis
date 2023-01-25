@@ -12,7 +12,6 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scena
                              seed = 1
                              # , conf.file = NA
                              )
-reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools", writeable = TRUE, conf.file = NA)
 
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
