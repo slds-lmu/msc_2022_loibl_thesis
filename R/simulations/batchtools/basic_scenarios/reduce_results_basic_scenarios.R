@@ -108,6 +108,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
 }
 
 
+# test = readRDS("Data/simulations/batchtools/basic_scenarios/batchtools/results/4.rds")
 reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
                    # ,conf.file = NA
                    )
@@ -121,17 +122,17 @@ result = reduce_trees(ades, pdes, savedir, reg)
 
 
 # result = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
-# View(result$mean[n == 1500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95, 
+# View(result$mean[n == 1500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
 #                                                                        mse_train_05, mse_train, mse_train_95,
-#                                                                        r2_train_05, r2_train, r2_train_05,
+#                                                                        r2_train_05, r2_train, r2_train_95,
 #                                                                        stability_05, stability, stability_95)])
 # 
-# View(result$mean[n == 7500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95, 
+# View(result$mean[n == 7500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
 #                                                          mse_train_05, mse_train, mse_train_95,
-#                                                          r2_train_05, r2_train, r2_train_05,
+#                                                          r2_train_05, r2_train, r2_train_95,
 #                                                          stability_05, stability, stability_95)])
-# 
-# View(result$mean[n == 15000 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95, 
+# linear_mixed
+# View(result$mean[n == 15000 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
 #                                                          mse_train_05, mse_train, mse_train_95,
 #                                                          r2_train_05, r2_train, r2_train_05,
 #                                                          stability_05, stability, stability_95)])

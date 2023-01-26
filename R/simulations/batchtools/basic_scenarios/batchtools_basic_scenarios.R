@@ -19,10 +19,12 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scena
 source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
-
+repls = 30
 set.seed(49)
 data_stability = lapply(c(linear_smooth = "linear_smooth", linear_abrupt = "linear_abrupt", linear_mixed = "linear_mixed"),
-                        function(t){create_sim_data(job = NULL, n = 20000, type = t)$data})
+                        function(t){
+                          lapply(1:(repls/2), function(i){create_sim_data(job = NULL, n = 1000, type = t)$data})
+                        })
 
 
 addProblem(name = "basic_scenarios", data = data_stability, fun = create_sim_data, reg = reg, seed = 123)
@@ -33,7 +35,7 @@ pdes = list("basic_scenarios" = expand.grid(n = c(1500, 7500, 15000), type = c("
 source("R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R")
 
 addAlgorithm(name = "get_sim_results", fun = get_sim_results)
-ades = list(get_sim_results = data.frame(alpha = c(0.01, 0.05,0.1), impr.par = c(0.15, 0.1, 0.05)))
+ades = list(get_sim_results = data.frame(alpha = c(0.01, 0.05,0.10), impr.par = c(0.15, 0.1, 0.05)))
 
 
 
@@ -42,12 +44,12 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = ades, 
-  repls = 30L)
+  repls = 100L)
 
 summarizeExperiments()
 testJob(1)
 submitJobs(reg = reg)
 
 
-pars = unwrap(getJobPars(reg = reg))
+# pars = unwrap(getJobPars(reg = reg))
 

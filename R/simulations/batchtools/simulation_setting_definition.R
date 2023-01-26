@@ -1,27 +1,26 @@
 create_sim_data = function(job, n = 1000, type, ...){
   
   if (type == "linear_smooth"){
+
     
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)
     x3 = runif(n, -1, 1)
-    x4 = runif(n, -1, 1)
-    x5 = runif(n, -1, 1)
 
     
-    formula = x1 + 4*x2 + 3*x2*x3 + 4*x4*x5 + x5
+    formula = x1 + 3*x1*x2 + x2*x3 
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = as.formula("y ~ x1 + x2 + x5 + x2:x3 + x4:x5")
+    data = data.frame(x1, x2, x3, y)
+    fm = as.formula("y ~ x1 + x1:x2 + x2:x3")
     lrn = lrn("regr.xgboost",
-              max_depth = 3,
-              eta = 0.5,
-              alpha = 0.6,
-              gamma = 1,
-              nrounds = 1000,
-              interaction_constraints = "[[1,2],[3,4]]")
+              max_depth = 5,
+              eta = 0.6,
+              alpha = 0.3,
+              gamma = 1.3,
+              nrounds = 900,
+              interaction_constraints = "[[0,1],[1,2]]")
     
     # search_space = ps(
     #   max_depth = p_int(lower = 2, upper = 8),

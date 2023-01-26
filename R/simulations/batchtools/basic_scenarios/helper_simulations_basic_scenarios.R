@@ -4,7 +4,6 @@ source("R/simulations/batchtools/helper_simulations.R")
 get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"), n.quantiles = 100,
                            exclude.categoricals = FALSE, min.split = 50, maxdepth = 7, correct.bias = TRUE, approximate = FALSE,
                            pruning = "forward", impr.par = 0.1, alpha = 0.05, ... ){
-  
   # The data used to compare the stability of the trees are identical across all replicates!
   data_stability = data[[as.character(job$prob.pars$type)]]
   
@@ -60,7 +59,7 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   result_surrogate_lm = rbind(result_surrogate_lm, c(mbt = "lm", n_leaves = list(NA), 
                                                      mse_train = list(mse_train_lm), r2_train = list(r2_train_lm), 
                                                      mse_test = list(mse_test_lm), r2_test = list(r2_test_lm),
-                                                     stability = list(NA)))
+                                                     stability = list(NA), stability_sem = list(NA)))
   result_surrogate_lm = cbind(surrogate = "lm", result_surrogate_lm)
   
   
@@ -73,10 +72,10 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   pred_xgboost_train = lrn$predict(task_train)
   pred_xgboost_test = lrn$predict(task_test)
   
-  mse_train_xgboost = pred_xgboost_train$score(msr("regr.mse"))
-  r2_train_xgboost = pred_xgboost_train$score(msr("regr.rsq"))
-  mse_test_xgboost = pred_xgboost_test$score(msr("regr.mse"))
-  r2_test_xgboost = pred_xgboost_test$score(msr("regr.rsq"))
+  mse_train_xgboost = as.numeric(pred_xgboost_train$score(msr("regr.mse")))
+  r2_train_xgboost = as.numeric(pred_xgboost_train$score(msr("regr.rsq")))
+  mse_test_xgboost = as.numeric(pred_xgboost_test$score(msr("regr.mse")))
+  r2_test_xgboost = as.numeric(pred_xgboost_test$score(msr("regr.rsq")))
   
   
   y_hat_train_xgboost = as.data.table(pred_xgboost_train)$response
@@ -91,7 +90,7 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   result_surrogate_xgboost = rbind(result_surrogate_xgboost, c(mbt = "xgboost", n_leaves = list(NA), 
                                                      mse_train = list(mse_train_xgboost), r2_train = list(r2_train_xgboost), 
                                                      mse_test = list(mse_test_xgboost), r2_test = list(r2_test_xgboost),
-                                                     stability = list(NA)))
+                                                     stability = list(NA), stability_sem = list(NA)))
   result_surrogate_xgboost = cbind(surrogate = "xgboost", result_surrogate_xgboost)
   
   res = rbind(result_original, result_surrogate_lm, result_surrogate_xgboost)
@@ -104,7 +103,6 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
 fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split, 
                      maxdepth, impr.par, alpha, pruning, approximate,
                      n.quantiles, exclude.categoricals, correct.bias, tree_methods){
-  
   if("slim" %in% tree_methods){
     slim_res = list(mbt = "SLIM")
     
@@ -123,7 +121,9 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     if(!is.null(data_stability)){
       # tree varies across all repetitions due to slightly different data, but data_stability is identical across all repetitions
-      slim_res$stability = predict_slim(slim, data_stability, type = "node")
+      slim_res$stability = lapply(data_stability, function(dat){predict_slim(slim, dat, type = "node")})
+      slim_res$stability_sem = lapply(data_stability, function(dat){predict_slim(slim, dat, type = "response")})
+      
     }
     
     
@@ -145,7 +145,9 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     
     if(!is.null(data_stability)){
-      guide_res$stability = predict_slim(guide, data_stability, type = "node")
+      guide_res$stability = lapply(data_stability, function(dat){predict_slim(guide, dat, type = "node")})
+      guide_res$stability_sem = lapply(data_stability, function(dat){predict_slim(guide, dat, type = "response")})
+      
     }
     
     
@@ -155,7 +157,11 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     # formula mob
     fm_mob = formula(paste("y ~", paste(colnames(x_test), collapse = "+"), "|", paste(colnames(x_test), collapse = "+")))
     
-    mob = lmtree(fm_mob, data = cbind(x_train, y = y_train), minsize = min.split, maxdepth = maxdepth, alpha = alpha)
+    mob = lmtree(fm_mob, 
+                 data = cbind(x_train, y = y_train), 
+                 minsize = min.split, 
+                 maxdepth = maxdepth, 
+                 alpha = alpha)
     mob_res$n_leaves = width(mob)
     
     mob_res$mse_train = mean((predict(mob, x_train)- y_train)^2)
@@ -165,18 +171,19 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     mob_res$r2_test = r_2(y_test, predict(mob, x_test))
     
     if(!is.null(data_stability)){
-      mob_res$stability = as.character(predict(mob, data_stability, type = "node"))
+      mob_res$stability = lapply(data_stability, function(dat){as.character(predict(mob, dat, type = "node"))})
+      mob_res$stability_sem = lapply(data_stability, function(dat){as.character(predict(mob, dat, type = "response"))})
+      
     }
     
   } 
   if("ctree" %in% tree_methods){
     ctree_res = list(mbt = "CTree")
-    
     fm_ctree = formula(paste("y ~", paste(colnames(x_test), collapse = "+"), "|", paste(colnames(x_test), collapse = "+")))
-    ctree = suppressWarnings(ctree(fm_mob,
-                                   data = data.frame(x_train, y = y_train),
-                                   ytrafo = fit_lm,
-                                   control = ctree_control(minbucket = min.split, maxdepth = maxdepth - 1, alpha = alpha)))
+    ctree = suppressWarnings(partykit::ctree(fm_ctree,
+                                             data = cbind(x_train, y = y_train),
+                                             ytrafo = fit_lm,
+                                             control = partykit::ctree_control(minbucket = min.split, maxdepth = maxdepth - 1, alpha = alpha)))
     
     ctree_res$n_leaves =  width(ctree)
     
@@ -189,7 +196,9 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     ctree_res$r2_test = r_2(y_test, predict_ctree(ctree, fit_ctree, x_test))
     
     if(!is.null(data_stability)){
-      ctree_res$stability = as.character(predict(ctree, data_stability, type = "node"))
+      ctree_res$stability = lapply(data_stability, function(dat){as.character(predict(ctree, dat, type = "node"))})
+      ctree_res$stability_sem = lapply(data_stability, function(dat){as.character(predict(ctree, dat, type = "response"))})
+      
     }
   }
   
