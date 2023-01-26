@@ -16,7 +16,6 @@ reduce_trees = function(ades, pdes, savedir, reg){
     pars = unwrap(getJobPars(reg = reg))
     toreduce = ijoin(experiments[exp,], pars)
     # toreduce = ijoin(toreduce$job.id, findDone(reg = reg))
-    browser()
     reduce = function(res) rbind(res)
     res = reduceResultsDataTable(ids = toreduce$job.id, fun = reduce, reg = reg)
     res_list = lapply(1:nrow(res), function(job){
@@ -28,27 +27,33 @@ reduce_trees = function(ades, pdes, savedir, reg){
     
     # nur vorübergehend! muss dann in der Simulation korrigiert werden!
     res_df = res_df[!is.na(n_leaves), ]
-    
     measure_cols = c("n_leaves", "mse_train", "r2_train", "mse_test", "r2_test")    
     group_cols = c("job.id", "type", "n", "alpha", "impr", "surrogate", "mbt")
-    
     
     cols_unwrap = c(measure_cols, group_cols)
     res_df = unwrap(res_df, cols = cols_unwrap)
     setnames(res_df, paste0(cols_unwrap, ".1"),
              cols_unwrap)
-    
     # save raw result data
     saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
-    
     
     # summarize results
     res_df[, config_id:=.GRP,by = list(type, n, alpha, impr, surrogate, mbt)]
    
-
     res_mean_exp = res_df[, lapply(.SD, mean), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
     res_sd_exp = res_df[, lapply(.SD, sd), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
     
+    lower_bound = function(col){mean(col)-qnorm(0.95)*(sd(col)/sqrt(length(col)))}
+    upper_bound = function(col){mean(col)+qnorm(0.95)*(sd(col)/sqrt(length(col)))}
+    
+    res_lower_bound_exp = res_df[, lapply(.SD, lower_bound), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
+    setnames(res_lower_bound_exp, measure_cols, paste0(measure_cols, "_05"))
+    res_upper_bound_exp = res_df[, lapply(.SD, upper_bound), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
+    setnames(res_upper_bound_exp, measure_cols, paste0(measure_cols, "_95"))
+    
+    
+    res_int_exp = ijoin(res_lower_bound_exp, res_upper_bound_exp, by = c("type", "n", "alpha", "impr", "surrogate", "mbt", "config_id"))
+    res_mean_exp = ijoin(res_mean_exp, res_int_exp, by = c("type", "n", "alpha", "impr", "surrogate", "mbt", "config_id"))
     
     # create all possible pairs of simulation repititions
     pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
@@ -67,7 +72,13 @@ reduce_trees = function(ades, pdes, savedir, reg){
 
     stability_df = data.table(do.call("rbind", stability_list))
     stability_mean = stability_df[, .(stability = mean(stability)), by = config_id]
+    stability_lower = stability_df[,  .(stability_05 = lower_bound(stability)), by = config_id]
+    stability_upper = stability_df[,  .(stability_95 = upper_bound(stability)), by = config_id]
     stability_sd = stability_df[, .(stability = sd(stability)), by = config_id]
+    
+    
+    stability_int = ijoin(stability_lower, stability_upper, by = "config_id")
+    stability_mean = ijoin(stability_mean, stability_int, by = "config_id")
     res_mean_exp = ijoin(res_mean_exp, stability_mean)
     res_sd_exp = ijoin(res_sd_exp, stability_sd)
     res_mean_exp$experiment_id = exp
@@ -76,7 +87,6 @@ reduce_trees = function(ades, pdes, savedir, reg){
     
     res_mean = rbind(res_mean, res_mean_exp)
     res_sd = rbind(res_sd, res_sd_exp)
-    
     
   }
   
@@ -95,5 +105,8 @@ pdes = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_a
 savedir = "Data/simulations/batchtools/basic_scenarios/results/"
 
 result = reduce_trees(ades, pdes, savedir, reg)
+
+
+result = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
 
 
