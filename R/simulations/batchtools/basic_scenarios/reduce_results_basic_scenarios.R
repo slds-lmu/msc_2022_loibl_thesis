@@ -92,7 +92,3 @@ savedir = "Data/simulations/batchtools/basic_scenarios/results/"
 result = reduce_trees(ades, pdes, savedir, reg)
 
 
-test = readRDS("Data/simulations/batchtools/basic_scenarios/results/1_res_experiments.rds")
-
-
-test1 = readRDS("Data/simulations/batchtools/basic_scenarios/batchtools/results/1.rds")
