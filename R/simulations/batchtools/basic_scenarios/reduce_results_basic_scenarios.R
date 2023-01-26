@@ -43,8 +43,19 @@ reduce_trees = function(ades, pdes, savedir, reg){
     res_mean_exp = res_df[, lapply(.SD, mean), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
     res_sd_exp = res_df[, lapply(.SD, sd), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
     
-    lower_bound = function(col){mean(col)-qnorm(0.95)*(sd(col)/sqrt(length(col)))}
-    upper_bound = function(col){mean(col)+qnorm(0.95)*(sd(col)/sqrt(length(col)))}
+    
+    
+    lower_bound = function(col){
+      df =  length(col)-1
+      t_score = qt(p=0.05/2, df = df,lower.tail=F)
+      mean(col)-t_score*(sd(col)/sqrt(length(col)))
+    }
+    
+    upper_bound = function(col){
+      df =  length(col)-1
+      t_score = qt(p=0.05/2, df = df,lower.tail=F)
+      mean(col)+t_score*(sd(col)/sqrt(length(col)))
+    }
     
     res_lower_bound_exp = res_df[, lapply(.SD, lower_bound), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
     setnames(res_lower_bound_exp, measure_cols, paste0(measure_cols, "_05"))
@@ -97,7 +108,9 @@ reduce_trees = function(ades, pdes, savedir, reg){
 }
 
 
-reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools", conf.file = NA)
+reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
+                   # ,conf.file = NA
+                   )
 
 ades = data.frame(alpha = c(0.01, 0.05,0.1), impr.par = c(0.15, 0.1, 0.05))
 pdes = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
@@ -107,6 +120,18 @@ savedir = "Data/simulations/batchtools/basic_scenarios/results/"
 result = reduce_trees(ades, pdes, savedir, reg)
 
 
-result = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
-
-
+# result = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
+# View(result$mean[n == 1500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95, 
+#                                                                        mse_train_05, mse_train, mse_train_95,
+#                                                                        r2_train_05, r2_train, r2_train_05,
+#                                                                        stability_05, stability, stability_95)])
+# 
+# View(result$mean[n == 7500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95, 
+#                                                          mse_train_05, mse_train, mse_train_95,
+#                                                          r2_train_05, r2_train, r2_train_05,
+#                                                          stability_05, stability, stability_95)])
+# 
+# View(result$mean[n == 15000 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95, 
+#                                                          mse_train_05, mse_train, mse_train_95,
+#                                                          r2_train_05, r2_train, r2_train_05,
+#                                                          stability_05, stability, stability_95)])
