@@ -34,15 +34,15 @@ reduce_trees = function(ades, pdes, savedir, reg){
              cols_unwrap)
     
     # save raw result data
-    saveRDS(list(mean = res_mean, sd = res_sd), paste0(savedir, "result_summary.rds" ))
+    saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
     
     
     # summarize results
     res_df[, config_id:=.GRP,by = list(type, n, alpha, impr, surrogate, mbt)]
    
-    
-    res_mean_exp = res_df[, lapply(.SD, mean), by = config_id, .SDcols = measure_cols]
-    res_sd_exp = res_df[, lapply(.SD, sd), by = config_id, .SDcols = measure_cols]
+
+    res_mean_exp = res_df[, lapply(.SD, mean), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
+    res_sd_exp = res_df[, lapply(.SD, sd), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
     
     
     # create all possible pairs of simulation repititions
@@ -59,18 +59,15 @@ reduce_trees = function(ades, pdes, savedir, reg){
       
       return(stability_df)
     })
-    browser()
-    
+
     stability_df = data.table(do.call("rbind", stability_list))
-    stability_mean = stability_df[, stability := mean(stability), by = config_id]
-    stability_sd = stability_df[, stability := sd(stability), by = config_id]
-    browser()
+    stability_mean = stability_df[, .(stability = mean(stability)), by = config_id]
+    stability_sd = stability_df[, .(stability = sd(stability)), by = config_id]
     res_mean_exp = ijoin(res_mean_exp, stability_mean)
     res_sd_exp = ijoin(res_sd_exp, stability_sd)
     res_mean_exp$experiment_id = exp
     res_sd_exp$experiment_id = exp
     
-    saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
     
     res_mean = rbind(res_mean, res_mean_exp)
     res_sd = rbind(res_sd, res_sd_exp)
@@ -93,3 +90,9 @@ pdes = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_a
 savedir = "Data/simulations/batchtools/basic_scenarios/results/"
 
 result = reduce_trees(ades, pdes, savedir, reg)
+
+
+test = readRDS("Data/simulations/batchtools/basic_scenarios/results/1_res_experiments.rds")
+
+
+test1 = readRDS("Data/simulations/batchtools/basic_scenarios/batchtools/results/1.rds")
