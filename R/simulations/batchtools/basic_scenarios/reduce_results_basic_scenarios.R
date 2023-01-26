@@ -16,7 +16,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     pars = unwrap(getJobPars(reg = reg))
     toreduce = ijoin(experiments[exp,], pars)
     # toreduce = ijoin(toreduce$job.id, findDone(reg = reg))
-    
+    browser()
     reduce = function(res) rbind(res)
     res = reduceResultsDataTable(ids = toreduce$job.id, fun = reduce, reg = reg)
     res_list = lapply(1:nrow(res), function(job){
@@ -26,8 +26,13 @@ reduce_trees = function(ades, pdes, savedir, reg){
     })
     res_df = data.table(do.call("rbind", res_list))
     
+    # nur vorübergehend! muss dann in der Simulation korrigiert werden!
+    res_df = res_df[!is.na(n_leaves), ]
+    
     measure_cols = c("n_leaves", "mse_train", "r2_train", "mse_test", "r2_test")    
     group_cols = c("job.id", "type", "n", "alpha", "impr", "surrogate", "mbt")
+    
+    
     cols_unwrap = c(measure_cols, group_cols)
     res_df = unwrap(res_df, cols = cols_unwrap)
     setnames(res_df, paste0(cols_unwrap, ".1"),
