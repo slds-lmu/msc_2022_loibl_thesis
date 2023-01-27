@@ -1,36 +1,71 @@
-create_sim_data = function(job, n = 1000, type, ...){
+create_sim_data = function(job, n = 1000, type, rho = 0, ...){
   
   if (type == "linear_smooth"){
-
-    
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)
     x3 = runif(n, -1, 1)
 
     
-    formula = x1 + 3*x1*x2 + x2*x3 
+    formula = x1 + 4*x2 + 3*x2*x3 
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     
     data = data.frame(x1, x2, x3, y)
-    fm = as.formula("y ~ x1 + x1:x2 + x2:x3")
+    fm = as.formula("y ~ x1 + x2 + x2:x3")
     lrn = lrn("regr.xgboost",
               max_depth = 5,
-              eta = 0.6,
-              alpha = 0.3,
-              gamma = 1.3,
-              nrounds = 900,
-              interaction_constraints = "[[0,1],[1,2]]")
+              eta = 0.5,
+              alpha = 1,
+              gamma = 2,
+              nrounds = 400,
+              interaction_constraints = "[[1,2]]")
     
-    # search_space = ps(
-    #   max_depth = p_int(lower = 2, upper = 8),
-    #   eta = p_dbl(lower = 0.5, upper = 1),
-    #   alpha = p_dbl(lower = 0, upper = 2),
-    #   gamma = p_dbl(lower = 1, upper = 5),
-    #   nrounds = p_int(lower = 5, upper = 1000)
-    # )
+    search_space = ps(
+      max_depth = p_int(lower = 2, upper = 5),
+      eta = p_dbl(lower = 0.5, upper = 1),
+      alpha = p_dbl(lower = 0, upper = 2),
+      gamma = p_dbl(lower = 1, upper = 5),
+      nrounds = p_int(lower = 200, upper = 1000)
+    )
     
-  } else if(type == "linear_abrupt"){
+   
+    
+  } else if(type == "linear_smooth_corr"){
+    marginals_copula = function(cor_matrix, list_distributions, n){
+      l = length(list_distributions)
+      # Correlated Gaussian variables
+      Gauss = rmvnorm(n=n, mean = rep(0,l), sig=cor_matrix)
+      # convert them to uniform distribution.
+      Unif = pnorm(Gauss) 
+      # Convert them to whatever I want
+      vars = sapply(1:l, FUN = function(i) list_distributions[[i]](Unif[,i]))
+      return(vars)
+    }
+    
+    cor_matrix = matrix(c(1,0.7,0.5,
+                          0.7,1,0.1,
+                          0.5,0.1,1), nrow = 3, byrow = TRUE)
+    
+    list_distributions = list(function(n) qunif(n, -1, 1), 
+                              function(n) qunif(n, -1, 1),
+                              function(n) qunif(n, -1, 1))
+    vars = marginals_copula(cor_matrix, list_distributions, n = n)
+    x1 = vars[,1]
+    x2 = vars[,2]
+    x3 = runif(n, -1, 1)
+    x4 = vars[,3]
+
+
+    formula = x1 + 4*x2 + 3*x2*x3 
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+
+    data = data.frame(x1, x2, x3, x4, y)
+    fm = as.formula("y ~ x1 + x2 + x2:x3")
+    lrn = NULL
+
+
+  }  else if(type == "linear_abrupt"){
     
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)
@@ -38,8 +73,11 @@ create_sim_data = function(job, n = 1000, type, ...){
   
     
     formula = x1 - 8*x2 + ifelse(x3 == 0, I(16*x2),0) + ifelse(x1 > mean(x1), I(8*x2),0) 
+
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
+    
+
     
     data = data.frame(x1, x2, x3, y)
     fm = as.formula("y ~ x1 + x2 + x2:x3 + ti(x1,x2)")
@@ -65,27 +103,23 @@ create_sim_data = function(job, n = 1000, type, ...){
     x2 = runif(n, -1, 1)
     x3 = as.numeric(rbernoulli(n))
     x4 = as.numeric(rbernoulli(n))
-    x5 = as.numeric(rbernoulli(n))
-    for(i in 6:10){
-      x = runif(n, -1, 1)
-      assign(paste0("x",i), x)
-    }
+
     
+    formula = 4*x2 + 2*x4 + 4*x2*x1 + ifelse(x3 == 0, 8*x2,0) + 
+      ifelse(x4 == 1, 8*x1*x2, 0)
     
-    formula = 4*x2 + 2*x4 + 2*x6 + 2*x8 + 4*x2*x1 + ifelse(x3 == 0, I(8*x2),0) + 
-      ifelse(x5 == 1, I(10*x2),0)*x6 + 8*x2*x7 + 3*x1*x3 + 3*x8*x10 + 3*x7*x9
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
     
-    data = data.frame(mget(paste0("x",1:10)), y)
-    fm = as.formula("y ~ x2 + x4 + x6 + x8 + x2:x1 + x3:x2 + x5:x2:x6 + x2:x7 + x1:x3 + x8:x10 + x7:x9")
+    data = data.frame(mget(paste0("x",1:4)), y)
+    fm = as.formula("y ~ x2 + x4 + x2:x1 + x2:x3 + x1:x2:x4")
     lrn = lrn("regr.xgboost",
               max_depth = 5,
               eta = 0.5,
-              alpha = 1.4,
+              alpha = 2,
               gamma = 3.5,
-              nrounds = 360,
-              interaction_constraints = "[[0,1],[1,2], [1,4,5], [1,6], [0,2], [7,9],[6,8]]")
+              nrounds = 500,
+              interaction_constraints = "[[0,1], [1,2], [0,1,3]]")
     
     search_space = ps(
       max_depth = p_int(lower = 4, upper = 10),

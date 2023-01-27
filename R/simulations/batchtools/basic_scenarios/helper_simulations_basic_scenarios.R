@@ -23,7 +23,7 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   
   y_train = train$y
   y_test = test$y
-  
+
   # fit trees to the original data (i.e. use MBTs as standalone ML model)
   result_original = fit_trees(x_train = x_train, y_train = y_train, x_test = x_test, y_test = y_test,  
                               min.split = min.split, maxdepth = maxdepth, impr.par = impr.par, alpha = alpha, 
@@ -135,6 +135,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
                               impr.par = impr.par, min.split = min.split, split.method = "guide",
                               exclude.categoricals = exclude.categoricals, correct.bias = correct.bias)
     split = extract_split_criteria(guide)
+    
     guide_res$n_leaves = sum(split$split.feature == "leafnode")
     
     guide_res$mse_train = mean((predict_slim(guide, x_train)- y_train)^2)

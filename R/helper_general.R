@@ -116,6 +116,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = interaction_models$z
 
   } else if(split.method == "guide"){
+    optimizer = find_best_binary_split
     X = X %>% dplyr::select(where(~ n_distinct(.) > 1))
     z_guide = find_split_variable_guide(Y = Y, X = X,
                                         objective = objective, 
@@ -125,7 +126,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = z_guide$z
     guide_type = z_guide$type
   }
-  
+  # browser()
   split_point = find_split_point(Y = Y, X = X, z = z, n.splits = n.splits,
                                  min.node.size = min.node.size, 
                                  optimizer = optimizer,
@@ -135,6 +136,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                                  penalization = penalization, 
                                  fit.bsplines = fit.bsplines,
                                  df.spline = df.spline)
+  # browser()
   if(split.method == "guide"){
     split_point$test.type = guide_type
   }
@@ -250,7 +252,6 @@ generate_node_index = function(Y, X, result) {
 
 # performs and evaluates binary splits
 find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, n.quantiles, splitpoints = "quantiles", ...) {
-  # browser()
   if(length(unique(xval)) == 1){
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
   }
@@ -298,11 +299,11 @@ find_best_binary_split_approx = function(xval, x, y, n.splits = 1, min.node.size
   
   # assign intervalnr. according to split points
   if (is.numeric(xval)){
-    node.number = findInterval(x = xval, vec = q, rightmost.closed = TRUE) + 1
+    node.number = findInterval(x = xval, vec = q, rightmost.closed = FALSE, left.open = TRUE)
+    
   } else if (is.factor(xval)){
     node.number = xval
   }
-  
   # create with gram matrices for all bins
   gram.list = create_gramlist(x = x, y = y, bin = node.number, fit.bsplines = fit.bsplines, penalization = penalization, df.spline = df.spline)
   
@@ -742,9 +743,9 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.ca
   } else {
     x = as.matrix(x)
   }  
-  
   fit = glmnet(x, y, nlambda=100)
   rss = deviance(fit)
+  n = nrow(x)
   bic = n*log(rss/n) + log(n)*fit$df
   lambda = fit$lambda[which.min(bic)]
   
