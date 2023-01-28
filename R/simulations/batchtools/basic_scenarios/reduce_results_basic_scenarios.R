@@ -40,8 +40,8 @@ reduce_trees = function(ades, pdes, savedir, reg){
     # summarize results
     res_df[, config_id:=.GRP,by = list(type, n, alpha, impr, surrogate, mbt)]
    
-    res_mean_exp = res_df[, lapply(.SD, mean), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
-    res_sd_exp = res_df[, lapply(.SD, sd), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
+    res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
+    res_sd_exp = res_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = list(type, n, alpha, impr, surrogate, mbt, config_id), .SDcols = measure_cols]
     
     
     
@@ -70,7 +70,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     pair_ids = split(unique(res_df$job.id), ceiling(seq_along(unique(res_df$job.id)) / 2))
 
     # function to calculate gaussian radial basis function (to measure semantic stability)
-    rbf = function(pred1, pred2, sigma = 0.05){
+    rbf = function(pred1, pred2, sigma = 0.01){
       rbf = exp( - sum((as.numeric(pred1) - as.numeric(pred2))^2) / 2*sigma)
       return(rbf)
     }
@@ -95,14 +95,13 @@ reduce_trees = function(ades, pdes, savedir, reg){
         }
 
       }
-      colnames(stability_df) = c("config_id", "ari", "rfb")
+      colnames(stability_df) = c("config_id", "ari", "rbf")
       
       return(stability_df)
     })
-
     stability_df = data.table(do.call("rbind", stability_list))
     
-    stability_mean = stability_df[, lapply(.SD, mean), by = config_id, .SDcols = c("ari", "rbf")]
+    stability_mean = stability_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ari", "rbf")]
     
     stability_lower = stability_df[,  lapply(.SD, lower_bound), by = config_id, .SDcols = c("ari", "rbf")]
     setnames(stability_lower, c("ari", "rbf"), c("ari_05", "rbf_05"))
@@ -110,7 +109,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     stability_upper = stability_df[,  .lapply(.SD, upper_bound), by = config_id, .SDcols = c("ari", "rbf")]
     setnames(stability_upper, c("ari", "rbf"), c("ari_95", "rbf_95"))
     
-    stability_sd = stability_df[, lapply(.SD, sd), by = config_id, .SDcols = c("ari", "rbf")]
+    stability_sd = stability_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ari", "rbf")]
     
     
     stability_int = ijoin(stability_lower, stability_upper, by = "config_id")
@@ -135,7 +134,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
 
 # test = readRDS("Data/simulations/batchtools/basic_scenarios/batchtools/results/4.rds")
 reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
-                    # ,conf.file = NA
+                    ,conf.file = NA
                    )
 
 ades = data.frame(alpha = c(0.01, 0.05,0.1), impr.par = c(0.15, 0.1, 0.05))
