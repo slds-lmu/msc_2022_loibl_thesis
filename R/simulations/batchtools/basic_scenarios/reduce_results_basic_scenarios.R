@@ -106,7 +106,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     stability_lower = stability_df[,  lapply(.SD, lower_bound), by = config_id, .SDcols = c("ari", "rbf")]
     setnames(stability_lower, c("ari", "rbf"), c("ari_05", "rbf_05"))
     
-    stability_upper = stability_df[,  .lapply(.SD, upper_bound), by = config_id, .SDcols = c("ari", "rbf")]
+    stability_upper = stability_df[,  lapply(.SD, upper_bound), by = config_id, .SDcols = c("ari", "rbf")]
     setnames(stability_upper, c("ari", "rbf"), c("ari_95", "rbf_95"))
     
     stability_sd = stability_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ari", "rbf")]
