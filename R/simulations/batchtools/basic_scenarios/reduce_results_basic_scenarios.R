@@ -25,8 +25,8 @@ reduce_trees = function(ades, pdes, savedir, reg){
     })
     res_df = data.table(do.call("rbind", res_list))
     
-    # nur vorübergehend! muss dann in der Simulation korrigiert werden!
-    res_df = res_df[!is.na(n_leaves), ]
+    # # nur vorübergehend! muss dann in der Simulation korrigiert werden!
+    # res_df = res_df[!is.na(n_leaves), ]
     measure_cols = c("n_leaves", "mse_train", "r2_train", "mse_test", "r2_test")    
     group_cols = c("job.id", "type", "n", "alpha", "impr", "surrogate", "mbt")
     
@@ -67,14 +67,21 @@ reduce_trees = function(ades, pdes, savedir, reg){
     res_mean_exp = ijoin(res_mean_exp, res_int_exp, by = c("type", "n", "alpha", "impr", "surrogate", "mbt", "config_id"))
     
     # create all possible pairs of simulation repititions
-    pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
+    pair_ids = split(unique(res_df$job.id), ceiling(seq_along(unique(res_df$job.id)) / 2))
 
+    browser()
     stability_list = lapply(pair_ids, function(pair){
       stability_df = data.frame(config_id = integer(), ari = double())
       for(conf in unique(res_df$config_id)){
         set1 =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]]
         set2 =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]]
-        stability_df = rbind(stability_df, c(config_id = conf, ari = adj.rand.index(set1, set2)))
+        svec = c()
+        for(s in 1:length(set1)){
+          s1 = set1[[s]]
+          s2 = set2[[s]]
+          stability_df = rbind(stability_df, c(config_id = conf, ari = adj.rand.index(s1, s2)))
+        }
+
       }
       colnames(stability_df) = c("config_id", "stability")
       
