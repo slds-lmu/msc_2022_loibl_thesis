@@ -69,7 +69,6 @@ reduce_trees = function(ades, pdes, savedir, reg){
     # create all possible pairs of simulation repititions
     pair_ids = split(unique(res_df$job.id), ceiling(seq_along(unique(res_df$job.id)) / 2))
 
-    browser()
     stability_list = lapply(pair_ids, function(pair){
       stability_df = data.frame(config_id = integer(), ari = double())
       for(conf in unique(res_df$config_id)){
