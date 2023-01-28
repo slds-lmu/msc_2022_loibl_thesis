@@ -198,7 +198,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     if(!is.null(data_stability)){
       ctree_res$stability = lapply(data_stability, function(dat){as.character(predict(ctree, dat, type = "node"))})
-      ctree_res$stability_sem = lapply(data_stability, function(dat){as.character(predict(ctree, dat, type = "response"))})
+      ctree_res$stability_sem = lapply(data_stability, function(dat){as.character(predict_ctree(ctree, fit_ctree, dat))})
       
     }
   }

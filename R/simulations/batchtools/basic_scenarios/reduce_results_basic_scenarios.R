@@ -137,7 +137,7 @@ reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
                     ,conf.file = NA
                    )
 
-ades = data.frame(alpha = c(0.01, 0.05,0.1), impr.par = c(0.15, 0.1, 0.05))
+ades = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
 pdes = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
 
 savedir = "Data/simulations/batchtools/basic_scenarios/results/"
@@ -145,18 +145,21 @@ savedir = "Data/simulations/batchtools/basic_scenarios/results/"
 result = reduce_trees(ades, pdes, savedir, reg)
 
 
-# result = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
-# View(result$mean[n == 1500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
-#                                                                        mse_train_05, mse_train, mse_train_95,
-#                                                                        r2_train_05, r2_train, r2_train_95,
-#                                                                        stability_05, stability, stability_95)])
-# 
-# View(result$mean[n == 7500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
-#                                                          mse_train_05, mse_train, mse_train_95,
-#                                                          r2_train_05, r2_train, r2_train_95,
-#                                                          stability_05, stability, stability_95)])
-# linear_mixed
-# View(result$mean[n == 15000 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
-#                                                          mse_train_05, mse_train, mse_train_95,
-#                                                          r2_train_05, r2_train, r2_train_05,
-#                                                          stability_05, stability, stability_95)])
+result = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
+View(result$mean[n == 1500 & type == "linear_abrupt" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
+                                                         mse_train_05, mse_train, mse_train_95,
+                                                         r2_train_05, r2_train, r2_train_95,
+                                                         ari_05, ari, ari_95,
+                                                         rbf_05, rbf, rbf_95)])
+
+View(result$mean[n == 7500 & type == "linear_abrupt" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
+                                                         mse_train_05, mse_train, mse_train_95,
+                                                         r2_train_05, r2_train, r2_train_95,
+                                                         ari_05, ari, ari_95,
+                                                         rbf_05, rbf, rbf_95)])
+
+View(result$mean[n == 15000 & type == "linear_mixed" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
+                                                         mse_train_05, mse_train, mse_train_95,
+                                                         r2_train_05, r2_train, r2_train_05,
+                                                         ari_05, ari, ari_95,
+                                                         rbf_05, rbf, rbf_95)])
