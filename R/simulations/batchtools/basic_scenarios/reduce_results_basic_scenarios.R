@@ -69,29 +69,48 @@ reduce_trees = function(ades, pdes, savedir, reg){
     # create all possible pairs of simulation repititions
     pair_ids = split(unique(res_df$job.id), ceiling(seq_along(unique(res_df$job.id)) / 2))
 
+    # function to calculate gaussian radial basis function (to measure semantic stability)
+    rbf = function(pred1, pred2, sigma = 0.05){
+      rbf = exp( - sum((as.numeric(pred1) - as.numeric(pred2))^2) / 2*sigma)
+      return(rbf)
+    }
+    
     stability_list = lapply(pair_ids, function(pair){
-      stability_df = data.frame(config_id = integer(), ari = double())
+      stability_df = data.frame(config_id = integer(), ari = double(), rbf = double())
       for(conf in unique(res_df$config_id)){
-        set1 =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]]
-        set2 =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]]
-        svec = c()
-        for(s in 1:length(set1)){
-          s1 = set1[[s]]
-          s2 = set2[[s]]
-          stability_df = rbind(stability_df, c(config_id = conf, ari = adj.rand.index(s1, s2)))
+        set1_region =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]]
+        set2_region =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]]
+        
+        set1_sem =  res_df[job.id == pair[[1]] & config_id == conf, stability_sem][[1]]
+        set2_sem =  res_df[job.id == pair[[2]] & config_id == conf, stability_sem][[1]]
+        for(s in 1:length(set1_region)){
+          s1_region = set1_region[[s]]
+          s2_region = set2_region[[s]]
+          
+          s1_sem = set1_sem[[s]]
+          s2_sem = set2_sem[[s]]
+          
+          stability_df = rbind(stability_df, 
+                               c(config_id = conf, ari = adj.rand.index(s1_region, s2_region), rbf = rbf(s1_sem, s2_sem)))
         }
 
       }
-      colnames(stability_df) = c("config_id", "stability")
+      colnames(stability_df) = c("config_id", "ari", "rfb")
       
       return(stability_df)
     })
 
     stability_df = data.table(do.call("rbind", stability_list))
-    stability_mean = stability_df[, .(stability = mean(stability)), by = config_id]
-    stability_lower = stability_df[,  .(stability_05 = lower_bound(stability)), by = config_id]
-    stability_upper = stability_df[,  .(stability_95 = upper_bound(stability)), by = config_id]
-    stability_sd = stability_df[, .(stability = sd(stability)), by = config_id]
+    
+    stability_mean = stability_df[, lapply(.SD, mean), by = config_id, .SDcols = c("ari", "rbf")]
+    
+    stability_lower = stability_df[,  lapply(.SD, lower_bound), by = config_id, .SDcols = c("ari", "rbf")]
+    setnames(stability_lower, c("ari", "rbf"), c("ari_05", "rbf_05"))
+    
+    stability_upper = stability_df[,  .lapply(.SD, upper_bound), by = config_id, .SDcols = c("ari", "rbf")]
+    setnames(stability_upper, c("ari", "rbf"), c("ari_95", "rbf_95"))
+    
+    stability_sd = stability_df[, lapply(.SD, sd), by = config_id, .SDcols = c("ari", "rbf")]
     
     
     stability_int = ijoin(stability_lower, stability_upper, by = "config_id")
@@ -116,7 +135,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
 
 # test = readRDS("Data/simulations/batchtools/basic_scenarios/batchtools/results/4.rds")
 reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
-                   # ,conf.file = NA
+                    # ,conf.file = NA
                    )
 
 ades = data.frame(alpha = c(0.01, 0.05,0.1), impr.par = c(0.15, 0.1, 0.05))
