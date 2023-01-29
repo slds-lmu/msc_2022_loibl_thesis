@@ -1,4 +1,4 @@
-create_sim_data = function(job, n = 1000, type, rho = 0, ...){
+create_sim_data = function(job, n = 1000, type, rho = 0, biased = FALSE, ...){
   
   if (type == "linear_smooth"){
     x1 = runif(n, -1, 1)
@@ -31,36 +31,37 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
    
     
   } else if(type == "linear_smooth_corr"){
-    marginals_copula = function(cor_matrix, list_distributions, n){
-      l = length(list_distributions)
-      # Correlated Gaussian variables
-      Gauss = rmvnorm(n=n, mean = rep(0,l), sig=cor_matrix)
-      # convert them to uniform distribution.
-      Unif = pnorm(Gauss) 
-      # Convert them to whatever I want
-      vars = sapply(1:l, FUN = function(i) list_distributions[[i]](Unif[,i]))
-      return(vars)
+    
+    cor_matrix = matrix(c(1,rho,
+                          rho,1), nrow = 2, byrow = TRUE)
+    
+    
+    if(biased){
+      list_distributions = list(function(n) qunif(n, -1, 1), 
+                                function(n) qunif(n, -1.05, 1.04999))
+      vars = marginals_copula(cor_matrix, list_distributions, n = n)
+      x1 = vars[,1]
+      x2 = round(vars[,2],1)
+      x3 = round(runif(n, -1.05, 1.04999),1)
+    } else{
+      list_distributions = list(function(n) qunif(n, -1, 1), 
+                                function(n) qunif(n, -1, 1))
+      vars = marginals_copula(cor_matrix, list_distributions, n = n)
+      
+      x1 = vars[,1]
+      x2 = vars[,2]
+      x3 = runif(n, -1, 1)
     }
     
-    cor_matrix = matrix(c(1,0.7,0.5,
-                          0.7,1,0.1,
-                          0.5,0.1,1), nrow = 3, byrow = TRUE)
     
-    list_distributions = list(function(n) qunif(n, -1, 1), 
-                              function(n) qunif(n, -1, 1),
-                              function(n) qunif(n, -1, 1))
-    vars = marginals_copula(cor_matrix, list_distributions, n = n)
-    x1 = vars[,1]
-    x2 = vars[,2]
-    x3 = runif(n, -1, 1)
-    x4 = vars[,3]
+
 
 
     formula = x1 + 4*x2 + 3*x2*x3 
     eps = rnorm(n, 0, sd(formula)*0.1)
     y =  formula + eps
 
-    data = data.frame(x1, x2, x3, x4, y)
+    data = data.frame(x1, x2, x3, y)
     fm = as.formula("y ~ x1 + x2 + x2:x3")
     lrn = NULL
 

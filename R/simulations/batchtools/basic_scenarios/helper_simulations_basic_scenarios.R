@@ -102,7 +102,8 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
 
 fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split, 
                      maxdepth, impr.par, alpha, pruning, approximate,
-                     n.quantiles, exclude.categoricals, correct.bias, tree_methods){
+                     n.quantiles, exclude.categoricals, correct.bias, tree_methods = c("slim", "mob", "ctree", "guide"),
+                     extract_variables = FALSE){
   if("slim" %in% tree_methods){
     slim_res = list(mbt = "SLIM")
     
@@ -117,6 +118,10 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     slim_res$mse_test = mean((predict_slim(slim, x_test)- y_test)^2)
     slim_res$r2_test = r_2(y_test, predict_slim(slim, x_test))
+    
+    if(extract_variables){
+      slim_res$x1 = ifelse("x1" %in% unique(split[,"split.feature"]), TRUE, FALSE)
+    }
     
     
     if(!is.null(data_stability)){
@@ -144,6 +149,9 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     guide_res$mse_test = mean((predict_slim(guide, x_test)- y_test)^2)
     guide_res$r2_test = r_2(y_test, predict_slim(guide, x_test))
     
+    if(extract_variables){
+      guide_res$x1 = ifelse("x1" %in% unique(split[,"split.feature"]), TRUE, FALSE)
+    }
     
     if(!is.null(data_stability)){
       guide_res$stability = lapply(data_stability, function(dat){predict_slim(guide, dat, type = "node")})
@@ -171,6 +179,12 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     mob_res$mse_test = mean((predict(mob, x_test)- y_test)^2)
     mob_res$r2_test = r_2(y_test, predict(mob, x_test))
     
+    if(extract_variables){
+      mobrule = partykit:::.list.rules.party(mob)
+      mob_res$x1 = ifelse("x1" %in% unique(unlist(str_extract_all(mobrule,"(x+[1-9])"))), TRUE, FALSE)
+
+    }
+    
     if(!is.null(data_stability)){
       mob_res$stability = lapply(data_stability, function(dat){as.character(predict(mob, dat, type = "node"))})
       mob_res$stability_sem = lapply(data_stability, function(dat){as.character(predict(mob, dat, type = "response"))})
@@ -195,6 +209,13 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     ctree_res$mse_test = mean((predict_ctree(ctree, fit_ctree, x_test)- y_test)^2)
     ctree_res$r2_test = r_2(y_test, predict_ctree(ctree, fit_ctree, x_test))
+    
+    
+    if(extract_variables){
+      ctreerule = partykit:::.list.rules.party(ctree)
+      ctree_res$x1 = ifelse("x1" %in% unique(unlist(str_extract_all(ctreerule,"(x+[1-9])"))), TRUE, FALSE)
+    }
+    
     
     if(!is.null(data_stability)){
       ctree_res$stability = lapply(data_stability, function(dat){as.character(predict(ctree, dat, type = "node"))})
