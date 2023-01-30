@@ -19,7 +19,7 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scena
 source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
-repls = 2L
+repls = 100L
 set.seed(49)
 data_stability = lapply(c(linear_smooth = "linear_smooth", linear_abrupt = "linear_abrupt", linear_mixed = "linear_mixed"),
                         function(t){
