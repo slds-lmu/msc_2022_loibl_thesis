@@ -111,14 +111,13 @@ reduce_trees = function(ades, pdes, savedir, reg){
           }
           
         }
-        colnames(stability_df) = c("config_id", "ari", "rbf")
+        colnames(stability_df) = c("config_id", "ari", "rbf", "job.id")
         
         return(stability_df)
       })
-      browser()
       stability_df = data.table(do.call("rbind", stability_list))
       
-      res_save = ijoin(res_df, stability_df)
+      res_save = ijoin(res_df, stability_df, by = c("job.id", "config_id"))
       res_save[, ":="(stability = NULL, stability_sem = NULL)]
       
       saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
@@ -162,7 +161,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
   
 }
 
-reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios_27_01/batchtools"
+reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
                          ,conf.file = NA
 )
 
