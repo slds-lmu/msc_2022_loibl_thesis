@@ -88,7 +88,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
       }
       
       stability_list = lapply(pair_ids, function(pair){
-        stability_df = data.frame(config_id = integer(), ari = double(), rbf = double())
+        stability_df = data.frame(config_id = integer(), ari = double(), rbf = double(), job.id = integer, evaluationset_id = integer())
         for(conf in unique(res_df$config_id)){
           set1_region =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]]
           set2_region =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]]
