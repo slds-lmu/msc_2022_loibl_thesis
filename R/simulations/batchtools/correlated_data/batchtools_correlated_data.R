@@ -11,7 +11,7 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/correlated_
                                         "R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R",
                                         "R/simulations/batchtools/correlated_data/helper_simulations_correlated_data.R"),
                              seed = 1
-                             # , conf.file = NA
+                             , conf.file = NA
 )
 
 

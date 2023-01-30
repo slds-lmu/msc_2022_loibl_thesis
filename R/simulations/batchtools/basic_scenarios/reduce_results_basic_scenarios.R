@@ -42,11 +42,11 @@ reduce_trees = function(ades, pdes, savedir, reg){
     setnames(res_df, paste0(cols_unwrap, ".1"),
              cols_unwrap)
     # save raw result data
-    saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
+    res_df[, config_id:=.GRP,by = group_cols]
+    
     
     # summarize results
    
-    res_df[, config_id:=.GRP,by = group_cols]
     group_cols = c(group_cols, "config_id")
     
     res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
@@ -102,8 +102,12 @@ reduce_trees = function(ades, pdes, savedir, reg){
             s1_sem = set1_sem[[s]]
             s2_sem = set2_sem[[s]]
             
+            ari = adj.rand.index(s1_region, s2_region)
+            rbf = rbf(s1_sem, s2_sem)
+            
             stability_df = rbind(stability_df, 
-                                 c(config_id = conf, ari = adj.rand.index(s1_region, s2_region), rbf = rbf(s1_sem, s2_sem)))
+                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[1]]),
+                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[2]]))
           }
           
         }
@@ -111,7 +115,14 @@ reduce_trees = function(ades, pdes, savedir, reg){
         
         return(stability_df)
       })
+      browser()
       stability_df = data.table(do.call("rbind", stability_list))
+      
+      res_save = ijoin(res_df, stability_df)
+      res_save[, ":="(stability = NULL, stability_sem = NULL)]
+      
+      saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
+      
       
       stability_mean = stability_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ari", "rbf")]
       
@@ -151,18 +162,16 @@ reduce_trees = function(ades, pdes, savedir, reg){
   
 }
 
+reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios_27_01/batchtools"
+                         ,conf.file = NA
+)
 
-# test = readRDS("Data/simulations/batchtools/basic_scenarios/batchtools/results/4.rds")
-# reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
-#                     ,conf.file = NA
-#                    )
-# 
-# ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
-# pdes_basic = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
-# 
-# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results/"
-# 
-# result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
+ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
+pdes_basic = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
+
+savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_test/"
+
+result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
 
 
 # result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
@@ -183,20 +192,20 @@ reduce_trees = function(ades, pdes, savedir, reg){
 #                                                          r2_train_05, r2_train, r2_train_05,
 #                                                          ari_05, ari, ari_95,
 #                                                          rbf_05, rbf, rbf_95)])
-
-reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
-                         ,conf.file = NA
-)
-
-ades_corr = NULL
-pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9), biased = c(FALSE))
-
-savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
-
-result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)
-
-
-result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")
-
-View(result_corr[["mean"]][,.(mbt, rho, biased, x1, n_leaves, r2_train, r2_test)])
-
+# 
+# reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
+#                          ,conf.file = NA
+# )
+# 
+# ades_corr = NULL
+# pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9), biased = c(FALSE))
+# 
+# savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
+# 
+# result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)
+# 
+# 
+# result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")
+# 
+# View(result_corr[["mean"]][,.(mbt, rho, biased, x1, n_leaves, r2_train, r2_test)])
+# 
