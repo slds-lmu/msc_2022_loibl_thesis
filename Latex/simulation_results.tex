@@ -1,0 +1,189 @@
+\documentclass[9pt, xcolor=table]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage[round, comma]{natbib}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+\usepackage{verbatim}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+
+
+\mode<presentation> {
+
+\usetheme{Madrid}
+
+\setbeamertemplate{navigation symbols}{} 
+\useinnertheme{circles}
+\definecolor{greenish}{RGB}{0, 153, 76}
+\usecolortheme[named=greenish]{structure}
+}
+
+\setbeamertemplate{headline}
+{%
+  \begin{beamercolorbox}[ht=3.5ex,dp=1.125ex,%
+      leftskip=.3cm,rightskip=.3cm plus1fil]{section in head/foot}
+    \usebeamerfont{section in head/foot}\usebeamercolor[fg]{section in head/foot}%
+\insertsectionnavigationhorizontal{\paperwidth}{\hskip0pt plus1fill}{\hskip0pt plus1fill}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[colsep=1.5pt]{middle separation line head}
+  \end{beamercolorbox}
+  \begin{beamercolorbox}[colsep=1.5pt]{lower separation line head}
+  \end{beamercolorbox}
+}
+
+\title[Interpretation of black box models]{Interpretation of black box models using tree-based surrogate models \newline \small{Simulations}}
+\author[Sofia Loibl]{Sofia Loibl}
+\institute[LMU]{LMU München}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+\titlepage 
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Outline} 
+\tableofcontents 
+\end{frame}
+
+
+\section{Simulation basic Scenarios}
+\begin{frame}{Simulation design}
+Comparison of four MBT algorithms (SLIM, GUIDE, MOB, CTree)
+with respect to performance, stability and interpretability.
+
+\vspace{0.3cm}
+\begin{itemize}
+    \item 3 basic scenarios (linear smooth, linear abrupt, linear mixed)
+    \item MBT as standalone (to measure accuracy of the MBT algorithms), surrogate for lm and surrogate for xgboost model (to measure fidelity)
+    \item 3 different sample sizes (1000, 5000, 10000)
+    \item 3 different pruning parameters (for alpha or impr)\end{itemize}
+    
+$\Rightarrow 3 \cdot 3 \cdot 3 \cdot 3 = 81$ Experiments for each MBT algorithm
+
+\vspace{0.3cm}
+100 Simulation runs
+
+    
+\end{frame}
+
+\begin{frame}{Evaluation measures}
+\begin{enumerate}
+    \item Performance: $R^2$ and $MSE$ on training and test data
+    \item Interpretability: number of leaf nodes
+    \item Stability: Adjusted Rand Index (ARI)
+\end{enumerate}
+    
+\end{frame}
+
+\section{Linear Smooth}
+\begin{frame}{Linear Smooth}
+\begin{itemize}
+    \item $x_1,..., x_3 \sim U(-1,1)$ $\epsilon \sim N(0, sd_{data})$
+    \item $ f(x) = x_1 + 4   x_2 + 3   x_2   x_3 $
+    \item $\epsilon \sim N(0, 0.1 sd(f(x))$
+    \item $y = f(x) + \epsilon$
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Linear Smooth}
+
+\begin{table}
+\caption{Mean simulation results on 100 simulation runs for \textbf{SLIM} as stand alone model on scenario Linear smooth with n = 1000 for different values of impr}
+\centering \small
+\begin{tabular}[t]{r|r|r|r|r}
+\hline
+impr & number of leave nodes & R2 train & R2 test & ARI\\
+\hline
+0.15 & 2.27 & 0.9586746 & 0.9560847 & 0.4734244\\
+\hline
+0.10 & 10.08 & 0.9856378 & 0.9830595 & 0.2669574\\
+\hline
+0.05 & 14.57 & 0.9908326 & 0.9884542 & 0.3258697\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}
+
+\caption{Mean simulation results on 100 simulation runs for \textbf{GUIDE} as stand alone model on scenario Linear smooth with n = 1000 for different values of impr}
+\centering \small
+\begin{tabular}[t]{r|r|r|r|r}
+\hline
+impr & number of leave nodes & R2 train & R2 test & ARI\\
+\hline
+0.15 & 2.25 & 0.9584099 & 0.9559713 & 0.5213677\\
+\hline
+0.10 & 9.70 & 0.9855840 & 0.9830494 & 0.2939543\\
+\hline
+0.05 & 14.49 & 0.9906753 & 0.9883918 & 0.3220653\\
+\hline
+\end{tabular}
+\end{table}
+    
+\end{frame}
+
+
+
+
+\begin{frame}{Linear Smooth}
+\begin{table}
+
+\caption{Mean simulation results on 100 simulation runs for \textbf{MOB} as stand alone model on scenario Linear smooth with n = 1000 for different values of alpha}
+\centering \small
+\begin{tabular}[t]{r|r|r|r|r}
+\hline
+alpha & number of leave nodes & R2 train & R2 test & ARI\\
+\hline
+0.001 & 9.65 & 0.9898598 & 0.9876318 & 0.3472862\\
+\hline
+0.010 & 10.96 & 0.9902735 & 0.9879067 & 0.3403858\\
+\hline
+0.050 & 12.51 & 0.9905938 & 0.9882748 & 0.3691474\\
+\hline
+\end{tabular}
+\end{table} 
+
+
+\begin{table}
+
+\caption{Mean simulation results on 100 simulation runs for \textbf{CTree} as stand alone model on scenario Linear smooth with n = 1000 for different values of alpha}
+\centering \small
+\begin{tabular}[t]{r|r|r|r|r}
+\hline
+impr & number of leave nodes & R2 train & R2 test & ARI\\
+\hline
+0.001 & 11.51 & 0.9900921 & 0.9881395 & 0.3763795\\
+\hline
+0.010 & 12.89 & 0.9904182 & 0.9884063 & 0.3657001\\
+\hline
+0.050 & 13.75 & 0.9905168 & 0.9885340 & 0.3632570\\
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{Linear Smooth}
+Results:
+\begin{itemize}
+    \item All four algorithms achieve good performance
+    \item The number of leafnodes is high considering that the data generating process is very simple and involves only one interaction 
+    \item with a similar number of leaf nodes (i.e. the same level of interpretability), MOB and GUIDE provide more stable MBTs
+    \item SLIM and CTree are very sensitive regarding the choice of impr
+\end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}{Bibliography}
+    \bibliography{bibliography}
+    \bibliographystyle{dcu}
+
+\end{frame}
+\end{document}
