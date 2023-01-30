@@ -106,8 +106,8 @@ reduce_trees = function(ades, pdes, savedir, reg){
             rbf = rbf(s1_sem, s2_sem)
             
             stability_df = rbind(stability_df, 
-                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[1]], evaluationset_id = set),
-                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[2]], evaluationset_id = set))
+                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[1]], evaluationset_id = s),
+                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[2]], evaluationset_id = s))
           }
           
         }
