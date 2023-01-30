@@ -120,7 +120,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
       res_save = ijoin(res_df, stability_df, by = c("job.id", "config_id"))
       res_save[, ":="(stability = NULL, stability_sem = NULL)]
       
-      saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
+      saveRDS(res_save, paste0(savedir, exp, "_res_experiments.rds" ))
       
       
       stability_mean = stability_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ari", "rbf")]
