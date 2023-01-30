@@ -13,11 +13,11 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   
   # -- standalone model 
   
-  # train test split
-  sample = sample.split(data$y, SplitRatio = 2/3)
-  train = subset(data, sample == TRUE)
-  test = subset(data, sample == FALSE)
+  # deterministic train test split (to avoid variability in the algorithm)
   
+  split_point = nrow(data)/3*2
+  train = data[1:split_point,]
+  test = data[(split_point+1):nrow(data),]
   x_train = train[, colnames(train) != "y"]
   x_test = test[, colnames(test) != "y"]
   

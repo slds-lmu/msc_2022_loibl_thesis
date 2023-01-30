@@ -50,6 +50,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     group_cols = c(group_cols, "config_id")
     
     res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
+    browser()
     res_sd_exp = res_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     
 
