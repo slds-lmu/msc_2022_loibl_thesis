@@ -50,7 +50,6 @@ reduce_trees = function(ades, pdes, savedir, reg){
     group_cols = c(group_cols, "config_id")
     
     res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
-    browser()
     res_sd_exp = res_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     
 
@@ -192,20 +191,20 @@ result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
 #                                                          r2_train_05, r2_train, r2_train_05,
 #                                                          ari_05, ari, ari_95,
 #                                                          rbf_05, rbf, rbf_95)])
-# 
-# reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
-#                          ,conf.file = NA
-# )
-# 
-# ades_corr = NULL
-# pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9), biased = c(FALSE))
-# 
-# savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
-# 
-# result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)
-# 
-# 
-# result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")
-# 
-# View(result_corr[["mean"]][,.(mbt, rho, biased, x1, n_leaves, r2_train, r2_test)])
-# 
+
+reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
+                         ,conf.file = NA
+)
+
+ades_corr = NULL
+pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9), biased = c(FALSE))
+
+savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
+
+result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)
+
+
+result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")
+
+View(result_corr[["mean"]][,.(mbt, rho, biased, x1, n_leaves, r2_train, r2_test)])
+
