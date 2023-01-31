@@ -324,7 +324,7 @@ No configuration is included where the average number of leaf nodes matches betw
 \end{figure}    
 \begin{itemize}
     \item Despite the small value for impr, SLIM and GUIDE generate only very small trees on the original data 
-    \item When SLIM and GUIDE are used as surrogates for a linear model, the number of leaf nodes increases and varies significantly. However, it remains below the number of leaf nodes for MOB and CTree.
+    \item When SLIM and GUIDE are used as surrogates for a linear model, the number of leaf nodes increases and varies strongly (more pronounced with SLIM than with guide). However, it remains below the number of leaf nodes for MOB and CTree.
 \end{itemize}
 \end{frame}
 
@@ -335,6 +335,7 @@ No configuration is included where the average number of leaf nodes matches betw
 \end{figure}     
 \begin{itemize}
     \item SLIM and GUIDE achieve better performance despite lower number of leaf nodes
+    \item MOB has better performance than CTree (This could be due to the fact that abrupt splits are more difficult to detect with the linear test statistics in CTree \citep{Schlosser.2019})
 \end{itemize}
 \end{frame}
 
@@ -443,8 +444,30 @@ alpha & number of leaf nodes & R2 train & R2 test & ARI\\
 \begin{frame}{Linear Mixed - Interpretability}
 For  $alpha= 0.001$ and $impr = 0.05$ the mean number of leaf nodes nodes is similar for the four MBT Algorithms
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/lm_1000_standalone_lm_int.pdf}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_int.pdf}
 \end{figure}     
+\end{frame}
+
+\begin{frame}{Linear Mixed - Performance}
+
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_r2_train.pdf}
+\end{figure}  
+\begin{itemize}
+    \item SLIM and GUIDE have a higher performance than MOB and CTree
+    \item Fidelity is higher than accuracy, i.e. better performance on the lm predictions
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Linear Mixed - Stability}
+
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_sta.pdf}
+\end{figure}     
+\begin{itemize}
+    \item Stability is higher if the MBTs are used as surrogates (as stated in the SLIM Paper)
+\end{itemize}
+
 \end{frame}
 
 
