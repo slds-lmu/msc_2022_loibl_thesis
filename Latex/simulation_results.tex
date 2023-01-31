@@ -82,6 +82,7 @@ $\Rightarrow 3 \cdot 3 \cdot 3 \cdot 3 = 81$ Experiments for each MBT algorithm
 
 \section{Linear Smooth}
 \begin{frame}{Linear Smooth}
+\textbf{Data}
 \begin{itemize}
     \item $x_1,..., x_3 \sim U(-1,1)$ $\epsilon \sim N(0, sd_{data})$
     \item $ f_{ls}(x) = x_1 + 4   x_2 + 3   x_2   x_3 $
@@ -89,10 +90,16 @@ $\Rightarrow 3 \cdot 3 \cdot 3 \cdot 3 = 81$ Experiments for each MBT algorithm
     \item $y = f(x) + \epsilon$
 \end{itemize}
 
+\textbf{Settings:}
+\begin{itemize}
+    \item max tree depth = 7 
+    \item min node size = 50    
+\end{itemize}
+
 \end{frame}
 
 \begin{frame}{Linear Smooth}
-
+\textbf{Comparison of MBTs as stand alone models}
 \begin{table}
 \caption{Mean simulation results on 100 simulation runs for \textbf{SLIM} as stand alone model on scenario Linear smooth with n = 1000 for different values of impr}
 \centering \small
@@ -169,16 +176,7 @@ impr & number of leaf nodes & R2 train & R2 test & ARI\\
 \end{table}
 \end{frame}
 
-\begin{frame}{Linear Smooth}
-General results:
-\begin{itemize}
-    \item All four algorithms achieve good performance
-    \item The number of leaf nodes is high considering that the data generating process is very simple and involves only one interaction 
-    \item SLIM and CTree are very sensitive regarding the choice of impr
-    
-\end{itemize}
-    
-\end{frame}
+
 
 \begin{frame}{Linear Smooth}
 For  $alpha= 0.001$ and $impr = 0.1$ the mean number of leaf nodes nodes is similar for the four MBT Algorithms, although it varies greatly for SLIM and CTree
@@ -196,6 +194,37 @@ For  $alpha= 0.001$ and $impr = 0.1$ the mean number of leaf nodes nodes is simi
     
 \end{frame}
 
+\begin{frame}{Linear Smooth}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_sta.pdf}
+\end{figure}  
+    
+\end{frame}
+
+\begin{frame}{Linear Smooth}
+Observations:
+\begin{itemize}
+    \item All four algorithms achieve good performance
+    \item The number of leaf nodes is high considering that the data generating process is very simple and involves only one interaction (increases even more with larger n)    
+    \item SLIM and CTree are very sensitive regarding the choice of impr
+    \item  If alpha and impr are chosen in this scenario so that the mean number of leaf nodes is similar, MOB and GUIDE provide more stable MBTs and have a better performance.
+
+\end{itemize}
+
+
+Select a smaller maximum tree depth and a larger min node size in order to avoid large fluctuations and to obtain trees that are easier to interpret.
+
+    
+\end{frame}
+
+\begin{frame}{Linear Smooth}
+Comparison of MBTs used as surrogate models on lm predictions vs. used as stand alone models
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_i.pdf}
+\end{figure}  
+
+    
+\end{frame}
 
 \begin{frame}{Linear abrupt}
 \begin{itemize}
@@ -205,6 +234,9 @@ For  $alpha= 0.001$ and $impr = 0.1$ the mean number of leaf nodes nodes is simi
     \item $y = f(x) + \epsilon$
 \end{itemize}    
 \end{frame}
+
+
+
 
 
 \begin{frame}{Bibliography}
