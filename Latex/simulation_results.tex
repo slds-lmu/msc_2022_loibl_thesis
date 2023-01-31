@@ -98,7 +98,7 @@ $\Rightarrow 3 \cdot 3 \cdot 3 \cdot 3 = 81$ Experiments for each MBT algorithm
 \centering \small
 \begin{tabular}[t]{r|r|r|r|r}
 \hline
-impr & number of leave nodes & R2 train & R2 test & ARI\\
+impr & number of leaf nodes & R2 train & R2 test & ARI\\
 \hline
 0.15 & 2.27 & 0.9586746 & 0.9560847 & 0.4734244\\
 \hline
@@ -116,7 +116,7 @@ impr & number of leave nodes & R2 train & R2 test & ARI\\
 \centering \small
 \begin{tabular}[t]{r|r|r|r|r}
 \hline
-impr & number of leave nodes & R2 train & R2 test & ARI\\
+impr & number of leaf nodes & R2 train & R2 test & ARI\\
 \hline
 0.15 & 2.25 & 0.9584099 & 0.9559713 & 0.5213677\\
 \hline
@@ -139,7 +139,7 @@ impr & number of leave nodes & R2 train & R2 test & ARI\\
 \centering \small
 \begin{tabular}[t]{r|r|r|r|r}
 \hline
-alpha & number of leave nodes & R2 train & R2 test & ARI\\
+alpha & number of leaf nodes & R2 train & R2 test & ARI\\
 \hline
 0.001 & 9.65 & 0.9898598 & 0.9876318 & 0.3472862\\
 \hline
@@ -157,7 +157,7 @@ alpha & number of leave nodes & R2 train & R2 test & ARI\\
 \centering \small
 \begin{tabular}[t]{r|r|r|r|r}
 \hline
-impr & number of leave nodes & R2 train & R2 test & ARI\\
+impr & number of leaf nodes & R2 train & R2 test & ARI\\
 \hline
 0.001 & 11.51 & 0.9900921 & 0.9881395 & 0.3763795\\
 \hline
@@ -170,18 +170,29 @@ impr & number of leave nodes & R2 train & R2 test & ARI\\
 \end{frame}
 
 \begin{frame}{Linear Smooth}
-Results:
+General results:
 \begin{itemize}
     \item All four algorithms achieve good performance
-    \item The number of leafnodes is high considering that the data generating process is very simple and involves only one interaction 
-    \item with a similar number of leaf nodes (i.e. approximately the same level of interpretability), MOB and GUIDE provide more stable MBTs and have a better performance
+    \item The number of leaf nodes is high considering that the data generating process is very simple and involves only one interaction 
     \item SLIM and CTree are very sensitive regarding the choice of impr
+    
 \end{itemize}
     
 \end{frame}
 
 \begin{frame}{Linear Smooth}
+For  $alpha= 0.001$ and $impr = 0.1$ the mean number of leaf nodes nodes is similar for the four MBT Algorithms, although it varies greatly for SLIM and CTree
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_int.pdf}
+\end{figure}   
 
+    
+\end{frame}
+
+\begin{frame}{Linear Smooth}
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_train.pdf}
+\end{figure}  
     
 \end{frame}
 
