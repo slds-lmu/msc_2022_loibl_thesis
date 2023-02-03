@@ -11,8 +11,18 @@ experiments = merge(ades_basic, pdes_basic, by = NULL)
 # stand-alone
 
 result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
-
+result_basic_mean = result_basic$mean
+result_basic_mean[type == "linear_mixed" & mbt == "lm" & n == 1500]
 list.files("Data/simulations/batchtools/basic_scenarios/results/")
+
+# mbt_group = as.factor(result_basic$mean[n == 1500 & type == "linear_smooth" & surrogate == "standalone" ,mbt])
+# alpha_group = as.factor(result_basic$mean[n == 1500 & type == "linear_smooth" & surrogate == "standalone" ,alpha])
+# pairs(result_basic$mean[n == 1500 & type == "linear_smooth" & surrogate == "standalone",
+#                         .(n_leaves, r2_train, ari)],
+#       col = c("red", "cornflowerblue", "purple", "green")[mbt_group],
+#       pch = c(19, 20, 22)[alpha_group], 
+#       labels = c("leaves", "r2", "ari"))
+
 
 
 result_basic$mean[n == 1500 & type == "linear_smooth" & surrogate == "standalone" & mbt == "MOB",
@@ -40,9 +50,26 @@ res_ls_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios/res
 mob_ls_n1500_alpha001 = unique(res_ls_n1500_alpha001[mbt == "MOB" & surrogate == "lm", .(job.id, n_leaves)])
 setnames(mob_ls_n1500_alpha001, "n_leaves", "n_leaves_001")
 
-res_ls_n1500_alpha01 = readRDS("Data/simulations/batchtools/basic_scenarios/results/2_res_experiments.rds")
+res_ls_n1500_alpha01 = readRDS("Data/simulations/batchtools/basic_scenarios/results_test/2_res_experiments.rds")
 mob_ls_n1500_alpha01 = unique(res_ls_n1500_alpha01[mbt == "MOB" & surrogate == "lm", .(job.id, n_leaves)])
 setnames(mob_ls_n1500_alpha01, "n_leaves", "n_leaves_01")
+
+
+test = unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE", "MOB", "CTree") & surrogate == "standalone",.(n_leaves, r2_train, mbt, job.id, config_id, ari, ri, rc, stability_same_size)])
+table(test$mbt)
+library(parcoords)
+parcoords(test[!is.na(ri),.(mbt, n_leaves, ri)], rownames = FALSE,  
+          color = list(colorBy = "mbt",colorScale = "scaleOrdinal",colorScheme = "schemeCategory10"),
+          withD3 = TRUE,
+          brushMode = "1D-axes-multi")
+
+library(GGally)
+
+ggpairs(test[!is.na(ari)  ,.(n_leaves, ri, r2_train, mbt)],
+        columns = 1:3,        # Columns
+        aes(color = mbt,  # Color by group (cat. variable)
+            alpha = 0.5))
+pairs()
 
 
 save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_smooth/"
@@ -330,7 +357,7 @@ p_lm_1000_standalone_int = ggplot(interpretabiliy_lm[surrogate == "standalone",]
                                   aes(x = factor(mbt, levels = c("SLIM", "GUIDE", "MOB", "CTree")), y = n_leaves)) +
   stat_boxplot(geom = "boxplot") +
   stat_summary(fun="mean", color = "grey") +
-  ggtitle("Interpretability of stand alone MBTs Linear Smooth", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  ggtitle("Interpretability of stand alone MBTs Linear Mixed", subtitle = "n = 1000, alpha = 0.001, impr = 0.05") +
   labs(x="MBT", y="Number of terminal leaves")
 
 ggexport(p_lm_1000_standalone_int, filename = paste0(save_dir, "lm_1000_standalone_int.pdf"), width = 7, height = 4)
@@ -345,7 +372,7 @@ p_lm_1000_standalone_lm_int = ggplot(interpretabiliy_lm[surrogate %in% c("standa
                                                         "CTree standalone", "CTree lm")), y = n_leaves)) +
   stat_boxplot(geom = "boxplot") +
   stat_summary(fun="mean", color = "grey") +
-  ggtitle("Interpretability of stand alone MBTs Linear Smooth", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  ggtitle("Interpretability of stand alone MBTs Linear Mixed", subtitle = "n = 1000, alpha = 0.001, impr = 0.05") +
   labs(x="MBT as standalone or as surrogate on lm predictions", y="Number of terminal leaves")
 ggexport(p_lm_1000_standalone_lm_int, filename = paste0(save_dir, "lm_1000_standalone_lm_int.pdf"), width = 10, height = 4)
 
@@ -361,7 +388,7 @@ p_lm_1000_standalone_sta = ggplot(stability_lm[surrogate == "standalone"],
                                   aes(x = factor(mbt, levels = c("SLIM", "GUIDE", "MOB", "CTree")), y = ari)) +
   stat_boxplot(geom = "boxplot") +
   stat_summary(fun="mean", color = "grey")+
-  ggtitle("Stability of stand alone MBTs Linear Smooth", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  ggtitle("Stability of stand alone MBTs Linear Mixed", subtitle = "n = 1000, alpha = 0.001, impr = 0.05") +
   labs(x="MBT", y="ARI")
 
 ggexport(p_lm_1000_standalone_sta, filename = paste0(save_dir, "lm_1000_standalone_sta.pdf"), width = 7, height = 4)
@@ -377,7 +404,7 @@ p_lm_1000_standalone_lm_sta = ggplot(stability_lm[surrogate %in% c("standalone",
                                                                               "CTree standalone", "CTree lm")), y = ari)) +
   stat_boxplot(geom = "boxplot") +
   stat_summary(fun="mean", color = "grey")+
-  ggtitle("Stability Linear Smooth", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  ggtitle("Stability Linear Mixed", subtitle = "n = 1000, alpha = 0.001, impr = 0.05") +
   labs(x="MBT as standalone or as surrogate on lm predictions", y="ARI")
 ggexport(p_lm_1000_standalone_lm_sta, filename = paste0(save_dir, "lm_1000_standalone_lm_sta.pdf"), width = 10, height = 4)
 
@@ -392,7 +419,7 @@ p_lm_1000_standalone_r2_train = ggplot(performance_lm[surrogate == "standalone"|
                                        aes(x = factor(mbt, levels = c("SLIM", "GUIDE", "MOB", "CTree", "lm", "xgboost")), y = r2_train)) +
   stat_boxplot(geom = "boxplot") +
   stat_summary(fun="mean", color = "grey")+
-  ggtitle("Accuracy of stand alone MBTs Linear Smooth Train", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  ggtitle("Accuracy of stand alone MBTs Linear Mixed Train", subtitle = "n = 1000, alpha = 0.001, impr = 0.05") +
   labs(x="MBT", y="R2")
 
 ggexport(p_lm_1000_standalone_r2_train, filename = paste0(save_dir, "lm_1000_standalone_r2_train.pdf"), width = 7, height = 4)
@@ -409,7 +436,19 @@ p_lm_1000_standalone_lm_r2_train = ggplot(performance_lm[surrogate %in% c("stand
                                                                                    "CTree standalone", "CTree lm")), y = r2_train)) +
   stat_boxplot(geom = "boxplot") +
   stat_summary(fun="mean", color = "grey")+
-  ggtitle("Accuracy and Fidelity Linear Smooth Train", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  ggtitle("Accuracy and Fidelity Linear Mixed Train", subtitle = "n = 1000, alpha = 0.001, impr = 0.05") +
   labs(x="MBT as standalone or as surrogate on lm predictions", y="R2")
 ggexport(p_lm_1000_standalone_lm_r2_train, filename = paste0(save_dir, "lm_1000_standalone_lm_r2_train.pdf"), width = 10, height = 4)
+
+
+p_lm_1000_standalone_lm_r2_test = ggplot(performance_lm[surrogate %in% c("standalone", "lm") & !(mbt %in% c("lm", "xgboost"))],
+                                          aes(x = factor(mbt_surrogate, levels = c("SLIM standalone", "SLIM lm", 
+                                                                                   "GUIDE standalone", "GUIDE lm",  
+                                                                                   "MOB standalone", "MOB lm",
+                                                                                   "CTree standalone", "CTree lm")), y = r2_test)) +
+  stat_boxplot(geom = "boxplot") +
+  stat_summary(fun="mean", color = "grey")+
+  ggtitle("Accuracy and Fidelity Linear Mixed Test", subtitle = "n = 1000, alpha = 0.001, impr = 0.05") +
+  labs(x="MBT as standalone or as surrogate on lm predictions", y="R2")
+ggexport(p_lm_1000_standalone_lm_r2_test, filename = paste0(save_dir, "lm_1000_standalone_lm_r2_test.pdf"), width = 10, height = 4)
 

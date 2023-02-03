@@ -127,8 +127,33 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     if(!is.null(data_stability)){
       # tree varies across all repetitions due to slightly different data, but data_stability is identical across all repetitions
       slim_res$stability = lapply(data_stability, function(dat){predict_slim(slim, dat, type = "node")})
-      slim_res$stability_sem = lapply(data_stability, function(dat){predict_slim(slim, dat, type = "response")})
-      
+    }
+    
+    
+  } 
+  if("slim_ridge" %in% tree_methods){
+    slim_ridge_res = list(mbt = "SLIM Ridge")
+    
+    slim_ridge = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning,  n.quantiles = n.quantiles,
+                                   impr.par = impr.par, min.split = min.split, approximate = FALSE,
+                                   split.method = "slim", penalization = "L2")
+    split = extract_split_criteria(slim_ridge)
+    slim_ridge_res$n_leaves = sum(split$split.feature == "leafnode")
+    predict_slim(slim_ridge, x_train)
+    slim_ridge_res$mse_train = mean((predict_slim(slim_ridge, x_train)- y_train)^2)
+    slim_ridge_res$r2_train = r_2(y_train, predict_slim(slim_ridge, x_train))
+    
+    slim_ridge_res$mse_test = mean((predict_slim(slim_ridge, x_test)- y_test)^2)
+    slim_ridge_res$r2_test = r_2(y_test, predict_slim(slim_ridge, x_test))
+    
+    if(extract_variables){
+      slim_ridge_res$x1 = ifelse("x1" %in% unique(split[,"split.feature"]), TRUE, FALSE)
+    }
+    
+    
+    if(!is.null(data_stability)){
+      # tree varies across all repetitions due to slightly different data, but data_stability is identical across all repetitions
+      slim_ridge_res$stability = lapply(data_stability, function(dat){predict_slim(slim, dat, type = "node")})
     }
     
     
@@ -155,8 +180,6 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     if(!is.null(data_stability)){
       guide_res$stability = lapply(data_stability, function(dat){predict_slim(guide, dat, type = "node")})
-      guide_res$stability_sem = lapply(data_stability, function(dat){predict_slim(guide, dat, type = "response")})
-      
     }
     
     
@@ -187,8 +210,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     if(!is.null(data_stability)){
       mob_res$stability = lapply(data_stability, function(dat){as.character(predict(mob, dat, type = "node"))})
-      mob_res$stability_sem = lapply(data_stability, function(dat){as.character(predict(mob, dat, type = "response"))})
-      
+
     }
     
   } 
@@ -219,12 +241,13 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     if(!is.null(data_stability)){
       ctree_res$stability = lapply(data_stability, function(dat){as.character(predict(ctree, dat, type = "node"))})
-      ctree_res$stability_sem = lapply(data_stability, function(dat){as.character(predict_ctree(ctree, fit_ctree, dat))})
-      
     }
   }
   
   res = rbind(slim_res, guide_res, mob_res, ctree_res)
+  if ("slim_ridge" %in% tree_methods){
+    res = rbind(res, slim_ridge_res)
+  }
   
   return(res)
 } 

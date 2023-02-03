@@ -14,15 +14,18 @@ predict_slim = function(tree, newdata, type = "response"){
     node_data = as.data.frame(newdata[eval(parse(text = nodes[n, "child.type"])),])
     node_id = as.character(nodes[n,"id.node"])
     if (nrow(node_data) > 0){
-      
       if (type == "response"){
-        y_hat = predict(models[[node_id]]$model, newdata = subset(node_data, select = -c(row_id)))
+        newdata_n = subset(node_data, select = -c(row_id))
+        if(class(models[[node_id]]$model)[1] %in% c("elnet", "glmnet")){
+          newdata_n = as.matrix(newdata_n)
+        }
+        y_hat = predict(models[[node_id]]$model, newdata_n)
       }
       else if (type == "node"){
         y_hat = node_id
       }
       
-      predictions = rbind(predictions, cbind(node_data, y_hat))
+      predictions = rbind(predictions, cbind(node_data, y_hat = as.vector(y_hat)))
     }
   }
   predictions = predictions[order(predictions$row_id),]

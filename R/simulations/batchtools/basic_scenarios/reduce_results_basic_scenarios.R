@@ -1,6 +1,7 @@
 # reduce data simulation 
 library(batchtools)
-library(pdfCluster)
+library(fossil)
+source("R/helper_stability.R")
 
 
 reduce_trees = function(ades, pdes, savedir, reg){
@@ -79,65 +80,69 @@ reduce_trees = function(ades, pdes, savedir, reg){
     
     if("stability" %in% colnames(res_df)){
       # create all possible pairs of simulation repititions
-      pair_ids = split(unique(res_df$job.id), ceiling(seq_along(unique(res_df$job.id)) / 2))
-      
+      pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
+      set.seed(1)
+      pair_ids_subset = sample(seq_along(pair_ids), 1000)
+      set_index = rep(1:100,10)
+      pair_ids = pair_ids[pair_ids_subset]
       # function to calculate gaussian radial basis function (to measure semantic stability)
-      rbf = function(pred1, pred2, sigma = 0.01){
-        rbf = exp( - sum((as.numeric(pred1) - as.numeric(pred2))^2) / 2*sigma)
-        return(rbf)
-      }
-      
-      stability_list = lapply(pair_ids, function(pair){
-        stability_df = data.frame(config_id = integer(), ari = double(), rbf = double(), job.id = integer(), evaluationset_id = integer())
+      stability_list = lapply(seq_along(pair_ids), function(p){
+        pair = pair_ids[[p]]
+        stability_df = data.frame(config_id = integer(), ri = double(), ari_fixed = double(), rc = double(), 
+                                  job.id = integer(), evaluationset_id = integer(), stability_same_size = logical())
+
         for(conf in unique(res_df$config_id)){
           set1_region =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]]
           set2_region =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]]
           
-          set1_sem =  res_df[job.id == pair[[1]] & config_id == conf, stability_sem][[1]]
-          set2_sem =  res_df[job.id == pair[[2]] & config_id == conf, stability_sem][[1]]
-          for(s in 1:length(set1_region)){
-            s1_region = set1_region[[s]]
-            s2_region = set2_region[[s]]
+          if(length(set1_region)>1){
+            s1_region = set1_region[[set_index[p]]]
+            s2_region = set2_region[[set_index[p]]]
             
-            s1_sem = set1_sem[[s]]
-            s2_sem = set2_sem[[s]]
+            ri = rand.index(as.numeric(s1_region), as.numeric(s2_region))
+            ari_fixed = ari_uniform(as.numeric(s1_region), as.numeric(s2_region), type = "fixed")
+
+            rc = RC(s1_region, s2_region)
             
-            ari = adj.rand.index(s1_region, s2_region)
-            rbf = rbf(s1_sem, s2_sem)
-            
+            stability_same_size = ifelse(length(unique(s1_region)) == length(unique(s2_region)), TRUE, FALSE)
+
             stability_df = rbind(stability_df, 
-                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[1]], evaluationset_id = s),
-                                 c(config_id = conf, ari = ari, rbf = rbf, job.id = pair[[2]], evaluationset_id = s))
+                                 c(config_id = conf, ri = ri, ari_fixed = ari_fixed, rc = rc, job.id = pair[[1]], 
+                                   evaluationset_id = set_index[p], stability_same_size = stability_same_size),
+                                 c(config_id = conf, ri = ri, ari_fixed = ari_fixed, rc = rc, job.id = pair[[2]], 
+                                   evaluationset_id = set_index[p], stability_same_size = stability_same_size))
+            
           }
+            
           
         }
-        colnames(stability_df) = c("config_id", "ari", "rbf", "job.id", "evaluationset_id")
+
+        colnames(stability_df) = c("config_id", "ri", "ari_fixed", "rc", "job.id", "evaluationset_id", "stability_same_size")
         
         return(stability_df)
       })
       stability_df = data.table(do.call("rbind", stability_list))
-      
-      res_save = ijoin(res_df, stability_df, by = c("job.id", "config_id"))
+      res_save = ojoin(res_df, stability_df, by = c("job.id", "config_id"))
       res_save[, ":="(stability = NULL, stability_sem = NULL)]
       
       saveRDS(res_save, paste0(savedir, exp, "_res_experiments.rds" ))
       
       
-      stability_mean = stability_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ari", "rbf")]
+      stability_mean = stability_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ri", "ari_fixed", "rc")]
       
-      stability_lower = stability_df[,  lapply(.SD, lower_bound), by = config_id, .SDcols = c("ari", "rbf")]
-      setnames(stability_lower, c("ari", "rbf"), c("ari_05", "rbf_05"))
+      stability_lower = stability_df[,  lapply(.SD, lower_bound), by = config_id, .SDcols = c("ri", "ari_fixed", "rc")]
+      setnames(stability_lower, c("ri", "ari_fixed", "rc"), c("ri_05", "ari_fixed_05", "rc_05"))
       
-      stability_upper = stability_df[,  lapply(.SD, upper_bound), by = config_id, .SDcols = c("ari", "rbf")]
-      setnames(stability_upper, c("ari", "rbf"), c("ari_95", "rbf_95"))
+      stability_upper = stability_df[,  lapply(.SD, upper_bound), by = config_id, .SDcols = c("ri", "ari_fixed", "rc")]
+      setnames(stability_upper, c("ri", "ari_fixed", "rc"), c("ri_95", "ari_fixed_95", "rc_95"))
       
-      stability_sd = stability_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ari", "rbf")]
+      stability_sd = stability_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ri", "ari_fixed", "rc")]
       
       
       stability_int = ijoin(stability_lower, stability_upper, by = "config_id")
       stability_mean = ijoin(stability_mean, stability_int, by = "config_id")
-      res_mean_exp = ijoin(res_mean_exp, stability_mean)
-      res_sd_exp = ijoin(res_sd_exp, stability_sd)
+      res_mean_exp = ljoin(res_mean_exp, stability_mean)
+      res_sd_exp = ljoin(res_sd_exp, stability_sd)
     }
     
     if("x1" %in% colnames(res_df)){
@@ -160,17 +165,16 @@ reduce_trees = function(ades, pdes, savedir, reg){
   return(list(mean = res_mean, sd = res_sd))
   
 }
-# 
-# reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
-#                          ,conf.file = NA
-# )
-# 
-# ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
-# pdes_basic = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
-# 
-# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_test/"
-# 
-# result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
+
+reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
+                         ,conf.file = NA)
+
+ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
+pdes_basic = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
+
+savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_test/"
+
+result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
 
 
 # result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
@@ -201,10 +205,17 @@ pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1
 
 savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
 
-result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)
+result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg)$mean
 
 
-result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")
+result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")$mean
 
-View(result_corr[["mean"]][,.(mbt, rho, biased, x1, n_leaves, r2_train, r2_test)])
 
+
+result_corr[,.(mbt, rho, x1, n_leaves, r2_train, r2_test)] %>%
+  kbl(caption="Mean simulation results on 500 simulation runs as stand alone model on scenario Linear Smooth - Correlated with n = 1000, alpha = 0.001, impr = 0.01",
+      format="latex",
+      col.names = c("MBT", "rho", "x1", "number of leaf nodes","R2 train","R2 test"),
+      align="r",
+      digits = 4) %>%
+  kable_minimal(full_width = F)

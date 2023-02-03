@@ -12,9 +12,11 @@ get_sim_results_corr = function(data, job, instance,
   # -- standalone model 
   
   # train test split
-  sample = sample.split(data$y, SplitRatio = 2/3)
-  train = subset(data, sample == TRUE)
-  test = subset(data, sample == FALSE)
+  split_point = nrow(data)/3*2
+  train = data[1:split_point,]
+  test = data[(split_point+1):nrow(data),]
+  x_train = train[, colnames(train) != "y"]
+  x_test = test[, colnames(test) != "y"]
   
   x_train = train[, colnames(train) != "y"]
   x_test = test[, colnames(test) != "y"]
@@ -28,7 +30,7 @@ get_sim_results_corr = function(data, job, instance,
                               pruning = pruning, approximate = approximate, n.quantiles = n.quantiles,
                               exclude.categoricals = FALSE, correct.bias = TRUE, 
                               data_stability = NULL, 
-                              extract_variables = TRUE)
+                              extract_variables = TRUE,  tree_methods = c("slim", "mob", "ctree", "guide", "slim_ridge"))
   result_original = cbind(surrogate = "standalone", result_original)
   res = cbind(type = as.character(job$prob.pars$type), n = nrow(data), rho = job$prob.pars$rho, biased = job$prob.pars$biased, result_original)
   

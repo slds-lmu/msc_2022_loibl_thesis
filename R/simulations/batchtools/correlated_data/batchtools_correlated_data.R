@@ -20,7 +20,7 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/correlated_
 source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
-repls = 500L
+repls = 50L
 set.seed(49)
 
 
@@ -40,11 +40,11 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = NULL, 
-  repls = repls)
+  repls = 250)
 
 summarizeExperiments()
 testJob(5)
-submitJobs(reg = reg)
+submitJobs(151:750,reg = reg)
 
 
 # pars = unwrap(getJobPars(reg = reg))

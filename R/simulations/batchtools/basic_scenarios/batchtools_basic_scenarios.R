@@ -23,7 +23,7 @@ repls = 100L
 set.seed(49)
 data_stability = lapply(c(linear_smooth = "linear_smooth", linear_abrupt = "linear_abrupt", linear_mixed = "linear_mixed"),
                         function(t){
-                          lapply(1:(100/2), function(i){create_sim_data(job = NULL, n = 1000, type = t)$data})
+                          lapply(1:100, function(i){create_sim_data(job = NULL, n = 1000, type = t)$data})
                         })
 
 
