@@ -59,7 +59,7 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   result_surrogate_lm = rbind(result_surrogate_lm, c(mbt = "lm", n_leaves = list(NA), 
                                                      mse_train = list(mse_train_lm), r2_train = list(r2_train_lm), 
                                                      mse_test = list(mse_test_lm), r2_test = list(r2_test_lm),
-                                                     stability = list(NA), stability_sem = list(NA)))
+                                                     stability = list(NA)))
   result_surrogate_lm = cbind(surrogate = "lm", result_surrogate_lm)
   
   
@@ -90,7 +90,7 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   result_surrogate_xgboost = rbind(result_surrogate_xgboost, c(mbt = "xgboost", n_leaves = list(NA), 
                                                      mse_train = list(mse_train_xgboost), r2_train = list(r2_train_xgboost), 
                                                      mse_test = list(mse_test_xgboost), r2_test = list(r2_test_xgboost),
-                                                     stability = list(NA), stability_sem = list(NA)))
+                                                     stability = list(NA)))
   result_surrogate_xgboost = cbind(surrogate = "xgboost", result_surrogate_xgboost)
   
   res = rbind(result_original, result_surrogate_lm, result_surrogate_xgboost)
