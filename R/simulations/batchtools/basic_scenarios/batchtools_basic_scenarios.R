@@ -2,9 +2,9 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/basic_scenarios")) dir.create("Data/simulations/batchtools/basic_scenarios", recursive = TRUE)
+if (!dir.exists("Data/simulations/batchtools/basic_scenarios_test")) dir.create("Data/simulations/batchtools/basic_scenarios_test", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scenarios/batchtools",
+reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scenarios/basic_scenarios_test",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/batchtools/helper_simulations.R",
