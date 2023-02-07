@@ -166,11 +166,11 @@ reduce_trees = function(ades, pdes, savedir, reg){
   
 }
 
-reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools"
-                         ,conf.file = NA)
+reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
+                         ,conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
 
 ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
-pdes_basic = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
+pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
 
 savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_test/"
 
