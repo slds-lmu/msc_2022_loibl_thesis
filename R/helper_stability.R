@@ -129,17 +129,6 @@ exp_ri = function(node_ids_1, node_ids_2, type = "fixed"){
   
   return(E_RI)
 }
-ari_uniform = function(node_ids_1, node_ids_2, type = "fixed"){
-  ri = fossil::rand.index(as.numeric(node_ids_1), as.numeric(node_ids_2))
-  e_ri = exp_ri(node_ids_1, node_ids_2, type = type)
-  ari = (ri-e_ri)/(1-e_ri)
-  return(ari)
-}
-
-rep_1 = c(1,1,1, 2,2,2, 3,3,3)
-rep_2 = c(1,1,1, 2,2,5, 3,3,4)
-
-ari_fixed(rep_1, rep_2)
 
 # source("R/simulations/batchtools/simulation_setting_definition.R")
 # source("R/helper_general.R")
