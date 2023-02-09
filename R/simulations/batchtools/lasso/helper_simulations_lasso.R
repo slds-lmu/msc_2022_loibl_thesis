@@ -65,7 +65,7 @@ get_sim_results_lasso = function(data, job, instance,
   
 
   result_surrogate_lm = cbind(surrogate = "lm", result_surrogate_lm)
-  res = rbind(result_original, result_surrogate_lm, result_surrogate_xgboost)
+  res = rbind(result_original, result_surrogate_lm)
   
   return(res)
   
