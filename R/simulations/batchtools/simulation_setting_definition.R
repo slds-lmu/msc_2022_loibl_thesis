@@ -66,6 +66,26 @@ create_sim_data = function(job, n = 1000, type, rho = 0, biased = FALSE, ...){
     lrn = NULL
 
 
+  } else if (type == "linear_smooth_lasso"){
+    x1 = runif(n, -1, 1)
+    x2 = runif(n, -1, 1)
+    x3 = runif(n, -1, 1)
+    for(i in 4:10){
+      x = runif(n, -1, 1)
+      assign(paste0("x",i), x)
+    }
+    
+    
+    formula = x1 + 4*x2 + 3*x2*x3 
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    
+    data = data.frame(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, y)
+    fm = as.formula("y ~ x1 + x2 + x2:x3")
+    lrn = NULL
+    
+    
+    
   }  else if(type == "linear_abrupt"){
     
     x1 = runif(n, -1, 1)

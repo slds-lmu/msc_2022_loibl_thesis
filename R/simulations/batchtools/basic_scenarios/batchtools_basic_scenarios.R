@@ -2,15 +2,15 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/basic_scenarios_test")) dir.create("Data/simulations/batchtools/basic_scenarios_test", recursive = TRUE)
+if (!dir.exists("Data/simulations/batchtools/basic_scenarios")) dir.create("Data/simulations/batchtools/basic_scenarios", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scenarios/basic_scenarios_test",
+reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scenarios/basic_scenarios",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/batchtools/helper_simulations.R",
                                         "R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R"),
                              seed = 1
-                             # , conf.file = NA
+                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
                              )
 
 
@@ -28,7 +28,7 @@ data_stability = lapply(c(linear_smooth = "linear_smooth", linear_abrupt = "line
 
 
 addProblem(name = "basic_scenarios", data = data_stability, fun = create_sim_data, reg = reg, seed = 123)
-pdes = list("basic_scenarios" = expand.grid(n = c(1500, 7500, 15000), type = c("linear_smooth", "linear_abrupt", "linear_mixed")))
+pdes = list("basic_scenarios" = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed")))
 
 
 # add algorithm
@@ -48,8 +48,8 @@ addExperiments(
 
 summarizeExperiments()
 testJob(27)
-# submitJobs(reg = reg)
-
+submitJobs(10:500)
+getJobTable(1:9)
 
 # pars = unwrap(getJobPars(reg = reg))
 

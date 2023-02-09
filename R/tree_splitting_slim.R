@@ -252,6 +252,8 @@ compute_tree_slim = function(y,
                              fit.gam = FALSE,
                              df.spline = 15,
                              penalization = NULL,
+                             lambda = NULL,
+                             df.max = NULL,
                              exclude.categoricals = FALSE,
                              correct.bias = FALSE) {
   time.start = Sys.time()
@@ -274,9 +276,7 @@ compute_tree_slim = function(y,
       } else if (penalization %in% c("L1", "L2")){
         alpha = ifelse(penalization == "L1", 1, 0)
         split.objective = get_objective_glmnet
-        formals(split.objective)$.alpha = alpha
         fit.model = get_model_glmnet
-        formals(fit.model)$.alpha = alpha
         predict.response = get_prediction_glmnet
 
       } else {
@@ -300,6 +300,8 @@ compute_tree_slim = function(y,
                                   .fit.bsplines = fit.bsplines,
                                   .family = family,
                                   .alpha = alpha,
+                                  .lambda = lambda,
+                                  .df.max = df.max,
                                   .exclude.categoricals = exclude.categoricals)
   
   formals(fit.model) = list(y = data.frame(), x = data.frame(), 
@@ -308,6 +310,8 @@ compute_tree_slim = function(y,
                             .fit.bsplines = fit.bsplines,
                             .family = family,
                             .alpha = alpha,
+                            .lambda = lambda,
+                            .df.max = df.max,
                             .exclude.categoricals = exclude.categoricals)
   
   formals(predict.response)$.exclude.categoricals = exclude.categoricals

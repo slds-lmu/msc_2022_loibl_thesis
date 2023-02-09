@@ -55,7 +55,7 @@ mob_ls_n1500_alpha01 = unique(res_ls_n1500_alpha01[mbt == "MOB" & surrogate == "
 setnames(mob_ls_n1500_alpha01, "n_leaves", "n_leaves_01")
 
 
-test = unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE", "MOB", "CTree") & surrogate == "standalone",.(n_leaves, r2_train, mbt, job.id, config_id, ari, ri, rc, stability_same_size)])
+test = unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE", "MOB", "CTree") & surrogate == "lm",.(n_leaves, r2_train, mbt, job.id, config_id, ri, ari_fixed, rc, stability_same_size)])
 table(test$mbt)
 library(parcoords)
 parcoords(test[!is.na(ri),.(mbt, n_leaves, ri)], rownames = FALSE,  
@@ -65,11 +65,16 @@ parcoords(test[!is.na(ri),.(mbt, n_leaves, ri)], rownames = FALSE,
 
 library(GGally)
 
-ggpairs(test[!is.na(ari)  ,.(n_leaves, ri, r2_train, mbt)],
+ggpairs(test[!is.na(ri) & stability_same_size == TRUE ,.(n_leaves, ri, r2_train, mbt)],
         columns = 1:3,        # Columns
         aes(color = mbt,  # Color by group (cat. variable)
             alpha = 0.5))
-pairs()
+
+ggpairs(unique(test[ ,.(n_leaves, r2_train, mbt, job.id, config_id)]),
+        columns = 1:2,        # Columns
+        # aes(color = mbt,  # Color by group (cat. variable)
+        #     alpha = 0.5)
+        )
 
 
 save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_smooth/"

@@ -722,7 +722,7 @@ get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
   return(prediction)
 }
 
-get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.categoricals, ...) {
+get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.categoricals, .lambda, .df.max, ...) {
   y = unlist(y)
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
@@ -746,20 +746,35 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.ca
   } else {
     x = as.matrix(x)
   }  
-  fit = glmnet(x, y, nlambda=100)
-  rss = deviance(fit)
-  n = nrow(x)
-  bic = n*log(rss/n) + log(n)*fit$df
-  lambda = fit$lambda[which.min(bic)]
+  if(is.null(.lambda)){
+    fit = glmnet(x, y, nlambda=100)
+    rss = deviance(fit)
+    n = nrow(x)
+    bic = n*log(rss/n) + log(n)*fit$df
+    if(!is.null(.df.max)){
+      # allow only lambda values which yield to df <= .df.max
+      bic[fit$df > .df.max] = Inf
+    } 
+    lambda = fit$lambda[which.min(bic)]
+
+  } else{
+    if(!is.null(.df.max)){
+      warning("df.max is ignored because lambda is not NULL. ")
+    }
+    lambda = .lambda
+  }
+  
   
   # cv.model = cv.glmnet(x, y, alpha = .alpha, family = .family)
   model = glmnet(x, y, alpha = .alpha, family = .family, lambda = lambda)
   return(model)
 }
 
-get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclude.categoricals, ...) {
+get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclude.categoricals, .lambda, .df.max, ...) {
   model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha,
-                           .degree.poly = .degree.poly, .exclude.categoricals, .exclude.categoricals = .exclude.categoricals)
+                           .degree.poly = .degree.poly, .exclude.categoricals, .exclude.categoricals = .exclude.categoricals,
+                           .lambda = .lambda,
+                           .df.max = .df.max)
   y = unlist(y)
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){

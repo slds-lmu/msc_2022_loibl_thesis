@@ -33,12 +33,14 @@ reduce_trees = function(ades, pdes, savedir, reg){
     # res_df = res_df[!is.na(n_leaves), ]
     measure_cols = c("n_leaves", "mse_train", "r2_train", "mse_test", "r2_test")    
     group_cols = c("type", "n", "alpha", "impr", "surrogate", "mbt")
+    group_cols = group_cols[group_cols %in% colnames(res_df)]
     
-    if("x1" %in% colnames(res_df)){
+    if("rho" %in% colnames(res_df)){
       group_cols = c("type", "n", "surrogate", "mbt", "rho", "biased")
     }
     
-    cols_unwrap = c(measure_cols, group_cols, "job.id")
+    cols_unwrap = colnames(res_df)[sapply(res_df, is.list) & colnames(res_df) != "stability"]
+    # cols_unwrap = c(measure_cols, group_cols, "job.id")
     res_df = unwrap(res_df, cols = cols_unwrap)
     setnames(res_df, paste0(cols_unwrap, ".1"),
              cols_unwrap)
@@ -145,9 +147,15 @@ reduce_trees = function(ades, pdes, savedir, reg){
       res_sd_exp = ljoin(res_sd_exp, stability_sd)
     }
     
-    if("x1" %in% colnames(res_df)){
-      x1_mean = res_df[, .(x1 = mean(as.numeric(x1))), by = config_id]
-      res_mean_exp = ijoin(res_mean_exp, x1_mean)
+    if("x_wrong" %in% colnames(res_df)){
+      x_wrong_mean = res_df[, .(x_wrong = mean(as.numeric(x_wrong))), by = config_id]
+      res_mean_exp = ijoin(res_mean_exp, x_wrong_mean)
+      
+    }
+    
+    if("x3" %in% colnames(res_df)){
+      x3_mean = res_df[, .(x3 = mean(as.numeric(x3))), by = config_id]
+      res_mean_exp = ijoin(res_mean_exp, x3_mean)
       
     }
 
@@ -166,8 +174,26 @@ reduce_trees = function(ades, pdes, savedir, reg){
   
 }
 
-reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
+# lasso
+reg_lasso = loadRegistry("Data/simulations/batchtools/lasso/batchtools/"
                          ,conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
+
+ades_lasso = NULL
+pdes_lasso = data.frame(n = c(3000), type = c("linear_smooth_lasso"))
+
+savedir_lasso = "Data/simulations/batchtools/lasso/results/"
+
+result_lasso = reduce_trees(ades_lasso, pdes_lasso, savedir_lasso, reg_lasso)$mean
+
+
+result_lasso = readRDS("Data/simulations/batchtools/lasso/results/result_summary.rds")$mean
+
+
+
+
+# basic scenarios
+reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
+                         ,conf.file = NA)
 
 ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
 pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
@@ -177,35 +203,21 @@ savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_test/"
 result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
 
 
-# result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
-# View(result_basic$mean[n == 1500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
-#                                                          mse_train_05, mse_train, mse_train_95,
-#                                                          r2_train_05, r2_train, r2_train_95,
-#                                                          ari_05, ari, ari_95,
-#                                                          rbf_05, rbf, rbf_95)])
-# 
-# View(result_basic$mean[n == 7500 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
-#                                                          mse_train_05, mse_train, mse_train_95,
-#                                                          r2_train_05, r2_train, r2_train_95,
-#                                                          ari_05, ari, ari_95,
-#                                                          rbf_05, rbf, rbf_95)])
-# 
-# View(result_basic$mean[n == 15000 & type == "linear_smooth" , .(surrogate, mbt, alpha, impr, n_leaves_05, n_leaves, n_leaves_95,
-#                                                          mse_train_05, mse_train, mse_train_95,
-#                                                          r2_train_05, r2_train, r2_train_05,
-#                                                          ari_05, ari, ari_95,
-#                                                          rbf_05, rbf, rbf_95)])
+
+
+
+
+# correlated data
 
 reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
-                         ,conf.file = NA
+                        ,conf.file = NA
 )
-
 ades_corr = NULL
 pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9), biased = c(FALSE))
 
 savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
 
-result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg)$mean
+result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)$mean
 
 
 result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")$mean
