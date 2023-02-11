@@ -1,4 +1,4 @@
-create_sim_data = function(job, n = 1000, type, rho = 0, biased = FALSE, ...){
+create_sim_data = function(job, n = 1000, type, rho = 0, ...){
   
   if (type == "linear_smooth"){
     x1 = runif(n, -1, 1)
@@ -36,25 +36,14 @@ create_sim_data = function(job, n = 1000, type, rho = 0, biased = FALSE, ...){
                           rho,1), nrow = 2, byrow = TRUE)
     
     
-    if(biased){
-      list_distributions = list(function(n) qunif(n, -1, 1), 
-                                function(n) qunif(n, -1.05, 1.04999))
-      vars = marginals_copula(cor_matrix, list_distributions, n = n)
-      x1 = vars[,1]
-      x2 = round(vars[,2],1)
-      x3 = round(runif(n, -1.05, 1.04999),1)
-    } else{
-      list_distributions = list(function(n) qunif(n, -1, 1), 
-                                function(n) qunif(n, -1, 1))
-      vars = marginals_copula(cor_matrix, list_distributions, n = n)
-      
-      x1 = vars[,1]
-      x2 = vars[,2]
-      x3 = runif(n, -1, 1)
-    }
+    list_distributions = list(function(n) qunif(n, -1, 1), 
+                              function(n) qunif(n, -1, 1))
+    vars = marginals_copula(cor_matrix, list_distributions, n = n)
     
+    x1 = vars[,1]
+    x2 = vars[,2]
+    x3 = runif(n, -1, 1)
     
-
 
 
     formula = x1 + 4*x2 + 3*x2*x3 

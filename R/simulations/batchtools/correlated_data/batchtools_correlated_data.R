@@ -11,7 +11,7 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/correlated_
                                         "R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R",
                                         "R/simulations/batchtools/correlated_data/helper_simulations_correlated_data.R"),
                              seed = 1
-                             , conf.file = NA
+                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
 )
 
 
@@ -25,7 +25,7 @@ set.seed(49)
 
 
 addProblem(name = "correlated_data", fun = create_sim_data, reg = reg, seed = 123)
-pdes = list("correlated_data" = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9), biased = c(FALSE)))
+pdes = list("correlated_data" = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9)))
 
 
 # add algorithm

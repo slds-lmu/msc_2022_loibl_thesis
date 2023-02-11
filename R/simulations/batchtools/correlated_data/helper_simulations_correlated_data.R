@@ -32,8 +32,33 @@ get_sim_results_corr = function(data, job, instance,
                               data_stability = NULL, 
                               extract_variables = TRUE,  tree_methods = c("slim", "mob", "ctree", "guide", "slim_ridge"))
   result_original = cbind(surrogate = "standalone", result_original)
-  res = cbind(type = as.character(job$prob.pars$type), n = nrow(data), rho = job$prob.pars$rho, biased = job$prob.pars$biased, result_original)
   
+  # train linear model (blackbox model 1)
+  fm = instance$fm
+  lm = gam(fm, data = train)
+  
+  # extract fitted values (surrogates)
+  y_hat_train_lm = lm$fitted.values
+  y_hat_test_lm = predict(lm, x_test)
+  
+  # calculate performance of the lm model (as benchmark for the accuracy of the MBT models)
+  mse_train_lm = mean((y_train - y_hat_train_lm)^2)
+  r2_train_lm = r_2(y_train, y_hat_train_lm)
+  mse_test_lm = mean((y_test - y_hat_test_lm)^2)
+  r2_test_lm = r_2(y_test, y_hat_test_lm)
+  
+  # fit trees to the lm predictions 
+  result_surrogate_lm  = fit_trees(x_train = x_train, y_train = y_hat_train_lm, x_test = x_test, y_test = y_hat_test_lm,  
+                                   min.split = min.split, maxdepth = maxdepth, impr.par = impr.par, alpha = alpha, 
+                                   pruning = pruning, approximate = approximate, n.quantiles = n.quantiles,
+                                   exclude.categoricals = FALSE, correct.bias = TRUE, 
+                                   data_stability = NULL, 
+                                   extract_variables = TRUE,  tree_methods = c("slim", "mob", "ctree", "guide", "slim_ridge"))
+  
+  
+  result_surrogate_lm = cbind(surrogate = "lm", result_surrogate_lm)
+  res = cbind(type = as.character(job$prob.pars$type), n = nrow(data), rho = job$prob.pars$rho, biased = job$prob.pars$biased, 
+              rbind(result_original, result_surrogate_lm))
   
   return(res)
 

@@ -466,7 +466,7 @@ perform_gram_splits_numeric = function(gram.list,
                                        x,
                                        min.node.size, 
                                        penalization, 
-                                       include.parent.sse = FALSE){
+                                       include.parent.loss = FALSE){
   n.bins = length(gram.list)
   
   # for test purposes
@@ -474,8 +474,8 @@ perform_gram_splits_numeric = function(gram.list,
     xtx = gram.list[[1]]$xtx
     xty = gram.list[[1]]$xty
     yty = gram.list[[1]]$yty
-    sse.total = calculate_sse_closed(xtx, xty, yty, nrow(x), min.node.size, penalization)
-    splits = sse.total
+    loss.total = calculate_loss_closed(xtx, xty, yty, nrow(x), min.node.size, penalization)
+    splits = loss.total
   } else {
     # calculate aggregated gram matrices 
     cxtx.t = gram.list[[1]]$xtx
@@ -486,7 +486,7 @@ perform_gram_splits_numeric = function(gram.list,
       cxty.t = cxty.t + gram.list[[b]]$xty
       cyty.t = cyty.t + gram.list[[b]]$yty
     }
-    sse.parent = calculate_sse_closed(cxtx.t, cxty.t, cyty.t, nrow(x), min.node.size, penalization)
+    loss.parent = calculate_loss_closed(cxtx.t, cxty.t, cyty.t, nrow(x), min.node.size, penalization)
    
     # calculate aggregated gram matrices for the first split (i.e. first bin in left node, rest in right node)
     cxtx.l = gram.list[[1]]$xtx
@@ -500,12 +500,12 @@ perform_gram_splits_numeric = function(gram.list,
     
     n.bin.l = gram.list[[1]]$n.bin
     n.bin.r = nrow(x) - n.bin.l
-    sse.l = calculate_sse_closed(cxtx.l, cxty.l, cyty.l, n.bin.l, min.node.size, penalization)
-    sse.r = calculate_sse_closed(cxtx.r, cxty.r, cyty.r, n.bin.r, min.node.size, penalization)
+    loss.l = calculate_loss_closed(cxtx.l, cxty.l, cyty.l, n.bin.l, min.node.size, penalization)
+    loss.r = calculate_loss_closed(cxtx.r, cxty.r, cyty.r, n.bin.r, min.node.size, penalization)
       
-    sse.total = sse.l + sse.r
+    loss.total = loss.l + loss.r
 
-    splits = c(sse.total)
+    splits = c(loss.total)
     
     
     # calculate the gram matrices and models of the remaining splits in a for loop
@@ -521,19 +521,19 @@ perform_gram_splits_numeric = function(gram.list,
         n.bin.l = n.bin.l + gram.list[[s]]$n.bin
         n.bin.r = nrow(x) - n.bin.l
         
-        sse.l = calculate_sse_closed(cxtx.l, cxty.l, cyty.l, n.bin.l, min.node.size, penalization)
-        sse.r = calculate_sse_closed(cxtx.r, cxty.r, cyty.r, n.bin.r, min.node.size, penalization)
+        loss.l = calculate_loss_closed(cxtx.l, cxty.l, cyty.l, n.bin.l, min.node.size, penalization)
+        loss.r = calculate_loss_closed(cxtx.r, cxty.r, cyty.r, n.bin.r, min.node.size, penalization)
           
-        sse.total = sse.l + sse.r
+        loss.total = loss.l + loss.r
      
-        splits = c(splits, sse.total)
+        splits = c(splits, loss.total)
       }
     }
   }
   
-  # include parent.sse nur für Testzwecke
-  if (include.parent.sse){
-    return(list(parent.sse = sse.parent, splits = splits))
+  # include parent.loss nur für Testzwecke
+  if (include.parent.loss){
+    return(list(parent.loss = loss.parent, splits = splits))
   } else {
     return(splits)
   }
@@ -545,7 +545,7 @@ perform_gram_splits_factor = function(gram.list,
                                       q,
                                       min.node.size, 
                                       penalization, 
-                                      include.parent.sse = FALSE){
+                                      include.parent.loss = FALSE){
   
   splits = c()
   for(split in 1:length(q)){
@@ -582,12 +582,12 @@ perform_gram_splits_factor = function(gram.list,
       }
     }
     
-    sse.l = calculate_sse_closed(cxtx.l, cxty.l, cyty.l, n.bin.l, min.node.size, penalization)
-    sse.r = calculate_sse_closed(cxtx.r, cxty.r, cyty.r, n.bin.r, min.node.size, penalization)
+    loss.l = calculate_loss_closed(cxtx.l, cxty.l, cyty.l, n.bin.l, min.node.size, penalization)
+    loss.r = calculate_loss_closed(cxtx.r, cxty.r, cyty.r, n.bin.r, min.node.size, penalization)
     
-    sse.total = sse.l + sse.r
+    loss.total = loss.l + loss.r
     
-    splits = c(splits, sse.total)
+    splits = c(splits, loss.total)
     
   }
   return(splits)
@@ -596,7 +596,7 @@ perform_gram_splits_factor = function(gram.list,
 
 
 
-calculate_sse_closed = function(xtx, xty, yty, n.bin, min.node.size, penalization){
+calculate_loss_closed = function(xtx, xty, yty, n.bin, min.node.size, penalization){
   if (n.bin >= min.node.size){
     if (is.null(penalization)) {
       try({beta = solve(xtx) %*% xty}, silent = TRUE)
@@ -615,11 +615,11 @@ calculate_sse_closed = function(xtx, xty, yty, n.bin, min.node.size, penalizatio
       beta = solve(xtx + diag.lambda) %*% xty
     }
     
-    sse = yty - 2 * t(beta) %*% xty + t(beta) %*% xtx %*% beta
+    loss = yty - 2 * t(beta) %*% xty + t(beta) %*% xtx %*% beta
   } else {
-    sse = Inf
+    loss = Inf
   }
-  return(sse)
+  return(loss)
 }
 
 
@@ -733,8 +733,8 @@ get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, 
   }
   model = get_model_lm(y, x, .degree.poly = .degree.poly, 
                        .fit.bsplines = .fit.bsplines, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals, .type = "model")
-  sse = crossprod(model$residuals)
-  return(sse)
+  loss = crossprod(model$residuals)
+  return(loss)
 }
 
 get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
@@ -828,8 +828,16 @@ get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclu
   } 
   
   predictions = predict.glmnet(model, newx = x, s = model$lambda)
-  sse = sum((predictions - y)^2)
-  return(sse)
+  coefs =  coef(model, s = "lambda.min")
+
+  if(.alpha == 1){
+    loss = sum((y - predictions)^2) + model$lambda * sum(abs(coefs[-1]))
+  } else if (.alpha == 2){
+    loss = sum((y - predictions)^2) + model$lambda * sum((coefs[-1])^2)
+  }
+
+  
+  return(loss)
 }
 
 get_prediction_glmnet = function(model, x, .exclude.categoricals, ...) {
@@ -897,8 +905,8 @@ get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, .type
 
 get_objective_gam = function(y, x, .family, .df.spline, .exclude.categoricals,  ...) {
   model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals, .type = "model")
-  sse = crossprod(residuals(model))
-  return(sse)
+  loss = crossprod(residuals(model))
+  return(loss)
 }
 
 get_prediction_gam = function(model, x, .exclude.categoricals, ...) {
