@@ -29,7 +29,7 @@ A recursive partitioning algorithm for MBTs can generally be divided into the fo
 \end{enumerate}
 
 
-The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in Step 3. This leads to variables with many possible split points being chosen more often as split variables than variables with few possible split points. This phenomenon is called selection bias and is explained in more detail in Chapter 3 and examined for the algorithms considered here.
+The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in Step 3. This can lead to the phenomenon, that variables with many possible split points are chosen more often as splitting variables than variables with few possible split points. This phenomenon is called selection bias and is explained in more detail in Chapter 3 and examined for the algorithms considered here.
 MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of comparing the objective for all possible split points and variables, step 3 of algorithm is split into 2 steps:
 
 \begin{enumerate}
@@ -46,24 +46,17 @@ MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of
 
 After fitting the model to all observations in step 2 the loss function or a performance metric is calculated, e.g. SSE.
 In step 3 SLIM performs an exhaustive search to find the optimal splitpoint.  
-The optimisation problem in each recursion step is given by \begin{align}
+The optimisation problem in each recursion step is given by \begin{align} \label{align:mob_opitimization}
     \min_{j \in 1,..., p} \left( \min_{s \in \mathcal{S}_j} \left(\min_{\theta_{l} \in \Theta}\sum_{i \in I_{l}(s)}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_{l})  +  \min_{\theta_{r} \in \Theta}\sum_{i \in I_{r}(s)}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_{r}) \right) \right),
 \end{align}
-where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $X_j$. For numeric variables, this set consists either of all unique values of $X_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, $I_{l}$ is than defined as the set of indices $i \in 1,...,n$ for which $X_{ij} \leq s$ holds and $I_{r}$ is its complement. For categorical variables, one subgroup of all possibilities of dividing the levels of $X_{j}$ into two subgroups are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $X_{ij} \in s$ applies and and $I_{r}$ is its complement.
+where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $X_j$. For numeric variables, this set consists either of all unique values of $X_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, $I_{l}$ is defined as the set of indices $i \in 1,...,n$ for which $X_{ij} \leq s$ holds and $I_{r}$ is its complement. For categorical variables, one subgroup of all possibilities of dividing the levels of $X_{j}$ into two subgroups are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $X_{ij} \in s$ applies and and $I_{r}$ is its complement.
 
-
-
-For this purpose for each possible partitioning variable $X_j$, a set of potential split points $s_j$ (e.g., quantiles) is selected for numeric variables. For categorical variables, each possible binary split of the categories is used as a potential split point.
-To find the best split point, for each potential split point two models are fitted to the corresponding child nodes and their joint performance is measured.
-
-is minimised over all the partitions $I_{l}$ and $I_{r}$. 
-For numerical variables $X_{j}$, the partitions are formed by a split point $s_{j}$, where $I_{left}$ is defined as the set of indices $i \in 1,...,n$ for which $X_{ij} \leq s_{j}$ and $I_{right}$ is its complement.
-
-
-
-The split point that leads to the greatest improvement in performance is then selected as the optimal split point in this iteration step.
+The variable $X_j$ and split point $s$ which minimize  \ref{align:mob_opitimization} are selected as splitting variable and split point, if this leads to an improvement of the loss function.
 
 Since the computational effort for estimating all possible child models becomes very large as the number of possible partitioning variables increases, \citep{Hu.2020} have developed an efficient algorithm for estimating them for the case of linear regression, GAMS and ridge regression. A detailed description of this algorithm can be found in \citep{Hu.2020}.
+
+To avoid overfitting and to obtain a small interpretable tree, the use of pruning is necessary. \citep{Hu.2020} uses the approach of backpruning, i.e. a deep tree is first adapted and then leaves that do not fulfil certain criteria are pruned back. 
+In order to keep the computational effort as low as possible, prepruning or early stopping was used instead in this work. Specifically, this means that a split is only performed if the improvement of the node objective is at least $impr.par \in [0,1]$ times the improvement of the objective in the parent node. In addition, it is possible to set a value for $R^2$ (defined in section \ref{simulation}) above which splitting in a node will not continue.
 
 
 
