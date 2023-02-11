@@ -22,19 +22,19 @@ get_sim_results_nonlinear = function(data, job, instance,
   
   # fit trees to the original data
   slim_basic = fit_slim_tree(x_train = x_train, y_train = y_train, x_test = x_test, y_test = y_test, 
-                             n.split = n.split, impr.par = impr.par, r2 = r2, min.split = min.split, 
+                             n.split = n.split, n.quantiles = n.quantiles, impr.par = impr.par, r2 = r2, min.split = min.split, 
                              degree.poly = 1, penalization = NULL, fit.bsplines = FALSE, fit.gam = FALSE)
   
   slim_poly = fit_slim_tree(x_train = x_train, y_train = y_train, x_test = x_test, y_test = y_test, 
-                          n.split = n.split, impr.par = impr.par, r2 = r2, min.split = min.split, 
+                          n.split = n.split, n.quantiles = n.quantiles, impr.par = impr.par, r2 = r2, min.split = min.split, 
                           degree.poly = 2, penalization = "L1", fit.bsplines = FALSE, fit.gam = FALSE)
   
   slim_bsplines = fit_slim_tree(x_train = x_train, y_train = y_train, x_test = x_test, y_test = y_test, 
-                                n.split = n.split, impr.par = impr.par, r2 = r2, min.split = min.split, 
+                                n.split = n.split, n.quantiles = n.quantiles, impr.par = impr.par, r2 = r2, min.split = min.split, 
                                 degree.poly = 1, penalization = NULL, fit.bsplines = TRUE, fit.gam = FALSE)
   
   slim_gam = fit_slim_tree(x_train = x_train, y_train = y_train, x_test = x_test, y_test = y_test, 
-                                n.split = n.split, impr.par = impr.par, r2 = r2, min.split = min.split, 
+                                n.split = n.split, n.quantiles = n.quantiles, impr.par = impr.par, r2 = r2, min.split = min.split, 
                                 degree.poly = 1, penalization = NULL, fit.bsplines = FALSE, fit.gam = TRUE)
                           
                              
@@ -46,7 +46,7 @@ get_sim_results_nonlinear = function(data, job, instance,
 }
 
 fit_slim_tree = function(x_train, y_train, x_test, y_test , 
-                         n.split, impr.par, r2, min.split,
+                         n.split, n.quantiles, impr.par, r2, min.split,
                          degree.poly, fit.bsplines, fit.gam, penalization){
   slim_res = list()
   
