@@ -45,6 +45,7 @@ Node <- R6Class("Node", list(
   # objective value in a node
   objective.value = NULL, 
   objective.value.parent = NULL,
+  r2 = NULL,
   term.predictions.parent = NULL,
   term.predictions = NULL,
   
@@ -75,7 +76,7 @@ Node <- R6Class("Node", list(
 
   
   
-  initialize = function(id, depth = NULL, subset.idx, id.parent = NULL, child.type = NULL, objective.value.parent = NULL, objective.value = NULL, improvement.met, intImp, model.fit = NULL, term.predictions.parent = NULL, variable.importance = NULL) {
+  initialize = function(id, depth = NULL, subset.idx, id.parent = NULL, child.type = NULL, objective.value.parent = NULL, objective.value = NULL, r2 = NULL, improvement.met, intImp, model.fit = NULL, term.predictions.parent = NULL, variable.importance = NULL) {
     assert_numeric(id, len = 1)
     assert_numeric(depth, len = 1, null.ok = TRUE)
     
@@ -93,6 +94,7 @@ Node <- R6Class("Node", list(
     self$objective.value.parent = objective.value.parent
     self$objective.value = objective.value
     self$improvement.met = improvement.met
+    self$r2 = r2
     
     self$term.predictions.parent = term.predictions.parent
     self$stop.criterion.met = FALSE
@@ -100,14 +102,21 @@ Node <- R6Class("Node", list(
     self$variable.importance = variable.importance
   },
   
-  computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, pruning, n.quantiles, penalization, fit.bsplines, df.spline, split.method, correction.factor) {
-    if (length(self$subset.idx) < (2*min.split + 1) | (self$improvement.met == TRUE & pruning == "forward")) {
+  computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, 
+                          pruning, n.quantiles, penalization, fit.bsplines, 
+                          df.spline, split.method, correction.factor, r2 = r2) {
+    self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
+    self$r2 = r_2(Y[self$subset.idx, , drop = FALSE],
+                 fit(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ], .type = "fitted.values"))
+    
+    if (length(self$subset.idx) < (2*min.split + 1) | (self$improvement.met == TRUE & pruning == "forward")  | (self$r2 >= r2 & pruning == "forward")) {
       self$stop.criterion.met = TRUE
-      self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
       self$objective.value = NULL
+      
     } else {
       self$objective.value.parent = objective(y = Y, x = X)
       self$objective.value = objective(y = Y[self$subset.idx, ,drop = FALSE], x = X[self$subset.idx, ])
+      
       tryCatch({
         split = split_parent_node(Y = Y[self$subset.idx, ,drop = FALSE], X = X[self$subset.idx, ], 
                                   objective = objective, optimizer = optimizer, 
@@ -121,11 +130,14 @@ Node <- R6Class("Node", list(
           self$intImp = 0
         }
         intImp = (self$objective.value - split$objective.value[split$best.split][1]) / self$objective.value.parent
+        
         if(self$intImp == 0){
-          if ( intImp < impr.par & pruning == "forward"){
+          if ( (intImp < impr.par) & pruning == "forward"){
             self$improvement.met = TRUE
             self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
             self$objective.value = NULL
+
+            
           } else{
             self$split.feature = split$feature[1]
             self$split.type = split$split.type
@@ -144,10 +156,12 @@ Node <- R6Class("Node", list(
             
           }
         } else {
-          if ( intImp < self$intImp*impr.par & pruning == "forward"){
+          if (intImp < self$intImp*impr.par & pruning == "forward"){
             self$improvement.met = TRUE
             self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
             self$objective.value = NULL
+
+                     
           } else{
             self$split.feature = split$feature
             self$split.type = split$split.type
@@ -163,7 +177,7 @@ Node <- R6Class("Node", list(
             if(split.method == "guide"){
               self$test.type = split$test.type
             }
-            
+                    
           }
         }
       },
@@ -177,7 +191,7 @@ Node <- R6Class("Node", list(
   
   computeChildren = function(X, Y, objective, fit, predict.response, pruning) {
 
-    if (self$stop.criterion.met|(self$improvement.met & pruning == "forward")) {
+    if (self$stop.criterion.met | (self$improvement.met & pruning == "forward")) {
       # no further split is performed
       self$children = list("left.child" = NULL, "right.child" = NULL)
     } else {
@@ -199,6 +213,10 @@ Node <- R6Class("Node", list(
       obj.left = objective(y = Y[idx.left, ,drop = FALSE], x = X[idx.left, ])
       obj.right = objective(y = Y[idx.right, ,drop = FALSE], x = X[idx.right, ])
       obj.parent = objective(y = Y[self$subset.idx, ,drop = FALSE], x = X[self$subset.idx, ])
+      r2.left = r_2(Y[idx.left, ,drop = FALSE],
+                    fit(y = Y[idx.left, ,drop = FALSE], x = X[idx.left, ], .type = "fitted.values"))
+      r2.right = r_2(Y[idx.right, ,drop = FALSE],
+                    fit(y = Y[idx.right, ,drop = FALSE], x = X[idx.right, ], .type = "fitted.values"))
       
       model.left = fit(y = Y[idx.left, ,drop = FALSE], x = X[idx.left, ])
       model.right = fit(y = Y[idx.right, ,drop = FALSE], x = X[idx.right, ])
@@ -222,9 +240,9 @@ Node <- R6Class("Node", list(
         child.type.right = paste(self$child.type, child.type.right, sep = " & ")
       }
       left.child = Node$new(id = 1, depth = self$depth + 1, subset.idx = idx.left, id.parent = self$id, child.type = child.type.left,  improvement.met = self$improvement.met, 
-                            intImp = self$intImp, model.fit = model.left, term.predictions.parent = term.predictions.left, objective.value.parent = obj.left, variable.importance = variable.importance.left)
+                            intImp = self$intImp, model.fit = model.left, term.predictions.parent = term.predictions.left, objective.value.parent = obj.left, r2 = r2.left, variable.importance = variable.importance.left)
       right.child = Node$new(id = 2, depth = self$depth + 1, subset.idx = idx.right, id.parent = self$id, child.type = child.type.right,  improvement.met = self$improvement.met, 
-                             intImp = self$intImp, model.fit = model.right, term.predictions.parent = term.predictions.right, objective.value.parent = obj.right, variable.importance = variable.importance.right)
+                             intImp = self$intImp, model.fit = model.right, term.predictions.parent = term.predictions.right, objective.value.parent = obj.right, r2 = r2.right, variable.importance = variable.importance.right)
       
       self$children = list("left.child" = left.child, "right.child" = right.child)
     }
@@ -240,6 +258,7 @@ compute_tree_slim = function(y,
                              x,
                              n.split, 
                              impr.par = 0.1,
+                             r2 = 1,
                              min.split = 10,
                              n.quantiles = 100,
                              approximate = FALSE,
@@ -312,7 +331,8 @@ compute_tree_slim = function(y,
                             .alpha = alpha,
                             .lambda = lambda,
                             .df.max = df.max,
-                            .exclude.categoricals = exclude.categoricals)
+                            .exclude.categoricals = exclude.categoricals,
+                            .type = "model")
   
   formals(predict.response)$.exclude.categoricals = exclude.categoricals
   
@@ -347,7 +367,7 @@ compute_tree_slim = function(y,
                                    impr.par = impr.par, optimizer = ifelse(approximate == FALSE, find_best_binary_split, find_best_binary_split_approx), 
                                    min.split = min.split, pruning = pruning, n.quantiles = n.quantiles,
                                    penalization = penalization, fit.bsplines = fit.bsplines, df.spline = df.spline,
-                                   split.method = split.method, correction.factor = correction.factor)
+                                   split.method = split.method, correction.factor = correction.factor, r2 = r2)
         node.to.split$computeChildren(input.data$X, input.data$Y, objective = split.objective,
                                       fit = fit.model, predict.response = predict.response, 
                                       pruning = pruning)

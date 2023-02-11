@@ -118,7 +118,28 @@ create_sim_data = function(job, n = 1000, type, rho = 0, biased = FALSE, ...){
     #   nrounds = p_int(lower = 5, upper = 1000)
     # )
     
-  } else if(type == "linear_mixed"){
+  } else if(type == "nonlinear_mixed"){
+    
+    x1 = runif(n, -1, 1)
+    x2 = runif(n, -1, 1)
+    x3 = runif(n, -1, 1)
+    x4 = runif(n, -1, 1)
+    x5 = runif(n, -1, 1)
+    x6 = as.numeric(rbernoulli(n))
+    
+    
+    formula = x1 + 2*x2^2 + x3*log(abs(x3)) + x4*x5 + x1*x4*ifelse(x6 == 0, 1,0)
+    
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    
+    data = data.frame(mget(paste0("x",1:6)), y)
+    fm = as.formula("y ~ x1 + x2 + x3 + ti(x2, x3) + ti(x1,x2,x4)")
+    lrn = lrn("regr.xgboost")
+    
+    search_space = ps()
+    
+  }else if(type == "linear_mixed"){
     
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)

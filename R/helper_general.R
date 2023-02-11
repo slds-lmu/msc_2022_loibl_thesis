@@ -1,11 +1,22 @@
 # Helper functions
 
-predict_slim = function(tree, newdata, type = "response"){
+predict_slim = function(tree, newdata, type = "response", degree.poly = 1){
   if(type == "response"){
     models = extract_models(tree)
   }
   nodes = extract_split_criteria(tree)
   nodes = nodes[nodes$split.feature == "leafnode",c("child.type", "id.node")]
+  if (degree.poly > 1) {
+    features = names(newdata)
+    for(f in features){
+      if (is.numeric(newdata[[f]])){
+        for(d in 2:degree.poly){
+          newdata = cbind(newdata, "new" = newdata[[f]]^d)
+          colnames(newdata)[which(names(newdata) == "new")] = paste0(f,"_",d)
+        }
+      }
+    }
+  }
   newdata = as.data.table(newdata)
   newdata$row_id = 1:nrow(newdata)
   
@@ -17,6 +28,7 @@ predict_slim = function(tree, newdata, type = "response"){
       if (type == "response"){
         newdata_n = subset(node_data, select = -c(row_id))
         if(class(models[[node_id]]$model)[1] %in% c("elnet", "glmnet")){
+          newdata_n = newdata_n[, colnames(newdata_n) %in% rownames(models[[node_id]]$model$beta)]
           newdata_n = as.matrix(newdata_n)
         }
         y_hat = predict(models[[node_id]]$model, newdata_n)
@@ -42,6 +54,7 @@ extract_split_criteria = function(tree){
                         "id.parent" = NA,
                         "objective.value" = NA, 
                         "objective.value.parent" = NA,
+                        "r2" = NA,
                         "intImp" = NA, 
                         "split.feature" = "final", 
                         "split.value" = NA,
@@ -53,7 +66,8 @@ extract_split_criteria = function(tree){
                         "id.parent" = ifelse(is.null(node$id.parent), 0, node$id.parent),
                         "objective.value" = ifelse(is.null(node$objective.value), NA, node$objective.value),
                         "objective.value.parent" = ifelse(is.null(node$objective.value.parent), NA, node$objective.value.parent),
-                        "intImp" = ifelse(is.null(node$objective.value.parent), NA, node$intImp),
+                        "r2" = ifelse(is.null(node$r2), NA, node$r2),
+                        "intImp" = ifelse(is.null(node$intImp), NA, node$intImp),
                         "split.feature" = ifelse(is.null(node$split.feature), "leafnode", node$split.feature),
                         "split.value" = ifelse(is.null(node$split.value), NA, node$split.value),
                         "child.type" = ifelse(is.null(node$child.type), "rootnode", node$child.type),
@@ -71,7 +85,7 @@ extract_split_criteria = function(tree){
   df.split.criteria = df.split.criteria[df.split.criteria$child.type!="final",]
   df.split.criteria$id.node = 0:(nrow(df.split.criteria)-1)
   row.names(df.split.criteria) = df.split.criteria$id.node
-  df.split.criteria[] <- lapply(df.split.criteria, unlist)
+  df.split.criteria[] = lapply(df.split.criteria, unlist)
   # print(paste0("RSS:",(sum(unlist(df.split.criteria[df.split.criteria$split.feature=="leafnode",]$objective.value.parent)))))
   return(df.split.criteria)
 }
@@ -134,6 +148,7 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                                  min.node.size = min.node.size, 
                                  optimizer = optimizer,
                                  objective = objective, 
+                                 fit = fit,
                                  approximate = approximate, 
                                  n.quantiles = n.quantiles, 
                                  penalization = penalization, 
@@ -204,14 +219,14 @@ find_split_variable_anova = function(Y, X, objective, fit, split.method, penaliz
 
 
 find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer,
-                            objective, approximate = FALSE, n.quantiles, splitpoints = "quantiles", penalization = NULL, 
+                            objective, fit, approximate = FALSE, n.quantiles, splitpoints = "quantiles", penalization = NULL, 
                             fit.bsplines = FALSE, df.spline = NULL, ...) {
   # browser()
 # find best split point per splitting feature z
   opt.feature = lapply(z, function(feat) {
     t1 = proc.time()
     res = optimizer(xval = X[,feat], x = X, y = Y, n.splits = n.splits, min.node.size = min.node.size,
-                    objective = objective, n.quantiles = n.quantiles, splitpoints = splitpoints, penalization = penalization, 
+                    objective = objective, fit = fit, n.quantiles = n.quantiles, splitpoints = splitpoints, penalization = penalization, 
                     fit.bsplines = fit.bsplines, df.spline = df.spline, ...)
     t2 = proc.time()
     res$runtime = (t2 - t1)[[3]]
@@ -254,7 +269,7 @@ generate_node_index = function(Y, X, result) {
 
 
 # performs and evaluates binary splits
-find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, n.quantiles, splitpoints = "quantiles", ...) {
+find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, objective, fit, n.quantiles, splitpoints = "quantiles", ...) {
   if(length(unique(xval)) == 1){
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
   }
@@ -283,13 +298,14 @@ find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, 
   } else {
     split.points = q[best]
     split.type = "numerical"
+    
   }
   return(list(split.points = split.points, objective.value = splits[best], split.type = split.type))
 }
 
 # performs and evaluates binary splits with approximative efficient numerical algorithm (vgl. slim paper)
 find_best_binary_split_approx = function(xval, x, y, n.splits = 1, min.node.size = 10, 
-                                         objective, n.quantiles, penalization, 
+                                         objective, fit, n.quantiles, penalization, 
                                          fit.bsplines, df.spline, ...) {
   if(length(unique(xval)) == 1){
     return(list(split.points = NA, objective.value = Inf, split.type = "categorical"))
@@ -441,7 +457,8 @@ perform_split = function(split.points, xval, x, y, min.node.size, objective, ...
   res = vapply(seq_along(y.list), FUN = function(i) {
     objective(y = y.list[[i]], x = x.list[[i]])
   }, FUN.VALUE = NA_real_, USE.NAMES = FALSE)
-  sum(res)
+  
+  return(sum(res))
 }
 
 # perform and evaluate splits based on gram matrices
@@ -678,7 +695,7 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
 # objectives and fitting functions
 
 get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
-                        .exclude.categoricals, ...) {
+                        .exclude.categoricals, .type = "model", ...) {
   # browser()
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   
@@ -688,6 +705,7 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
   numeric.names = c()
   poly = c()
   splines = c()
+
   if (.degree.poly > 1) {
     numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > .degree.poly+1))]
     poly = paste0("poly(",numeric.names, ", degree =", .degree.poly,")")
@@ -700,7 +718,12 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
   fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], poly, splines), collapse = "+")))
   data = cbind(y,x)
   model = lm(fm, data)
-  return(model)
+  if(.type == "fitted.values"){
+    predictions = model$fitted.values
+    return(predictions)
+  } else{
+    return(model)
+  }
 }
 
 get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, .df.spline = 15,
@@ -709,7 +732,7 @@ get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, 
     x = x %>% select(where(~ !is.factor(.)))
   }
   model = get_model_lm(y, x, .degree.poly = .degree.poly, 
-                       .fit.bsplines = .fit.bsplines, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals)
+                       .fit.bsplines = .fit.bsplines, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals, .type = "model")
   sse = crossprod(model$residuals)
   return(sse)
 }
@@ -722,7 +745,7 @@ get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
   return(prediction)
 }
 
-get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.categoricals, .lambda, .df.max, ...) {
+get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.categoricals, .lambda, .df.max, .type = "model", ...) {
   y = unlist(y)
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
@@ -731,7 +754,7 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.ca
   if (.degree.poly > 1) {
     features = names(x)
     for(f in features){
-      if (is.numeric(x[[f]])){
+      if (is.numeric(x[[f]]) & (length(unique(x[[f]])) > .degree.poly+1)){
         for(d in 2:.degree.poly){
           x = cbind(x, "new" = x[[f]]^d)
           colnames(x)[which(names(x) == "new")] = paste0(f,"_",d)
@@ -764,17 +787,22 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.ca
     lambda = .lambda
   }
   
-  
+
   # cv.model = cv.glmnet(x, y, alpha = .alpha, family = .family)
   model = glmnet(x, y, alpha = .alpha, family = .family, lambda = lambda)
-  return(model)
+  if(.type == "fitted.values"){
+    predictions = predict.glmnet(model, newx = x, s = lambda)
+    return(predictions)
+  } else{
+    return(model)
+  }
 }
 
 get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclude.categoricals, .lambda, .df.max, ...) {
   model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha,
                            .degree.poly = .degree.poly, .exclude.categoricals, .exclude.categoricals = .exclude.categoricals,
                            .lambda = .lambda,
-                           .df.max = .df.max)
+                           .df.max = .df.max, .type = "model")
   y = unlist(y)
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
@@ -783,7 +811,7 @@ get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclu
   if (.degree.poly > 1) {
     features = names(x)
     for(f in features){
-      if (is.numeric(x[[f]])){
+      if (is.numeric(x[[f]]) & (length(unique(x[[f]])) > .degree.poly+1)){
         for(d in 2:.degree.poly){
           x = cbind(x, "new" = x[[f]]^d)
           colnames(x)[which(names(x) == "new")] = paste0(f,"_",d)
@@ -819,7 +847,7 @@ get_prediction_glmnet = function(model, x, .exclude.categoricals, ...) {
   return(prediction)
 }
 
-get_model_lad = function(y, x, .exclude.categoricals, ...){
+get_model_lad = function(y, x, .exclude.categoricals, .type = "model", ...){
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
     x = x %>% dplyr::select(where(~ !is.factor(.)))
@@ -827,45 +855,48 @@ get_model_lad = function(y, x, .exclude.categoricals, ...){
   fm = as.formula(paste("y~", paste(names(x), collapse = "+")))
   data = cbind(y,x)
   model = rq(fm, data = data, tau = 0.5)
-  return(model)
+  if(.type == "fitted.values"){
+    predictions = model$fitted.values
+    return(predictions)
+  } else{
+    return(model)
+  }
 }
 
 get_objective_lad = function(y, x, .exclude.categoricals,  ...){
   if (.exclude.categoricals){
     x = x %>% dplyr::select(where(~ !is.factor(.)))
   }
-  model = get_model_lad(y, x, .exclude.categoricals = .exclude.categoricals)
+  model = get_model_lad(y, x, .exclude.categoricals = .exclude.categoricals, .type = "model")
   sae = sum(abs(model$residuals))
   return(sae)
 }
 
 
 
-get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, ...) {
+get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, .type = "model", ...) {
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   term = c()
   for (n in names(x)){
-    if (is.numeric(x[,n])){
-      if(length(unique(x[,n])) < 10){
-        x[,n] = as.factor(x[,n])
-        newterm = n
-      } else {
-        newterm = n
-      }
+    newterm = n
+    if (is.numeric(x[,n]) & length(unique(x[,n])) > 10){
       newterm = paste0("s(", n, ")")    
-    } else {
-      newterm = n
     }
     term = c(term, newterm)
   }
   fm = as.formula(paste("y ~", paste(term, collapse = "+")))
   data = cbind(y,x)
   model = gam(formula = fm, data = data, family = .family, method = "REML")
-  return(model)
+  if(.type == "fitted.values"){
+    predictions = model$fitted.values
+    return(predictions)
+  } else{
+    return(model)
+  }
 }
 
 get_objective_gam = function(y, x, .family, .df.spline, .exclude.categoricals,  ...) {
-  model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals)
+  model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals, .type = "model")
   sse = crossprod(residuals(model))
   return(sse)
 }
@@ -875,5 +906,14 @@ get_prediction_gam = function(model, x, .exclude.categoricals, ...) {
   return(prediction)
 }
 
+# calculate r squared
+r_2 = function(y_true, y_hat){
+  y_true = unlist(y_true)
+  y_hat = unlist(y_hat)
+  rss = sum((y_hat - y_true) ^ 2)  ## residual sum of squares
+  tss = sum((y_true - mean(y_true)) ^ 2)  ## total sum of squares
+  r_2 = 1 - rss/tss
+  return(r_2)
+}
 
 
