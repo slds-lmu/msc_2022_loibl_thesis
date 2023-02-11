@@ -49,7 +49,7 @@ In step 3 SLIM performs an exhaustive search to find the optimal splitpoint.
 The optimisation problem in each recursion step is given by \begin{align}
     \min_{j \in 1,..., p} \left( \min_{s \in \mathcal{S}_j} \left(\min_{\theta_{l} \in \Theta}\sum_{i \in I_{l}(s)}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_{l})  +  \min_{\theta_{r} \in \Theta}\sum_{i \in I_{r}(s)}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_{r}) \right) \right),
 \end{align}
-where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $X_j$. For numeric variables, this set consists either of all unique values contained in the vector $X_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, $I_{l}$ is than defined as the set of indices $i \in 1,...,n$ for which $X_{ij} \leq s_{j}$ holds and $I_{r}$ is its complement. 
+where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $X_j$. For numeric variables, this set consists either of all unique values of $X_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, $I_{l}$ is than defined as the set of indices $i \in 1,...,n$ for which $X_{ij} \leq s$ holds and $I_{r}$ is its complement. For categorical variables, one subgroup of all possibilities of dividing the levels of $X_{j}$ into two subgroups are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $X_{ij} \in s$ applies and and $I_{r}$ is its complement.
 
 
 
