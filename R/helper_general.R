@@ -1,6 +1,6 @@
 # Helper functions
 
-predict_slim = function(tree, newdata, type = "response", degree.poly = 1){
+predict_slim = function(tree, newdata, type = "response", degree.poly = 1, fit.bsplines = FALSE, df.spline = 15){
   if(type == "response"){
     models = extract_models(tree)
   }
@@ -16,7 +16,7 @@ predict_slim = function(tree, newdata, type = "response", degree.poly = 1){
         }
       }
     }
-  }
+  } 
   newdata = as.data.table(newdata)
   newdata$row_id = 1:nrow(newdata)
   
@@ -28,6 +28,17 @@ predict_slim = function(tree, newdata, type = "response", degree.poly = 1){
       if (type == "response"){
         newdata_n = subset(node_data, select = -c(row_id))
         if(class(models[[node_id]]$model)[1] %in% c("elnet", "glmnet")){
+          if(fit.bsplines){
+            features = names(newdata_n)
+            for(f in features){
+              if (is.numeric(newdata_n[[f]])){
+                splined = bs(newdata_n[[f]], df = df.spline, degree = 1)
+                df_splined = as.data.frame(splined)
+                newdata_n[[f]]= NULL
+                newdata_n = cbind(newdata_n, df_splined)
+              }
+            }
+          }
           newdata_n = newdata_n[, colnames(newdata_n) %in% rownames(models[[node_id]]$model$beta)]
           newdata_n = as.matrix(newdata_n)
         }
@@ -745,7 +756,7 @@ get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
   return(prediction)
 }
 
-get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.categoricals, .lambda, .df.max, .type = "model", ...) {
+get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .df.spline, .fit.bsplines, .exclude.categoricals, .lambda, .df.max, .type = "model", ...) {
   y = unlist(y)
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
@@ -761,7 +772,18 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.ca
         }
       }
     }
+  } else if(.fit.bsplines){
+    features = names(x)
+    for(f in features){
+      if (is.numeric(x[[f]])){
+        splined = bs(x[[f]], df = .df.spline, degree = 1)
+        df_splined = as.data.frame(splined)
+        x[[f]]= NULL
+        x = cbind(x, df_splined)
+      }
+    }
   }
+  
   factor.names = names(x)[sapply(x,class) == "factor"]
   if (length(factor.names) > 0){
     xfactors = model.matrix(as.formula(paste("y ~", paste(factor.names, collapse = "+"))), data = cbind(y,x))[, -1]
@@ -798,9 +820,10 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .exclude.ca
   }
 }
 
-get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclude.categoricals, .lambda, .df.max, ...) {
+get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .df.spline, .use.bsplines, .exclude.categoricals, .lambda, .df.max, ...) {
   model = get_model_glmnet(y, x, .family = .family , .alpha = .alpha,
-                           .degree.poly = .degree.poly, .exclude.categoricals, .exclude.categoricals = .exclude.categoricals,
+                           .degree.poly = .degree.poly, .df.spline = .df.spline, .fit.bsplines = .fit.bsplines,
+                           .exclude.categoricals, .exclude.categoricals = .exclude.categoricals,
                            .lambda = .lambda,
                            .df.max = .df.max, .type = "model")
   y = unlist(y)
@@ -818,7 +841,18 @@ get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclu
         }
       }
     }
+  } else if(.fit.bsplines){
+    features = names(x)
+    for(f in features){
+      if (is.numeric(x[[f]])){
+        splined = bs(x[[f]], df = .df.spline, degree = 1)
+        df_splined = as.data.frame(splined)
+        x[[f]]= NULL
+        x = cbind(x, df_splined)
+      }
+    }
   }
+  
   factor.names = names(x)[sapply(x,class) == "factor"]
   if (length(factor.names) > 0){
     xfactors = model.matrix(as.formula(paste("y ~", paste(factor.names, collapse = "+"))), data = cbind(y,x))[, -1]
@@ -832,7 +866,7 @@ get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .exclu
 
   if(.alpha == 1){
     loss = sum((y - predictions)^2) + model$lambda * sum(abs(coefs[-1]))
-  } else if (.alpha == 2){
+  } else if (.alpha == 0){
     loss = sum((y - predictions)^2) + model$lambda * sum((coefs[-1])^2)
   }
 
@@ -906,6 +940,8 @@ get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, .type
 get_objective_gam = function(y, x, .family, .df.spline, .exclude.categoricals,  ...) {
   model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals, .type = "model")
   loss = crossprod(residuals(model))
+  # use the negative log likelihood (we actually need the penalized log likelihood)
+  # loss = -logLik.gam(model)
   return(loss)
 }
 

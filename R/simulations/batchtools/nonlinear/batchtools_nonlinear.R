@@ -35,7 +35,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = NULL, 
-  repls = 50)
+  repls = 30)
 
 summarizeExperiments()
 testJob(1)
