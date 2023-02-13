@@ -84,10 +84,10 @@ reduce_trees = function(ades, pdes, savedir, reg){
     if("stability" %in% colnames(res_df)){
       # create all possible pairs of simulation repititions
       pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
-      set.seed(1)
-      pair_ids_subset = sample(seq_along(pair_ids), 5000)
+      # set.seed(1)
+      # pair_ids_subset = sample(seq_along(pair_ids), 5000)
       set_index = rep(1:100,50)
-      pair_ids = pair_ids[pair_ids_subset]
+      # pair_ids = pair_ids[pair_ids_subset]
       # function to calculate gaussian radial basis function (to measure semantic stability)
       stability_list = lapply(seq_along(pair_ids), function(p){
         pair = pair_ids[[p]]
