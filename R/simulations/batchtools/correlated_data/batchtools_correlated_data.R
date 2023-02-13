@@ -20,9 +20,6 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/correlated_
 source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
-repls = 50L
-set.seed(49)
-
 
 addProblem(name = "correlated_data", fun = create_sim_data, reg = reg, seed = 123)
 pdes = list("correlated_data" = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9)))
@@ -44,7 +41,7 @@ addExperiments(
 
 summarizeExperiments()
 testJob(5)
-submitJobs(151:750,reg = reg)
+submitJobs(1:750,reg = reg)
 
 
 # pars = unwrap(getJobPars(reg = reg))

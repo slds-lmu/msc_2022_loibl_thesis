@@ -10,7 +10,7 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/lasso/batch
                                         "R/simulations/batchtools/helper_simulations.R",
                                         "R/simulations/batchtools/lasso/helper_simulations_lasso.R"),
                              seed = 1
-                             # , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
+                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
 )
 # reg = loadRegistry("Data/simulations/batchtools/lasso/batchtools", writeable = TRUE, conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
 
@@ -37,7 +37,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = NULL, 
-  repls = 250)
+  repls = 100)
 
 summarizeExperiments()
 testJob(1)
