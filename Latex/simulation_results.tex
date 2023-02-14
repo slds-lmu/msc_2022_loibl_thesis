@@ -149,10 +149,15 @@ CTree & 0.050 & 13.76 & 11 & 16 & 0.9905 & 6e-04 & 0.9885 & 0.0010\\
 \end{frame}
 
 
+\begin{frame}{Linear Smooth - Interpretability}
+Comparison of MBTs used as surrogate models on lm predictions vs. used as stand alone models 
+\begin{figure}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_int.pdf}
+\end{figure}  
+\end{frame}
 
 
-
-\begin{frame}{Linear Smooth}
+\begin{frame}{Linear Smooth - Performance}
 \begin{figure}
 \caption{Simulation results of stand alone MBTs on Scenario Linear Smooth with $n = 1000, alpha = 0.001, impr = 0.1$}
     \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_nleaves.pdf}
@@ -161,14 +166,23 @@ CTree & 0.050 & 13.76 & 11 & 16 & 0.9905 & 6e-04 & 0.9885 & 0.0010\\
     
 \end{frame}
 
-\begin{frame}{Linear Smooth}
+\begin{frame}{Linear Smooth - Performance}
 \begin{figure}
     \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_train.pdf}
 \end{figure}  
     
 \end{frame}
 
-\begin{frame}{Linear Smooth}
+
+\begin{frame}{Linear Smooth - Stability}
+\begin{figure}
+\caption{Stability simulation results of stand alone MBTs on Scenario Linear Smooth with $n = 1000, alpha = 0.001, impr = 0.1$. Only RI values for pairs with the same number of leaf nodes are considered.}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_overview.pdf}
+\end{figure}  
+    
+\end{frame}
+
+\begin{frame}{Linear Smooth - Stability}
 \begin{figure}
     \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_sta.pdf}
 \end{figure}  
@@ -176,12 +190,7 @@ CTree & 0.050 & 13.76 & 11 & 16 & 0.9905 & 6e-04 & 0.9885 & 0.0010\\
 \end{frame}
 
 
-\begin{frame}{Linear Smooth}
-\begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_overview.pdf}
-\end{figure}  
-    
-\end{frame}
+
 
 \begin{frame}{Linear Smooth}
 \textbf{Observations:}
@@ -199,26 +208,8 @@ Select a smaller maximum tree depth and a larger min node size in order to avoid
     
 \end{frame}
 
-\begin{frame}{Linear Smooth - Interpretability}
-Comparison of MBTs used as surrogate models on lm predictions vs. used as stand alone models 
-\begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_lm_int.pdf}
-\end{figure}  
-\end{frame}
-
-\begin{frame}{Linear Smooth - Performance}
-\begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_lm_r2_train.pdf}
-\end{figure}  
-\end{frame}
 
 
-\begin{frame}{Linear Smooth - Stability}
-
-\begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_lm_sta.pdf}
-\end{figure}  
-\end{frame}
 
 \begin{frame}{Linear Abrupt}
 \textbf{Data:}
