@@ -34,6 +34,7 @@ predict_slim = function(tree, newdata, type = "response", degree.poly = 1, fit.b
               if (is.numeric(newdata_n[[f]])){
                 splined = bs(newdata_n[[f]], df = df.spline, degree = 1)
                 df_splined = as.data.frame(splined)
+                colnames(df_splined) = paste0(f,"_",colnames(df_splined))
                 newdata_n[[f]]= NULL
                 newdata_n = cbind(newdata_n, df_splined)
               }
@@ -779,6 +780,7 @@ get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .df.spline,
         splined = bs(x[[f]], df = .df.spline, degree = 1)
         df_splined = as.data.frame(splined)
         x[[f]]= NULL
+        colnames(df_splined) = paste0(f,"_",colnames(df_splined))
         x = cbind(x, df_splined)
       }
     }
@@ -847,6 +849,7 @@ get_objective_glmnet = function(y, x, .family , .alpha, .degree.poly = 1, .df.sp
       if (is.numeric(x[[f]])){
         splined = bs(x[[f]], df = .df.spline, degree = 1)
         df_splined = as.data.frame(splined)
+        colnames(df_splined) = paste0(f,"_",colnames(df_splined))
         x[[f]]= NULL
         x = cbind(x, df_splined)
       }

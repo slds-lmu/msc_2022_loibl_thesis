@@ -9,7 +9,7 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/nonlinear/b
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/batchtools/nonlinear/helper_simulations_nonlinear.R"),
                              seed = 1
-                             # , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
+                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
 )
 
 
@@ -20,7 +20,7 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 # add problems and setting definitions
 
 addProblem(name = "nonlinear_data", fun = create_sim_data, reg = reg, seed = 123)
-pdes = list("nonlinear_data" = data.frame(n = c(7500), type = c("nonlinear_mixed")))
+pdes = list("nonlinear_data" = data.frame(n = c(4500), type = c("nonlinear_mixed")))
 
 
 # add algorithm
@@ -39,4 +39,6 @@ addExperiments(
 
 summarizeExperiments()
 testJob(1)
-submitJobs(resources = list(walltime = 9000))
+
+submitJobs()
+# submitJobs(resources = list(walltime = 9000))

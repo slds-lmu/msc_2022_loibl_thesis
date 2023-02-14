@@ -138,6 +138,9 @@ reduce_trees = function(ades, pdes, savedir, reg){
       
       res_mean_exp = ljoin(res_mean_exp, stability_mean)
       res_sd_exp = ljoin(res_sd_exp, stability_sd)
+      
+    } else if(!("stability" %in% colnames(res_df))){
+      saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
     }
     
     if("x_wrong" %in% colnames(res_df)){
@@ -186,37 +189,37 @@ reduce_trees = function(ades, pdes, savedir, reg){
 
 
 
-# basic scenarios
-reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
-                         # ,conf.file = NA
-                         )
-
-ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
-pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
-
-savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_test/"
-
-result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
-
-
-
-
-
-
-# # correlated data
+# # basic scenarios
+# reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
+#                          # ,conf.file = NA
+#                          )
 # 
-# reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
-#                         ,conf.file = NA
-# )
-# ades_corr = NULL
-# pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9))
+# ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
+# pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
 # 
-# savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
+# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_test/"
 # 
-# result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)$mean
-# 
-# 
-# result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")$mean
+# result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
+
+
+
+
+
+
+# correlated data
+
+reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
+                        ,conf.file = NA
+)
+ades_corr = NULL
+pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9))
+
+savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
+
+result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)$mean
+
+
+result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")$mean
 # 
 # 
 # 
