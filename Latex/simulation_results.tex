@@ -101,80 +101,54 @@ $\Rightarrow 3 \cdot 3 \cdot 3 \cdot 3 = 81$ Experiments for each MBT algorithm
 \begin{frame}{Linear Smooth}
 \textbf{Comparison of MBTs as stand alone models}
 \begin{table}
-\caption{Mean simulation results on 100 simulation runs for \textbf{SLIM} as stand alone model on scenario Linear smooth with n = 1000 for different values of impr}
-\centering 
-\begin{tabular}[t]{r|r|r|r|r}
+\caption{Mean simulation results on 100 simulation runs for \textbf{SLIM} and \textbf{GUIDE} as stand alone model on scenario Linear smooth with $n = 1000$ for different values of $impr$}
+\centering \tiny
+\begin{tabular}[t]{r|r|r|r|r|r|r|r|r}
 \hline
-impr & number of leaf nodes & R2 train & R2 test & ARI\\
+MBT & impr & mean n leaves & n leaves min & n leaves max & mean R2 train & sd R2 train & mean R2 test & sd R2 test\\
 \hline
-0.15 & 2.27 & 0.9587 & 0.9561 & 0.4734\\
+SLIM & 0.15 & 2.27 & 2 & 5 & 0.9584 & 0.0072 & 0.9557 & 0.0076\\
 \hline
-0.10 & 10.08 & 0.9856 & 0.9831 & 0.2670\\
+SLIM & 0.10 & 10.09 & 5 & 15 & 0.9860 & 0.0057 & 0.9835 & 0.0059\\
 \hline
-0.05 & 14.57 & 0.9908 & 0.9885 & 0.3259\\
+SLIM & 0.05 & 14.75 & 12 & 18 & 0.9909 & 0.0006 & 0.9884 & 0.0009\\
+\hline
+GUIDE & 0.15 & 2.25 & 2 & 5 & 0.9582 & 0.0071 & 0.9555 & 0.0072\\
+\hline
+GUIDE & 0.10 & 9.81 & 5 & 14 & 0.9859 & 0.0058 & 0.9834 & 0.0060\\
+\hline
+GUIDE & 0.05 & 14.60 & 11 & 17 & 0.9907 & 0.0006 & 0.9883 & 0.0009\\
 \hline
 \end{tabular}
 \end{table}
-
 
 \begin{table}
 
-\caption{Mean simulation results on 100 simulation runs for \textbf{GUIDE} as stand alone model on scenario Linear smooth with n = 1000 for different values of impr}
-\centering 
-\begin{tabular}[t]{r|r|r|r|r}
+\caption{Mean simulation results on 100 simulation runs for \textbf{SLIM} and \textbf{GUIDE} as stand alone model on scenario Linear smooth with $n = 1000$ for different values of $alpha$}
+\centering \tiny
+\begin{tabular}[t]{r|r|r|r|r|r|r|r|r}
 \hline
-impr & number of leaf nodes & R2 train & R2 test & ARI\\
+MBT & alpha & mean n leaves & n leaves min & n leaves max & mean R2 train & sd R2 train & mean R2 test & sd R2 test\\
 \hline
-0.15 & 2.25 & 0.9584 & 0.9560 & 0.5214\\
+MOB & 0.001 & 9.48 & 8 & 13 & 0.9898 & 7e-04 & 0.9876 & 0.0011\\
 \hline
-0.10 & 9.70 & 0.9856 & 0.9830 & 0.2940\\
+MOB & 0.010 & 11.02 & 8 & 14 & 0.9902 & 7e-04 & 0.9879 & 0.0011\\
 \hline
-0.05 & 14.49 & 0.9907 & 0.9884 & 0.3221\\
+MOB & 0.050 & 12.54 & 9 & 15 & 0.9906 & 6e-04 & 0.9882 & 0.0010\\
+\hline
+CTree & 0.001 & 11.35 & 9 & 14 & 0.9900 & 6e-04 & 0.9881 & 0.0010\\
+\hline
+CTree & 0.010 & 12.74 & 10 & 15 & 0.9904 & 6e-04 & 0.9884 & 0.0010\\
+\hline
+CTree & 0.050 & 13.76 & 11 & 16 & 0.9905 & 6e-04 & 0.9885 & 0.0010\\
 \hline
 \end{tabular}
 \end{table}
+
     
 \end{frame}
 
 
-
-
-\begin{frame}{Linear Smooth}
-\begin{table}
-
-\caption{Mean simulation results on 100 simulation runs for \textbf{MOB} as stand alone model on scenario Linear smooth with n = 1000 for different values of alpha}
-\centering 
-\begin{tabular}[t]{r|r|r|r|r}
-\hline
-alpha & number of leaf nodes & R2 train & R2 test & ARI\\
-\hline
-0.001 & 9.65 & 0.9899 & 0.9876 & 0.3473\\
-\hline
-0.01 & 10.96 & 0.9903 & 0.9879 & 0.3404\\
-\hline
-0.05 & 12.51 & 0.9906 & 0.9883 & 0.3691\\
-\hline
-\end{tabular}
-\end{table} 
-
-
-\begin{table}
-
-\caption{Mean simulation results on 100 simulation runs for \textbf{CTree} as stand alone model on scenario Linear smooth with n = 1000 for different values of alpha}
-\centering 
-\begin{tabular}[t]{r|r|r|r|r}
-\hline
-alpha & number of leaf nodes & R2 train & R2 test & ARI\\
-\hline
-0.001 & 11.51 & 0.9901 & 0.9881 & 0.3764\\
-\hline
-0.01 & 12.89 & 0.9904 & 0.9884 & 0.3657\\
-\hline
-0.05 & 13.75 & 0.9905 & 0.9885 & 0.3633\\
-\hline
-\end{tabular}
-\end{table}
-\end{frame}
 
 
 
@@ -207,7 +181,7 @@ For  $alpha= 0.001$ and $impr = 0.1$ the mean number of leaf nodes nodes is simi
     \item All four algorithms achieve good performance
     \item The number of leaf nodes is high considering that the data generating process is very simple and involves only one interaction (increases even more with larger n)    
     \item SLIM and GUIDE are very sensitive regarding the choice of impr
-    \item  If alpha and impr are chosen in this scenario so that the mean number of leaf nodes is similar, MOB and GUIDE provide more stable MBTs and have a better performance.
+    \item  given the number of leave nodes is identical, MOB and GUIDE provide more stable MBTs and have a better performance.
 
 \end{itemize}
 
