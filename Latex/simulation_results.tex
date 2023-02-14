@@ -230,64 +230,54 @@ Select a smaller maximum tree depth and a larger min node size in order to avoid
 
 \begin{frame}{Linear Abrupt}
 \textbf{Comparison of MBTs as stand alone models}
-
-\begin{table}
-\caption{Mean simulation results on 100 simulation runs for \textbf{SLIM} and \textbf{GUIDE}  as stand alone model on scenario Linear abrupt with n = 1000 for different values of impr }
-\centering
-\begin{tabular}[t]{r|r|r|r|r}
-\hline
-impr & number of leaf nodes & R2 train & R2 test & ARI\\
-\hline
-0.15 & 2.01 & 0.8283 & 0.8255 & 0.9950\\
-\hline
-0.10 & 4.00 & 0.9889 & 0.9876 & 0.9742\\
-\hline
-0.05 & 4.00 & 0.9892 & 0.9878 & 0.9735\\
-\hline
-\end{tabular}
-\end{table}    
-
-Results of SLIM and GUIDE are identical in this special case
-\end{frame}
-
-\begin{frame}{Linear Abrupt}
-
 \begin{table}
 
-\caption{Mean simulation results on 100 simulation runs for \textbf{MOB} as stand alone model on scenario Linear abrupt with n = 1000 for different values of impr }
-\centering
-\begin{tabular}[t]{r|r|r|r|r}
+\caption{Mean simulation results on 100 simulation runs for \textbf{SLIM} and \textbf{GUIDE}  as stand alone model on scenario Linear abrupt with $n = 1000$ for different values of $impr$}
+\centering \tiny
+\begin{tabular}[t]{r|r|r|r|r|r|r|r|r}
 \hline
-alpha & number of leaf nodes & R2 train & R2 test & ARI\\
+MBT & impr & mean n leaves & n leaves min & n leaves max & mean R2 train & sd R2 train & mean R2 test & sd R2 test\\
 \hline
-0.001 & 12.83 & 0.9660 & 0.9554 & 0.5520\\
+SLIM & 0.15 & 2.00 & 2 & 2 & 0.8272 & 0.0071 & 0.8250 & 0.0111\\
 \hline
-0.010 & 14.24 & 0.9736 & 0.9640 & 0.5544\\
+SLIM & 0.10 & 3.99 & 3 & 4 & 0.9884 & 0.0069 & 0.9870 & 0.0078\\
 \hline
-0.050 & 14.84 & 0.9751 & 0.9660 & 0.5555\\
+SLIM & 0.05 & 4.00 & 4 & 4 & 0.9891 & 0.0010 & 0.9878 & 0.0028\\
 \hline
-\end{tabular}
-\end{table}  
-
-\begin{table}
-
-\caption{Mean simulation results on 100 simulation runs for \textbf{CTree} as stand alone model on scenario Linear abrupt with n = 1000 for different values of impr }
-\centering
-\begin{tabular}[t]{r|r|r|r|r}
+GUIDE & 0.15 & 2.00 & 2 & 2 & 0.8272 & 0.0071 & 0.8250 & 0.0111\\
 \hline
-alpha & number of leaf nodes & R2 train & R2 test & ARI\\
+GUIDE & 0.10 & 3.99 & 3 & 4 & 0.9884 & 0.0069 & 0.9870 & 0.0078\\
 \hline
-0.001 & 11.96 & 0.9489 & 0.9384 & 0.6427\\
-\hline
-0.010 & 12.74 & 0.9501 & 0.9397 & 0.6316\\
-\hline
-0.050 & 13.59 & 0.9511 & 0.9409 & 0.6105\\
+GUIDE & 0.05 & 4.00 & 4 & 4 & 0.9891 & 0.0010 & 0.9878 & 0.0028\\
 \hline
 \end{tabular}
 \end{table}
 
-No configuration is included where the average number of leaf nodes matches between the MBTs.
+\begin{table}
+\caption{Mean simulation results on 100 simulation runs for \textbf{MOB} and \textbf{CTree}  as stand alone model on scenario Linear abrupt with $n = 1000$ for different values of $alpha$}
+\centering \tiny
+\begin{tabular}[t]{r|r|r|r|r|r|r|r|r}
+\hline
+MBT & alpha & mean n leaves & n leaves min & n leaves max & mean R2 train & sd R2 train & mean R2 test & sd R2 test\\
+\hline
+MOB & 0.001 & 12.77 & 10 & 15 & 0.9661 & 0.0083 & 0.9558 & 0.0091\\
+\hline
+MOB & 0.010 & 14.40 & 12 & 16 & 0.9736 & 0.0067 & 0.9641 & 0.0076\\
+\hline
+MOB & 0.050 & 14.85 & 13 & 17 & 0.9747 & 0.0063 & 0.9654 & 0.0071\\
+\hline
+CTree & 0.001 & 11.87 & 10 & 14 & 0.9484 & 0.0030 & 0.9390 & 0.0052\\
+\hline
+CTree & 0.010 & 12.82 & 11 & 15 & 0.9498 & 0.0030 & 0.9404 & 0.0051\\
+\hline
+CTree & 0.050 & 13.61 & 11 & 16 & 0.9508 & 0.0029 & 0.9411 & 0.0048\\
+\hline
+\end{tabular}
+\end{table}
+
 \end{frame}
+
+
 
 \section{Linear Abrupt}
 \begin{frame}{Linear Abrupt - Interpretability}
