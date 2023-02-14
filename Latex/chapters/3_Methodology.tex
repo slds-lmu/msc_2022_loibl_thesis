@@ -1,10 +1,10 @@
-\subsection{Model}
-Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((Y, \mathbf{X}), \theta)$ be a parametric model, that describes the response $Y$ as a function of a feature matrix $X$  and a vector of parameters $\theta$. When the model is used as a surrogate model, $Y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, we use the notation $\hat{Y}^{bb}$. Given $n$ observations $Y_i(i = 1,...,n)$ the model can be fitted by minimizing some objective function $\Psi((Y, X), \theta)$ yielding the parameter estimate $\hat{\theta}$
+\subsection{Model and Notation}
+Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((\mathbf{y}, \mathbf{x}), \theta)$ be a parametric model, that describes the target $\mathbf{y} \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x} = (\mathbf{x_1}, ... \mathbf{x_p})^T \in \mathcal{X}$  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $\mathbf{y}$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, we use the notation $\mathbf{y}^{bb}$. Given $n$ observations $(\mathbf{y}, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((\mathbf{y}, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
 \begin{align}
-    \hat{\theta} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(Y_{i}, \mathbf{X}_{i}, \theta).
+    \hat{\mathbf{\theta}} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta).
 \end{align}
 
-In this paper, $\mathcal{M}((Y, X), \theta)$ is restricted to regression models, which include only main-effect models. However, if the data includes interactions, a single global model is not sufficient to fit all n observations well.  To deal with the interactions, one can partition the feature space $X$ into subregions $\{\mathcal{B}_b\}_{b = 1,...,B}$ and search for locally well fitting main-effect models in these regions. The global objective function thus expands to
+In this thesis we restrict $\mathcal{M}((\mathbf{y}, \mathbf{x}), \theta)$ to regression models, which include only main-effect models. However, if the data includes interactions, a single global model is not sufficient to fit all $n$ observations well.  To deal with interactions, the idea is to partition the feature space $\mathcal{X}$ into subregions $\{\mathcal{B}_b\}_{b = 1,...,B}$ and search for locally well fitting main-effect models in these regions. The global objective function thus expands to
 \begin{align}
     \sum_{b=1}^B\sum_{i \in I_b}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_b)
 \end{align}
@@ -15,15 +15,15 @@ and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with correspond
 
 
 \subsection{Model-based Trees}
-In this chapter, four algorithms are described that aim to find a partition that is close to the optimal one and the associated estimators for $\theta_b$ through binary recursive partitioning. This approach involves a greedy forward search to optimize the objective function $\Psi$ locally in each step \citep{Zeileis.2008}.  
-The resulting global models are called Model-based Trees (MBT)
+In this chapter, four algorithms are described that aim to find a partition that is close to the optimal one and the associated estimators for $\theta_b$ through binary recursive partitioning. All approachs use a greedy forward search to optimize the objective function $\Psi$ locally in each step \citep{Zeileis.2008}.  
+The resulting global models are called Model-based Trees (MBT).
 
 
 
 A recursive partitioning algorithm for MBTs can generally be divided into the following steps:
 \begin{enumerate}
     \item Start with the partition (node) $I_0 = 1,...,n$
-    \item Fit the model to all observations in the current node $\{y_{i}, \mathbf{x}_{i}\}, i \in I_b$ by estimating $\hat{\theta}_b$ via minimization of the objective function $\Psi$
+    \item Fit the model to all observations in the current node $\{y^{i}, \mathbf{x}^{i}\}, i \in I_b$ by estimating $\hat{\theta}_b$ via minimization of the objective function $\Psi$
     \item Find the local optimal splitpoint for this node 
     \item If no stop criterion is met (e.g. depth of the tree, improvement of the objective through split, significance of parameter instability) split the node in two child nodes and repeat the steps 2-4.
 \end{enumerate}
@@ -44,14 +44,14 @@ MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of
 \subsubsection{SLIM}
 \citep{Hu.2020} pursue exactly the goal of this paper with the Surrogate locally interpretable models (SLIM) method, that is: Using predictions of a blackbox models to train a MBT surrogate model, that contains only main effect effect models in the leafnodes. SLIM is flexible in the choice of the objective, i.e. different main effect models can be fitted in the nodes. If the main effect are fitted well, only interactions between variables should be taken into account by splitting. 
 
-After fitting the model to all observations in step 2 the  loss function is calculated, e.g. the sum of squared errors (SSE).
+After fitting the model to all observations in step 2 the  objective function is calculated, e.g. the sum of squared errors (SSE).
 In step 3 SLIM performs an exhaustive search to find the optimal splitpoint.  
-The optimisation problem in each recursion step is given by \begin{align} \label{align:mob_opitimization}
-    \min_{j \in 1,..., p} \left( \min_{s \in \mathcal{S}_j} \left(\min_{\theta_{l} \in \Theta}\sum_{i \in I_{l}(s)}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_{l})  +  \min_{\theta_{r} \in \Theta}\sum_{i \in I_{r}(s)}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_{r}) \right) \right),
+The optimisation problem in each recursion step includes the optimization of the objective of the left node and the right node and is given by \begin{align} \label{align:mob_opitimization}
+    \min_{j \in 1,..., p} \left( \min_{s \in \mathcal{S}_j} \left(\min_{\theta_{l} \in \Theta}\sum_{i \in I_{l}(s)}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{l})  +  \min_{\theta_{r} \in \Theta}\sum_{i \in I_{r}(s)}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{r}) \right) \right),
 \end{align}
-where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $X_j$. For numeric variables, this set consists either of all unique values of $X_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, $I_{l}$ is defined as the set of indices $i \in 1,...,n$ for which $X_{ij} \leq s$ holds and $I_{r}$ is its complement. For categorical variables, one subgroup of all possibilities of dividing the levels of $X_{j}$ into two subgroups are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $X_{ij} \in s$ applies and and $I_{r}$ is its complement.
+where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $\mathbf{x}_j$. For numeric variables, this set consists either of all unique values of $\mathbf{x}_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, the left node $I_{l}$ is defined as the set of indices $i \in 1,...,n$ for which $x_j^{(i)} \leq s$ holds and the right node $I_{r}$ is its complement. For categorical variables, one subgroup of all possibilities of dividing the levels of $\mathbf{x}_j$ into two disjoint sets are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $x_j^{(i)} \in s$ applies and and $I_{r}$ is its complement.
 
-The variable $X_j$ and split point $s$ which minimize  \ref{align:mob_opitimization} are selected as splitting variable and split point, if this leads to an improvement of the objective function.
+The variable $\mathbf{x}_j$ and split point $s$ which minimize  \ref{align:mob_opitimization} are selected as splitting variable and split point, if this leads to an improvement of the objective function.
 
 Since the computational effort for estimating all possible child models becomes very large as the number of possible partitioning variables increases, \citep{Hu.2020} have developed an efficient algorithm for estimating them for the case of linear regression, GAMS and ridge regression. A detailed description of this algorithm can be found in \citep{Hu.2020}.
 
@@ -74,7 +74,7 @@ To investigate this, the so called score $\psi$ function is considered, which is
 gradient of the objective function regarding the parameter vector $\theta_b$ - provided that it exists:
 
 \begin{align}
-    \psi \left( \left( Y, \mathbf{X} \right), \theta_b \right) = \frac{\partial \Psi\left( \left( Y, \mathbf{X} \right), \theta_b \right)}{\partial \theta_b}.
+    \psi \left( \left(\mathbf{y}, \mathbf{x} \right), \theta_b \right) = \frac{\partial \Psi\left( \left(\mathbf{y}, \mathbf{x} \right), \theta_b \right)}{\partial \theta_b}.
 \end{align}
 
 \citep{Zeileis.2008}
@@ -83,27 +83,35 @@ If the scores - ordered by the potential split variable - do not fluctuate rando
 To test the null hypothesis of parameter stability with the so called $M$-fluctuation test, MOB captures systematic deviations from zero through the empirical fluctuation process
 
 \begin{align}\label{align:W_j}
-    W_{j}(t) = \hat{J}^{-1/2}n^{-1/2}\sum_{i = 1}^{\lfloor nt \rfloor} \hat{\psi}_{\sigma(X_{ij})} \hspace{0.5cm} (0 \leq t \leq 1), 
+    W_{j}(t) = \hat{J}^{-1/2}n^{-1/2}\sum_{i = 1}^{\lfloor nt \rfloor} \hat{\psi}_{\sigma(x_{j}^{(i)})} \hspace{0.5cm} (0 \leq t \leq 1), 
 \end{align}
 
-where $\hat{\psi}_{\sigma(X_{ij})}$ are the scores ordered by $X_{j}$ and $\hat{J}$ is an estimate of the covariance matrix $cov(\psi(Y, \hat(\theta)))$. \citep{Zeileis.2008}
+where $\hat{\psi}_{\sigma(x_{j}^{(i)})}$ are the scores ordered by $\mathbf{x}_{j}$ and $\hat{J}$ is an estimate of the covariance matrix $cov(\psi(Y, \hat{\theta}))$. \citep{Zeileis.2008}
 
-MOB generally distinguishes between regressor variables $X$, which are only used to fit the models in the nodes, and pure partitioning variables $Z$, but does not exclude overlap. In our case, there is no such distinction necessary, as all covariates can fulfil both functions.  They can be used as main effects in the regression models and as splitting variables for the correction of interactions and therefore, in contrast to the definition in \citep{Zeileis.2008}, $Z = X$ was set in \ref{align:W_j}.
+MOB generally distinguishes between regressor variables $\mathbf{x}$, which are only used to fit the models in the nodes, and pure partitioning variables $\mathbf{z}$, but does not exclude overlap. In our case, there is no such distinction necessary, as all covariates can fulfil both functions.  They can be used as main effects in the regression models and as splitting variables for the correction of interactions and therefore, in contrast to the definition in \citep{Zeileis.2008}, $z = x$ was set in \ref{align:W_j}.
 
 
 According to \citep{Zeileis.2008} and \citep{Zeileis.2007}, under the null hypothesis of parameter stability the empirical fluctuation process $W_j(t)$ converges to a Brownian Bridge $W_0$. By applying a scalar test function to the empirical fluctuation process and the Brownian Bridge, a test statistic and the theoretical limiting distribution can be derived. An overview of possible scalar functions that can be used for this purpose can be found in \citep{Zeileis.2008} and in more detail in \citep{Zeileis.2007}.
+The variable for which the M-fluctuation test detects the most significant parameter instability is used as splitting variable. The choice of the optimal split point with respect to this variable is then made by means of an exhaustive search, analogous to slim
 
-With MOB, only objective functions can be selected for which the gradient regarding $\theta_b$  exists. This means, for example, that it is not possible to adapt LASSO models in the nodes.
+
+A limitation of MOB that is considerably for this thesis is
+that only objective functions can be selected for which the gradient regarding $\theta_b$  exists. This means, for example, that it is not possible to fit LASSO models in the nodes.
 
 
 
 \subsubsection{CTree}
 Ctree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
-CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $g()$ of the response $Y$.
-A common transformation used in MBTs is the score function, but another transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
+CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $h()$ of the response $\textbf{y}$.
+A common transformation used in MBTs is the score function, i.e. $h(\textbf{y}) = \psi$, but another transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
 
 To test the independence between the scores and the potential partition variables, Ctree uses a linear association test.
 
+To measure the association between the scores $\textbf{y}$ and a potential splitting variable $\textbf{x}_{j}, j = 1,...,p$ a linear statistics of the form 
+\begin{align}
+    T_{j}(\textbf{y},\textbf{x}) = vec\left(\sum_{i=1}^n \textbf{x}_j^{(i)}\hat{\psi}^{(i)}^T\right) \in \mathbb{R}^{p_{j}q}
+\end{align}
+is used. \citep{Hothorn.2006}
 
 \citep{Schlosser.2019} state that the linear test used in Ctree has higher power in detecting smooth relationships between the scores and the splitting variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
 

@@ -30,15 +30,6 @@ Accuracy and fidelity are measured on both training and test data in order to ma
 
 \vspace{0.5cm}
 
-\color{blue}
-How to compare the performance of MBTs with different pruning methods?
-\begin{itemize}
-    \item Fixed tree depth for all MBTs: i.e. the question would be, how does the performance of the algorithms differ with the same degree of interpretability of the tree?
-    \item Implement post pruning via AIC or cross-validation for all MBTs (associated with more effort).
-    \item Use different pruning approaches: How do I choose alpha or SSE Improvement?
-\end{itemize}
-\color{black}
-
 \subsubsection{Stability}
 A well-known weakness of recursive partitioning algorithms is that the resulting decision trees are often unstable, meaning that slight fluctuations in the training data can lead to large differences in the models \citep{Fokkema.2020}.
 Depending on whether differences between two decision trees mean different predictions for the same observations or different structural properties of a tree, such as the number of leaf nodes, we speak of semantic or structural instability \citep{Wang.2018}. 
@@ -85,10 +76,8 @@ With regard to interpretability, two different questions are examined here. On t
 
 \vspace{0.5cm}
 
-On the other hand, it will be investigated how the choice of objective affects the interpretability of a specific MBT. In concrete terms, this means, for example: How does the interpretability of an MBT with many leafnodes but comparatively easy-to-understand regression models in the leafnodes differ from the interpretability of a compact tree with more complex spline-based models in the leafnodes?  Since SLIM is very flexible in the choice of objective, this method is used for the analysis.
+On the other hand, it will be investigated how the choice of objective affects the interpretability of a specific MBT. In concrete terms, this means, for example: How does the interpretability of an MBT with many leafnodes but comparatively easy-to-understand regression models in the leafnodes differ from the interpretability of a compact tree with more complex spline-based models in the leafnodes?  Since SLIM is  flexible in the choice of objective, this method is used for the analysis.
 
-\color{blue}
-The complexity of the different models can be quantified by a joint assessment of the number of leaf nodes the average complexity of the leaf models (measured by main effect complexity \citep{Molnar.2020}) and number of features used.
 
 \color{black}
 
@@ -107,27 +96,25 @@ The following basic scenarios are used to compare the presented MBTs with respec
     \item \textbf{Linear smooth}
         Numerical features with linear effects on y and smooth interactions
         \begin{itemize}
-            \item $x_1,..., X_5 \sim U(-1,1)$
+            \item $\textbf{x}_1,\textbf{x}_2, \textbf{x}_3 \sim U(-1,1)$
             \item $\epsilon \sim N(0, sd_{data})$
-            \item $ y = x_1 + 4   x_2 + 3   x_2   x_3 + 4  x_4  x_5 + x_5 + \epsilon$
+            \item $ \textbf{y} = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3  + \epsilon$
            
         \end{itemize}
     \item \textbf{Linear categorical}
         Numerical and binary features with linear effects and abrupt interactions
         \begin{itemize}
-            \item $x_1, x_2 \sim U(-1,1)$, $x_3 \sim Bern(0.5)$,  
+            \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3 \sim Bern(0.5)$,  
             \item $\epsilon \sim N(0, sd_{data})$
-            \item $ y =  x_{1} - 8  x_2 + 16  x_2  \mathbf{I}_{x_3 = 0} + 8  x_2  \mathbf{I}_{x_1 > mean(x_1)} + \epsilon $
+            \item $ \textbf{y} =  \textbf{x}_{1} - 8  \textbf{x}_2 + 16  \textbf{x}_2  \mathbf{I}_{\textbf{x}_3 = 0} + 8  \textbf{x}_2  \mathbf{I}_{\textbf{x}_1 > mean(\textbf{x}_1)} + \epsilon $
             
         \end{itemize}
     \item \textbf{Linear mixed}
         Numerical and binary features with linear effects, abrupt and smooth two- and three-way interactions
         \begin{itemize}
-            \item $x_1, x_2 \sim U(-1,1)$, $x_3, ..., x_5 \sim Bern(0.5)$, $x_6, ... x_{10} \sim N(0,1)$,  \item $\epsilon \sim N(0, sd_{data})$
-            \item \begin{align*}
-            y = & 4   x_2 + 2   x_4 + 2   x_6 + 2   x_8 + 4   x_2   x_1 + 8   x_2   \mathbf{I}_{x_3 = 0} + 10   x_2   X_6    \mathbf{I}_{x_5 = 1} \\
-            & + 8   x_2   x_7 + 3   x_1   x_3 + 3   x_8   x_{10} + 3   x_7   x_9     
-            \end{align*}
+            \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3, \textbf{x}_4 \sim Bern(0.5)$
+            \item $\epsilon \sim N(0, sd_{data})$
+            \item $\textbf{y} = 4   \textbf{x}_2 + 2   \textbf{x}_4  + 4   \textbf{x}_2   \textbf{x}_1 + 8   \textbf{x}_2   \mathbf{I}_{\textbf{x}_3 = 0} +  8 \textbf{x}_1   \textbf{x}_2    \mathbf{I}_{\textbf{x}_4 = 1}$
     
         \end{itemize}
 \end{enumerate}
@@ -140,59 +127,39 @@ does this change the trend of the results? (e.g. MBT with best performance etc.)
 
 
 \subsubsection{Correlated features}
+\textbf{Linear smooth with correlated features} set correlation $\rho_{13}$ between  variables $\textbf{x}_1$ and $\textbf{x}_3$ to the values $\{0.1, 0.5, 0.9\}$
 
-\begin{enumerate}
-    \item \textbf{Linear smooth with correlated features} set correlation $\rho_{13}$ between  variables $x_1$ and $x_3$ to the values $\{0.1, 0.5, 0.9\}$
-   
-    \item \textbf{Linear categorical with correlated features} set correlation $\rho_{12}$ between  variables $x_1$ and $x_2$ to the values $\{0.1, 0.5, 0.9\}$
-\end{enumerate}
-If SLIM and GUIDE have problems due to the correlation, try if Ridge Regression improves the situation.
+If SLIM has problems due to the correlation, try if Ridge Regression improves the situation.
+
+Question: is x1 wrongly chosen as the splitting variable?
 
 \subsubsection{Big number of noisy features}
-\begin{enumerate}
-    \item \textbf{Linear mixed with noisy features}
-    Add features $x_{11}, ... x_{20} \sim N(0,1)$, which have no effect on $y$
-\end{enumerate}
+\textbf{Linear smooth with noisy features}
+Add features $\textbf{x}_{4}, ... \textbf{x}_{10} \sim U(-1,1)$, which have no effect on $\textbf{y}$
 
-For SLIM (and GUIDE) use standard linear regression models and a Lasso Regression and compare performance and Interpretability between these to Variations
+For SLIM use standard linear regression models and a Lasso Regression and compare performance and Interpretability between these to Variations.
+
+Question: Are noisy variables used for splitting? How does the use of a lasso model affect SLIM trees (in different configurations)?
 
 \subsubsection{Non-linear Effects}
-\begin{enumerate}
-    \item \textbf{polynomial smooth} Numerical features         with polynomial effects on y and smooth interactions
-        \begin{itemize}
-            \item $x_1,..., x_5 \sim U(-1,1)$
-            \item $\epsilon \sim N(0, sd_{data})$
-            \item $ y = x_1^3 + 4   x_2^2 + 3   x_2   x_3 + 4  x_4  x_5 + x_5 + \epsilon$
-            \item fit polynomial regression models for all MBTs
-            \item fit spline based models for SLIM and GUIDE
-           
-        \end{itemize}
-    \item \textbf{non-linear smooth} Numerical features         with non-linear effects on y and smooth interactions
-        \begin{itemize}
-            \item $x_1,..., x_5 \sim U(-1,1)$
-            \item $\epsilon \sim N(0, sd_{data})$
-            \item $ Y = \pi^{x_1} + 4   x_2^3 + 3   x_2   x_3 + 4  x_4  x_5 + x_5 + \epsilon$
-            \item fit polynomial regression models for all MBTs
-            \item fit spline based models for SLIM (and GUIDE)           
-        \end{itemize}
-    \item \textbf{Non-linear mixed}
-        Numerical and binary features with non-linear effects on $y$ and abrupt and smooth two- and three-way interactions
-        \begin{itemize}
-            \item $x_1, x_2 \sim U(-1,1)$, $x_3, ..., x_5 \sim Bern(0.5)$, $x_6, ... x_{10} \sim N(0,1)$,  \item $\epsilon \sim N(0, sd_{data})$
-            \item \begin{align*}
-            y = & 4   x_2 + exp(-2 x_4^2) + x_6 + 2 x_6^2 + 2   x_8 + 4   x_2   x_1 + 8   x_2   \mathbf{I}_{x_3 = 0} + 10   x_2   X_6    \mathbf{I}_{x_5 = 1} \\
-            & + 8   x_2   x_7 + 3   x_1   x_3 + 3   x_8   x_{10} + 3   x_7   x_9  + \epsilon  
-            \end{align*}
-                \item fit polynomial regression models for all MBTs
-            \item fit spline based models for SLIM (and GUIDE) 
-    
-        \end{itemize}
-\end{enumerate}
+\textbf{Non-linear mixed}
+Numerical and binary features with non-linear effects on $y$ and abrupt and smooth two- and three-way interactions
+\begin{itemize}
+    \item $x_1, x_2 \sim U(-1,1)$, $x_3, ..., x_5 \sim Bern(0.5)$, $x_6, ... x_{10} \sim N(0,1)$,  \item $\epsilon \sim N(0, sd_{data})$
+    \item $y = 4   x_2 + exp(-2 x_4^2) + x_6 + 2 x_6^2 + 2   x_8 + 4   x_2   x_1 + 8   x_2   \mathbf{I}_{x_3 = 0} + 10   x_2   X_6    \mathbf{I}_{x_5 = 1} + 8   x_2   x_7 + 3   x_1   x_3 + 3   x_8   x_{10} + 3   x_7   x_9  + \epsilon$
+\end{itemize}
+use different objectives to fit SLIM Trees (standard linear Model, polynomial Lasso Regression, Spline-based regression).
+
+Question: How do the results differ in terms of performance and interpretability?
+
+When is a MBT well interpretable?
+\begin{itemize}
+    \item low number of leafnodes
+    \item Simple models in the leaf nodes, i.e. preferably models where the weights are directly interpretable (LM and (polynomial) LASSO). Less interpretability if it can only be done visually.
+    \item Separation of interactions and main effects, concretely: When splitting, I can make the interpretation that this variable is involved in an interaction. Not possible when linear models are used to model non-linear main effects.
+\end{itemize}
 
 
 
 
-\subsection{Results}
-\subsubsection{Performance}
-\subsubsection{Stability}
-\subsubsection{Interpretability}
+\subsection{Main Results}
