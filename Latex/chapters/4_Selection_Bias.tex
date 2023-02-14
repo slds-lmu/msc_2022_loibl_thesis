@@ -32,30 +32,37 @@ overall prediction accuracy may be preserved;}
 
 
 
-\textbf{Test for selection bias:} $\chi^2$ goodness of fit test\\
-H0: the probabilities of the population are all equal (or are equal to an assumed probability distribution p)
+%\textbf{Test for selection bias:} $\chi^2$ goodness of fit test\\
+%H0: the probabilities of the population are all equal (or are equal to an assumed probability distribution p)
 
 \subsection{Scenario 1: numerical features}
-$X_{1}, X_{2} \sim U(0,1)$; 
-$X_{3} \sim U(0,1)$ and rounded to one digit;
-$X_{4}$ binary;
+$\textbf{x}_{1}, \textbf{x}_{2} \sim U(0,1)$; 
+$\textbf{x}_{3}$ uniformly distributed on the set $(0, 0.1, 0.1,..., 0.9, 1)$;
+$\textbf{x}_{4}$ uniformly distributed on the set $(0, 0.01, 0.02,..., 0.99, 1)$;
+   
 \subsubsection{Independence scenario}
-$Y \sim N(0,1)$
+$\textbf{Y} \sim N(0,1)$
+\begin{figure}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/selection_bias_general_10_01/independence_small.pdf}
+\end{figure}  
+\color{blue} guide nur einmal !
+\color{black}
 \subsubsection{Interaction scenario}
-$Y = X_1X_2 + X_1X_3 + X_1X_4 + X_2X_3 + X_2X_4 + X_3X_4 + \epsilon$ \\
+$Y = \textbf{x}_1\textbf{x}_2 + \textbf{x}_1\textbf{x}_3 + \textbf{x}_1\textbf{x}_4 + \textbf{x}_2\textbf{x}_3 + \textbf{x}_2\textbf{x}_4 + \textbf{x}_3\textbf{x}_4 + \epsilon$ \\
 $\epsilon \sim N(0,0.1sd(Y))$
-
+\begin{figure}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/selection_bias_general_10_01/full_interaction.pdf}
+\end{figure}  
 
 \subsubsection{SLIM correction approach of selection bias for numerical features}
+\begin{figure}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/selection_bias_slim/independence_small.pdf}
+\end{figure} 
+
 
 \subsection{Scenario 2: mixed features}
 \subsubsection{Independence scenarios}
-\begin{itemize}
-    \item binary vs. numerical
-    \item categorical vs. numerical
-    \item categorical vs. binary
-    \item GUIDE Scenario
-\end{itemize}
+
 
 \subsubsection{Interaction Scenarios}
 \begin{itemize}
