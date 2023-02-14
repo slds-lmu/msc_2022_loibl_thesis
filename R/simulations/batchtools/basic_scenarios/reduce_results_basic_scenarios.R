@@ -172,20 +172,29 @@ reduce_trees = function(ades, pdes, savedir, reg){
   
 }
 
-# # lasso
-# reg_lasso = loadRegistry("Data/simulations/batchtools/lasso/batchtools/"
-#                          ,conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
-# 
-# ades_lasso = NULL
-# pdes_lasso = data.frame(n = c(3000), type = c("linear_smooth_lasso"))
-# 
-# savedir_lasso = "Data/simulations/batchtools/lasso/results/"
-# 
-# result_lasso = reduce_trees(ades_lasso, pdes_lasso, savedir_lasso, reg_lasso)$mean
-# 
-# 
-# result_lasso = readRDS("Data/simulations/batchtools/lasso/results/result_summary.rds")$mean
-# 
+# lasso
+reg_lasso = loadRegistry("Data/simulations/batchtools/lasso/batchtools/"
+                         ,conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
+
+ades_lasso = NULL
+pdes_lasso = data.frame(n = c(3000), type = c("linear_smooth_lasso"))
+
+savedir_lasso = "Data/simulations/batchtools/lasso/results/"
+
+result_lasso = reduce_trees(ades_lasso, pdes_lasso, savedir_lasso, reg_lasso)$mean
+
+
+result_lasso = readRDS("Data/simulations/batchtools/lasso/results/result_summary.rds")$mean
+
+
+# result_lasso[,.(surrogate, mbt, x_wrong, share_x3, n_leaves, r2_train, r2_test)] %>%
+#   arrange(., desc(surrogate))
+#   kbl(caption="Mean simulation results on 500 simulation runs as stand alone model on scenario Linear Smooth - Correlated with n = 1000, alpha = 0.001, impr = 0.01",
+#       format="latex",
+#       col.names = c("surrogate","MBT", "x_wrong", "share_x3", "n leaves","R2 train","R2 test"),
+#       align="r",
+#       digits = 4) %>%
+#   kable_minimal(full_width = F)
 
 
 

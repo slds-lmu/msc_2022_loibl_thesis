@@ -27,7 +27,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     slim_res$r2_test = r_2(y_test, predict_slim(slim, x_test))
     
     if(extract_variables){
-      slim_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,"split.feature"])), TRUE, FALSE)
+      slim_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,split.feature])), TRUE, FALSE)
     }
     
     if("slim_lasso" %in% tree_methods){
@@ -48,7 +48,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     slim_ridge = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning,  n.quantiles = n.quantiles,
                                    impr.par = impr.par, min.split = min.split, approximate = FALSE,
                                    split.method = "slim", penalization = "L2")
-    split = extract_split_criteria(slim_ridge)
+    split = as.data.table(extract_split_criteria(slim_ridge))
     slim_ridge_res$n_leaves = sum(split$split.feature == "leafnode")
 
     slim_ridge_res$mse_train = mean((predict_slim(slim_ridge, x_train)- y_train)^2)
@@ -58,7 +58,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     slim_ridge_res$r2_test = r_2(y_test, predict_slim(slim_ridge, x_test))
     
     if(extract_variables){
-      slim_ridge_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,"split.feature"])), TRUE, FALSE)
+      slim_ridge_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,split.feature])), TRUE, FALSE)
     }
     
     
@@ -84,7 +84,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     slim_lasso_res$mse_test = mean((predict_slim(slim_lasso, x_test)- y_test)^2)
     slim_lasso_res$r2_test = r_2(y_test, predict_slim(slim_lasso, x_test))
     
-    slim_lasso_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,"split.feature"])), TRUE, FALSE)
+    slim_lasso_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,split.feature])), TRUE, FALSE)
     
     slim_lasso_res$share_x3 = sum(split[split.feature == "x3", size])/sum(split[split.feature != "leafnode", size])
     
@@ -108,7 +108,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
       slim_lasso_max_df_res$mse_test = mean((predict_slim(slim_lasso_max_df, x_test)- y_test)^2)
       slim_lasso_max_df_res$r2_test = r_2(y_test, predict_slim(slim_lasso_max_df, x_test))
       
-      slim_lasso_max_df_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,"split.feature"])), TRUE, FALSE)
+      slim_lasso_max_df_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,split.feature])), TRUE, FALSE)
       
       slim_lasso_max_df_res$share_x3 = sum(split[split.feature == "x3", size])/sum(split[split.feature != "leafnode", size])
       
@@ -124,7 +124,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     guide = compute_tree_slim(y_train, x_train ,n.split = maxdepth - 1, pruning = pruning, 
                               impr.par = impr.par, min.split = min.split, split.method = "guide",
                               exclude.categoricals = exclude.categoricals, correct.bias = correct.bias)
-    split = extract_split_criteria(guide)
+    split = as.data.table(extract_split_criteria(guide))
     
     guide_res$n_leaves = sum(split$split.feature == "leafnode")
     
@@ -135,7 +135,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     guide_res$r2_test = r_2(y_test, predict_slim(guide, x_test))
     
     if(extract_variables){
-      guide_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,"split.feature"])), TRUE, FALSE)
+      guide_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,split.feature])), TRUE, FALSE)
     }
     
     if(!is.null(data_stability)){

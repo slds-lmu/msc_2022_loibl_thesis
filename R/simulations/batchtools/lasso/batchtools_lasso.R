@@ -41,4 +41,4 @@ addExperiments(
 
 summarizeExperiments()
 testJob(1)
-submitJobs(101:250)
+submitJobs(1:100)
