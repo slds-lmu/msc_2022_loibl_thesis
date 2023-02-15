@@ -381,28 +381,24 @@ CTree & 0.05 & 15.03 & 13 & 17 & 0.9802 & 0.0017 & 0.9731 & 0.0023\\
 \begin{frame}{Linear Mixed - Interpretability}
 For  $alpha= 0.001$ and $impr = 0.05$ the mean number of leaf nodes nodes is similar for the four MBT Algorithms
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_int.pdf}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_int.pdf}
 \end{figure}     
 \end{frame}
 
 \begin{frame}{Linear Mixed - Performance}
 
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_r2_train.pdf}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_r2_nleaves.pdf}
 \end{figure}  
-\begin{itemize}
-    \item SLIM and GUIDE have a higher performance than MOB and CTree
-    \item Fidelity is higher than accuracy, i.e. better performance on the lm predictions
-\end{itemize}
 \end{frame}
 
 \begin{frame}{Linear Mixed - Performance}
 
 \begin{figure}
-    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_r2_test.pdf}
+    \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_r2_test.pdf}
 \end{figure}  
-
 \end{frame}
+
 
 \begin{frame}{Linear Mixed - Stability}
 
@@ -410,7 +406,7 @@ For  $alpha= 0.001$ and $impr = 0.05$ the mean number of leaf nodes nodes is sim
     \includegraphics[width=11cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_sta.pdf}
 \end{figure}     
 \begin{itemize}
-    \item Here stability is higher if the MBTs are used as surrogates (as stated in the SLIM Paper)
+    \item Here stability is almost everywhere higher if the MBTs are used as surrogates (as stated in the SLIM Paper)
 \end{itemize}
 
 \end{frame}
