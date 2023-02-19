@@ -56,7 +56,7 @@ The variable $\mathbf{x}_j$ and split point $s$ which minimize  \ref{align:mob_o
 Since the computational effort for estimating all possible child models becomes very large as the number of possible partitioning variables increases, \citep{Hu.2020} have developed an efficient algorithm for estimating them for the case of linear regression, GAMS and ridge regression. A detailed description of this algorithm can be found in \citep{Hu.2020}.
 
 To avoid overfitting and to obtain a small interpretable tree, the use of pruning is necessary. \citep{Hu.2020} uses the approach of backpruning, i.e. a deep tree is first fitted and then leaves that do not fulfil certain criteria are pruned back. 
-In order to keep the computational effort as low as possible, prepruning is used in this thesis. Specifically, this means that a split is only performed if the improvement of the objective through the split is at least $impr.par \in [0,1]$ times the improvement of the objective in the parent node. In addition, it is possible to set a value for $R^2$ (defined in section \ref{simulation}) above which splitting in a node will not continue.
+In order to keep the computational effort as low as possible, prepruning is used in this thesis. Specifically, this means that a split is only performed if the improvement of the objective through the split is at least $impr \in [0,1]$ times the improvement of the objective in the parent node. In addition, it is possible to set a value for $R^2$ (defined in section \ref{simulation}) above which splitting in a node will not continue.
 
 
 
