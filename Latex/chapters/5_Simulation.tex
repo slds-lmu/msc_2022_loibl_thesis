@@ -1,163 +1,241 @@
+Desirable properties of an MBT are high performance, good interpretability and stability.
+In this chapter, simulation scenarios are described with which an empirical comparison of these properties for the different MBT algorithms is carried out.
+In addition, a comparison of the performance and interpretability of SLIM MBTs is made when objectives of different complexity are used for modelling.
+
 \subsection{Evaluation measures}
-In this chapter, an empirical comparison of the introduced MBT algorithms is carried out. Different aspects of the MBTs are considered, which are described in the following.
+To evaluate the desired properties we use the following definitions and measurements.
 
 \subsubsection{Performance}
 A central aspect in the comparison of the different MBT algorithms is their performance. 
 To find out how well an MBT algorithm performs as a stand-alone machine learning model, the MBT is fitted to the original response. 
-In the following, the mean squared error ($MSE_{acc}$) and $R^2_{acc}$ are used as performance measures of accuracy, which are defined as
+In the following, the mean squared error ($MSE$) and $R^2$ are used as performance measures of accuracy, which are defined as
 \begin{align}
-    MSE_{acc} \left( \left\{y, \hat{y}^{MBT}\right\}\right) = \frac{1}{n}\sum_{i = 1}^{n}\left(y_{i}-\hat{y_{i}}^{MBT}\right)^2
+    MSE \left( \left\{y, \hat{y}\right\}\right) = \frac{1}{n}\sum_{i = 1}^{n}\left(y^{(i)}-\hat{y}^{(i)}\right)^2
 \end{align}
 \begin{align}
-    R^2_{acc}\left( \left\{y, \hat{y}^{MBT}\right\}\right) = \frac{\sum_{i = 1}^{n}\left(\hat{y_{i}}^{MBT} - \bar{y}\right)^2}{\sum_{i = 1}^{n}\left(y_{i} - \bar{y}\right)^2},
+    R^2\left( \left\{y, \hat{y}\right\}\right) = 1-\frac{\sum_{i = 1}^{n}\left(\hat{y}^{(i) } - y\right)^2}{\sum_{i = 1}^{n}\left(y^{(i)} - \bar{y}\right)^2},
 \end{align}
-where $\hat{y_i}^{MBT}, i = 1,...,n$ are the predictions of the MBT model and $\bar{y}$ is the arithmetic mean of the original response.
+where $\hat{y}^{(i)}, i = 1,...,n$ are the predictions of the MBT model and $\bar{y}$ is the arithmetic mean of the target $y$.
 
-
-
-
-To determine how well the respective MBT algorithm works as a surrogate model, i.e. how well the predictions of a black box model are replicated by the MBT, the so called fidelity is measured. 
-$MSE_{fid}$ and $R^2_{fid}$ are defined as
-\begin{align}
-    MSE_{fid} \left( \left\{\hat{y}^{BB}, \hat{y}^{MBT}\right\}\right) = \frac{1}{n}\sum_{i = 1}^{n}\left(\hat{y_{i}}^{BB}-\hat{y_{i}}^{MBT}\right)^2
-\end{align}
-\begin{align}
-    R^2_{fid}\left( \left\{\hat{y}^{BB}, \hat{y}^{MBT}\right\}\right) = \frac{\sum_{i = 1}^{n}\left(\hat{y_{i}}^{MBT} - \bar{\hat{y}}^{BB}\right)^2}{\sum_{i = 1}^{n}\left(\hat{y_{i}}^{BB} - \bar{\hat{y}}^{BB}\right)^2},
-\end{align} 
-where $\hat{y_i}^{BB}, i = 1,...,n$ are the predictions of the underlying black box model.
+To determine how well the respective MBT algorithm works as a surrogate model, i.e. how well the predictions of a black box model are replicated by the MBT, $MSE(\left( \left\{y^{bb}, \hat{y}\right\}\right)$ and $R^2_{fid}\left( \left\{y^{bb}, \hat{y}\right\}\right)$ are used to measure fidelity. 
 
 Accuracy and fidelity are measured on both training and test data in order to make a statement about the generalisation performance of the MBTs.
 
 \vspace{0.5cm}
+\subsubsection{Interpretability}
+When evaluating the suitability of an MBT algorithm as a surrogate model, the trade-off between performance and interpretability is the central aspect. While performance is easy to measure, the concept of interpretability is much more abstract.
+According to \citet{DoshiVelez.2017} interpretability is defined as the ability to explain or present something to a person in understandable terms. Tf, for different MBT algorithms to be compared, the models in the leaf nodes are defined as equally complex (e.g. linear regression models), these do not have to be taken into account when comparing interpretability, but only the structure of the tree is relevant. We then use the number of leafnodes as the most important criterion for interpretability.  The underlying assumption is: the fewer leafnodes a tree has, the easier its structure is to understand.
+
+As an additional measure, we include the number of different features used for splitting. The idea here is that the splitting of the feature space is easier to understand if it is done in few dimensions.
+
+\vspace{0.5cm}
+
+In order to assess how the choice of the objective function affects the interpretability of a given SLIM MBT, additional criteria are applied, which are:
+\begin{itemize}
+    \item effective degrees of freedoms of the leaf node models
+    \item proportion of observation splits where the split is actually due to an interaction rather than an incompletely modelled main effect
+    \item interpretable weights versus merely visually interpretability
+\end{itemize}
 
 \subsubsection{Stability}
 A well-known weakness of recursive partitioning algorithms is that the resulting decision trees are often unstable, meaning that slight fluctuations in the training data can lead to large differences in the models \citep{Fokkema.2020}.
 Depending on whether differences between two decision trees mean different predictions for the same observations or different structural properties of a tree, such as the number of leaf nodes, we speak of semantic or structural instability \citep{Wang.2018}. 
-Since we are looking for MBTs that are easy to interpret, it is not enough for us to look at semantic stability. It would be desirable to have an algorithm in which the subregions found for trees trained on slightly different data are as similar as possible and thus the interpretation is also similar.
-To measure the similarity of subregions of different trees, we use the Adjusted Rand index (ARI) \citep{Hubert.1985}.
-This measure was developed to compare two clusterings and is based on the Rand index (RI) \citep{Rand.1971}. The RI defines the similarity of two clusterings by the proportion of observation pairs that were either assigned to the same partition in both clusterings or to different partitions in both clusterings measured against the total set of observation pairs. The ARI is a corrected-for-chance version of the RI, which means that it $0$, if two random clusters are compared. The correction is done by substraction the expected value of the RI from the RI. The ARI is generally defined as
+Since we are looking for MBTs that are easy to interpret, it is not enough to look at semantic stability. It would be desirable for an MBT that has been fitted twice on slightly different training data to partition the feature space in the same way. To compare two trees that have the same number of leafnodes, an additional data set (evaluation data) is used that is clustered according to the decision rules found for the training data. The subregions of an MBT are defined as the clustering of the evaluation data set according to the decision rules learned by fitting the MBT to a training data set. 
+If the clustering of the evaluation data is identical for both MBTs, the interpretation of the decision rules is also identical, even if the order of split features in the two MBTs is reversed and the rules therefore appear different at first glance.
+In order to measure the similarity of subregions found by MBTs trained on slightly different data we use the Rand index (RI) \citep{Rand.1971}. The RI defines the similarity of two clusterings $\mathcal{A}, \mathcal{B}$ of $n$ observations each by the proportion of  the number observation pairs that were either assigned to the same partition in both clusterings ($n_{11}$) or to different partitions in both clusterings ($n_{00}$) measured against the total number of observation pairs. 
 \begin{align}
-    ARI = \frac{RI - Expected RI}{Maximum RI - Expected RI}
+    RI(\mathcal{A}, \mathcal{B}) = \frac{n_{11} + n_{00}}{\binom{n}{2}}
 \end{align}
-By including the maximum RI, one obtains an upper bound of the ARI at the value 1.
-In calculating the expected index, the underlying random model assumes that the partitions in both clusters were randomly selected, with the original number of partitions fixed for both clusters. 
-For details, see \citep{Hubert.1985}.
+\citep{Gates.2017}
+
+The higher the RI for a pair of trees with the same number of leaf nodes, the more similar the subregions defined by these trees and the more stable the MBT algorithm is in a concrete simulation scenario. 
 
 
+Besides the similarity of subregions with the same number of leafnodes, we use the variability of the number of leafnodes as a measure of stability. The more the number of leaf nodes fluctuates in for an MBT algorithm, the more unstable we consider it to be.
 
-
-According to \citep{Hu.2020}, the stability problem with SLIM is less if it is used as a surrogate and not as stand-alone model on the original data. However, this is not proven in the paper. Therefore, this claim is empirically investigated here for all MBTs presented by comparing the stability of MBTs on the original data with the stability of the surrogate models.
-
-
-\vspace{0.5 cm}
-
-\textbf{Procedure:} 
-\begin{enumerate}
-    \item create simulation data and train black box models on the data 
-    \item for each simulation run:
-    \begin{enumerate}
-        \item sample subset of the simulation data (with original response and blackbox prediction)
-        \item For each MBT fit standalone model to the original response of the subset and a surrogate models to the  blackbox predictions of the subset
-        \item get predicted leafnode ids of the whole simulation data for both trees
-    \end{enumerate}
-    \item calculate the ARI for all pairs of standalone trees (leafnode ids) and for all pairs of surrogate trees
-\end{enumerate}
+According to \citep{Hu.2020}, the stability problem with SLIM is less if it is used as a surrogate and not as stand-alone model on the original data. However, this is not proven in the paper. Therefore, this claim is empirically investigated here for all MBT Algorithms presented by comparing the stability of MBTs on the original data with the stability of MBTs used as surrogate models.
 
 
 
 
 
-
-\subsubsection{Interpretability}
-%According to \citet{DoshiVelez.2017} Interpretability is defined as ability to explain or to present in understandable terms to a human.
-
-
-With regard to interpretability, two different questions are examined here. On the one hand, a comparison of interpretability between the different MBT algorithms takes place, whereby the same objective (or a similar objective) is used in the leafnodes. As a measure of interpretability, we will simply use the number of leafnodes needed to achieve a certain performance ($R^2$).  The assumption underlying this measure is: the fewer leafnodes a tree has, the easier its structure is to understand.
-
-\vspace{0.5cm}
-
-On the other hand, it will be investigated how the choice of objective affects the interpretability of a specific MBT. In concrete terms, this means, for example: How does the interpretability of an MBT with many leafnodes but comparatively easy-to-understand regression models in the leafnodes differ from the interpretability of a compact tree with more complex spline-based models in the leafnodes?  Since SLIM is  flexible in the choice of objective, this method is used for the analysis.
+\subsection{Basic scenarios}
+We use three simple scenarios that differ mainly in the type of interaction(s) they contain (smooth interaction vs subgroup depending effects). Based on these scenarios the different MBT algorithms are compared with respect to performance, interpretability and stability.
 
 
-\color{black}
-
-\subsection{Simulation Scenarios}
-In the following, various simulation scenarios are defined with which the properties defined above are to be investigated for different data-generating processes. In addition to the data generating process, two black box models are defined for each scenario to investigate the properties of the MBTs both as standalone models and as surrogate models.
+\subsubsection{Scenarios}
+The data generating processes of the basic scenarios are defined as follows:
 
 
-\subsubsection{Basic scenarios}
-
-The following basic scenarios are used to compare the presented MBTs with respect to all defined evaluation measures.
-
-
-
-
-\begin{enumerate}
-    \item \textbf{Linear smooth}
-        Numerical features with linear effects on y and smooth interactions
-        \begin{itemize}
-            \item $\textbf{x}_1,\textbf{x}_2, \textbf{x}_3 \sim U(-1,1)$
-            \item $\epsilon \sim N(0, sd_{data})$
-            \item $ \textbf{y} = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3  + \epsilon$
+\paragraph{Linear smooth}
+Numerical features with linear effects on y and smooth interactions
+\begin{itemize}
+    \item $\textbf{x}_1,\textbf{x}_2, \textbf{x}_3 \sim U(-1,1)$
+    \item $\epsilon \sim N(0, sd_{data})$
+    \item $ y = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3  + \epsilon$            
            
-        \end{itemize}
-    \item \textbf{Linear categorical}
-        Numerical and binary features with linear effects and abrupt interactions
-        \begin{itemize}
-            \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3 \sim Bern(0.5)$,  
-            \item $\epsilon \sim N(0, sd_{data})$
-            \item $ \textbf{y} =  \textbf{x}_{1} - 8  \textbf{x}_2 + 16  \textbf{x}_2  \mathbf{I}_{\textbf{x}_3 = 0} + 8  \textbf{x}_2  \mathbf{I}_{\textbf{x}_1 > mean(\textbf{x}_1)} + \epsilon $
+\end{itemize}                
+\paragraph{Linear categorical}
+Numerical and binary features with linear effects and subgroup specific linear effect
+\begin{itemize}
+    \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3 \sim Bern(0.5)$,  
+    \item $\epsilon \sim N(0, sd_{data})$
+    \item $ y =  \textbf{x}_{1} - 8  \textbf{x}_2 + 16  \textbf{x}_2  \mathbf{I}_{\textbf{x}_3 = 0} + 8  \textbf{x}_2  \mathbf{I}_{\textbf{x}_1 > mean(\textbf{x}_1)} + \epsilon $
             
-        \end{itemize}
-    \item \textbf{Linear mixed}
-        Numerical and binary features with linear effects, abrupt and smooth two- and three-way interactions
-        \begin{itemize}
-            \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3, \textbf{x}_4 \sim Bern(0.5)$
-            \item $\epsilon \sim N(0, sd_{data})$
-            \item $\textbf{y} = 4   \textbf{x}_2 + 2   \textbf{x}_4  + 4   \textbf{x}_2   \textbf{x}_1 + 8   \textbf{x}_2   \mathbf{I}_{\textbf{x}_3 = 0} +  8 \textbf{x}_1   \textbf{x}_2    \mathbf{I}_{\textbf{x}_4 = 1}$
-    
-        \end{itemize}
+\end{itemize}
+The scenario is based on a simulation example in \citep{Herbinger.2022}.
+
+\paragraph{Linear mixed}
+Numerical and binary features with linear effects, subgroup dependent and smooth two- and three-way interactions
+\begin{itemize}
+    \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3, \textbf{x}_4 \sim Bern(0.5)$
+    \item $\epsilon \sim N(0, sd_{data})$
+    \item $y = 4   \textbf{x}_2 + 2   \textbf{x}_4  + 4   \textbf{x}_2   \textbf{x}_1 + 8   \textbf{x}_2   \mathbf{I}_{\textbf{x}_3 = 0} +  8 \textbf{x}_1   \textbf{x}_2 \mathbf{I}_{\textbf{x}_4 = 1}$
+\end{itemize}
+
+
+\subsubsection{Simulation Setting}
+Since the number of leafnodes and the performance strongly depend on the prepruning value for $impr$ for SLIM and GUIDE and $alpha$ for MOB and CTree, the simulations are carried out for different values of these parameters. In addition, two different sample sizes $n$ are chosen. 
+All MBT algorithms are fitted as standalone models on the original data and as surrogate models on a correctly specified linear model or GAM and on an xgboost model with correctly specified interactions. 
+Table \ref{tab:simulation_setting} lists all varied factors and their levels. In total, there are $3 \times 2 \times 3 \times 3 = 54$ variants for each of the 4 MBT algorithms.
+Settings that are fixed in all variants are maximum tree depth of $6$ and a minimum node size of $50$.
+The experiment is repeated $N = 100$ times.
+
+\begin{table} \label{tab:simulation_setting}
+
+\caption{Simulation setting basic scenarios}
+\centering \small
+\begin{tabular}[t]{lll}
+\hline
+Varied factors & levels \\
+\hline
+Scenario  & linear smooth, linear categorical, linear mixed\\
+Sample size $n$  & 1500, 7500 ($\frac{2}{3}$  training, $\frac{1}{3}$ test data)\\
+Prepruning parameters   & $alpha \in \{0.05,0.01,0.001\}, impr \in \{0.05,0.1,0.15\}$ \\
+Usage of MBT  & standalone, surrogate for lm, surrogate for xgboost \\ 
+\hline
+\end{tabular}
+\end{table}
+
+Performance and Interaction measures are calculated in each simulation run.  
+The RIs are calculated following the simulation based on pairwise comparisons of clusterings of an evaluation dataset. The simulation setup is as follows
+
+\begin{enumerate}
+    \item simulate evaluation data (list of $100$ datasets with each $1000$ observations) from the data generating process
+    \item for each simulation run in $1:100$ runs:
+    \begin{enumerate}
+        \item simulate data and perform train/test split
+        \item train MBT on the training data, calculate performance measures on train and test set and extract the number of leafnodes
+        \item save the clustering of the whole evaluation data defined through the trained MBT
+    \end{enumerate}
+    \item for each of the ($100(100-1)/2 = 4950$ MBT pairs
+    \begin{enumerate}
+        \item if both trees have the same number of leaf nodes, calculate the $RI$ for one of the $100$ subsets of the clustering of the evaluation data
+    \end{enumerate}
 \end{enumerate}
 
-For each basic scenario two black box models are fitted: One correctly specified linear model and a xgboost model with correctly specified interactions. 
-\color{blue}
-does this change the trend of the results? (e.g. MBT with best performance etc.)
+\subsubsection{Results}
+\paragraph{Linear Smooth}
+For a comparison of the different MBT algorithms as standalone model on the scenario linear smooth the aggregated results are listed in table \ref{tab:linear_smooth_summary} for sample size n = 1000. 
+\begin{table} \label{tab:linear_smooth_summary}
+\caption{Mean simulation results on 100 simulation runs for SLIM, GUIDE, MOB and CTree as stand alone model on scenario Linear smooth with sample size $n = 1000$ for different values of $impr$ and $alpha$}
+\centering \tiny
+\begin{tabular}[t]{r|r|r|r|r|r|r|r|r}
+\hline
+MBT & \textbf{impr} & mean n leaves & n leaves min & n leaves max & mean R2 train & sd R2 train & mean R2 test & sd R2 test\\
+\hline
+SLIM & 0.15 & 2.27 & 2 & 5 & 0.9584 & 0.0072 & 0.9557 & 0.0076\\
+SLIM & 0.10 & 10.09 & 5 & 15 & 0.9860 & 0.0057 & 0.9835 & 0.0059\\
+SLIM & 0.05 & 14.75 & 12 & 18 & 0.9909 & 0.0006 & 0.9884 & 0.0009\\
+GUIDE & 0.15 & 2.25 & 2 & 5 & 0.9582 & 0.0071 & 0.9555 & 0.0072\\
+GUIDE & 0.10 & 9.81 & 5 & 14 & 0.9859 & 0.0058 & 0.9834 & 0.0060\\
+GUIDE & 0.05 & 14.60 & 11 & 17 & 0.9907 & 0.0006 & 0.9883 & 0.0009\\
+\hline
+ & \textbf{alpha} &  &  &  &  &  &  & \\
+\hline
+MOB & 0.001 & 9.48 & 8 & 13 & 0.9898 & 7e-04 & 0.9876 & 0.0011\\
+MOB & 0.010 & 11.02 & 8 & 14 & 0.9902 & 7e-04 & 0.9879 & 0.0011\\
+MOB & 0.050 & 12.54 & 9 & 15 & 0.9906 & 6e-04 & 0.9882 & 0.0010\\
+CTree & 0.001 & 11.35 & 9 & 14 & 0.9900 & 6e-04 & 0.9881 & 0.0010\\
+CTree & 0.010 & 12.74 & 10 & 15 & 0.9904 & 6e-04 & 0.9884 & 0.0010\\
+CTree & 0.050 & 13.76 & 11 & 16 & 0.9905 & 6e-04 & 0.9885 & 0.0010\\
+\hline
+\end{tabular}
+\end{table}
+The results of SLIM and GUIDE are very close to each other here. Noticeable is the large variation in the number of leaf nodes and thus also in the performance of SLIM and GUIDE for different values of $impr$. The variation of $alpha$ has a much smaller impact on the results for MOB and CTree.
 
-\color{black}
+Since the trade off between interpretability and performance must be taken into account when comparing the models, we compare the performance of the different MBTs depending on the number of leaf nodes. 
+At impr = 0.1 and alpha = 0.001, all four models have a similar mean number of leaf nodes, which is why we use these setting for a more detailed comparison.
+In figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that in general, as expected, the performance increases with increasing number of leafnodes for all models. Noticeable, however, are the two different training performance levels of SLIM and GUIDE for trees with $7$ to $9$ leafnodes. This is due to the fact that trees with different symmetry properties were generated by SLIM and GUIDE in this range. While in the MBTs with higher performance the distribution of the observations on the different leafnodes is approximately equal, in the group with lower performance one leaf node each was generated with almost half of the observations and the remaining half is distributed on the remaining $6$ to $8$ leafnodes. This is shown in more detail in the appendix \textbf{appendix einfügen}. There you can also see that the strongly assymmetric trees with one leaf node each with the large number of observations have only just fallen short of the prepruning criterion in this node. The choice of the parameter $impr$ therefore also has a decisive influence on the resulting tree at this point.
 
 
-\subsubsection{Correlated features}
+\begin{figure} \label{fig:ls_1000_standalone_r2_nleaves}
+\caption{Pairwise plot of the number of leaf nodes vs the accuracy measures $R^2$ train and $R^2$ test for the four MBTs as standalone models on scenario linear smooth with $n=1000, alpha = 0.001, impr = 0.1$}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_nleaves.pdf}
+\end{figure} 
+
+
+Figure \ref{fig:ls_1000_standalone_r2_train} shows the accuracy depending on the number of leaf nodes for the four different MBTs.
+
+\begin{figure} \label{fig:ls_1000_standalone_r2_train}
+\caption{number of leaf nodes vs the accuracy  $R^2$ train for the four MBTs as standalone models on scenario linear smooth with $n=1000, alpha = 0.001, impr = 0.1$}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_train.pdf}
+\end{figure} 
+
+
+
+Figure \ref{fig:ls_1000_int} shows that even with $impr$ fixed, the interquartile range of SLIM and GUIDE is considerably higher than that of MOB and CTree, both when the MBTs are used as standalone models and when used as surrogate models.
+
+\begin{figure} \label{fig:ls_1000_int}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_int.pdf}
+\end{figure}  
+
+
+
+\newpage
+\subsection{Correlated features}
+Question: is x1 wrongly chosen as the splitting variable?
+\subsubsection{Scenarios}
+
 \textbf{Linear smooth with correlated features} set correlation $\rho_{13}$ between  variables $\textbf{x}_1$ and $\textbf{x}_3$ to the values $\{0.1, 0.5, 0.9\}$
 
 If SLIM has problems due to the correlation, try if Ridge Regression improves the situation.
 
-Question: is x1 wrongly chosen as the splitting variable?
+\subsubsection{Results}
 
-\subsubsection{Big number of noisy features}
-\textbf{Linear smooth with noisy features}
-Add features $\textbf{x}_{4}, ... \textbf{x}_{10} \sim U(-1,1)$, which have no effect on $\textbf{y}$
+
+\subsection{Big number of noise features}
+Question: Are noisy variables used for splitting? How does the use of a lasso model affect SLIM trees (in different configurations)?
+\subsubsection{Scenarios}
+\textbf{Linear smooth with noise features}
+Add features $\textbf{x}_{4}, ... \textbf{x}_{10} \sim U(-1,1)$, which have no effect on $y$
 
 For SLIM use standard linear regression models and a Lasso Regression and compare performance and Interpretability between these to Variations.
 
-Question: Are noisy variables used for splitting? How does the use of a lasso model affect SLIM trees (in different configurations)?
+\subsubsection{Results}
 
-\subsubsection{Non-linear Effects}
+
+\subsection{Non-linear Effects}
+When is a MBT well interpretable?
+\begin{itemize}
+    \item low number of leafnodes
+    \item only few variables are used for splitting
+    \item sparse main effect models
+    \item Simple models in the leaf nodes, i.e. preferably models where the weights are directly interpretable (LM and (polynomial) LASSO)
+    \item Separation of interactions and main effectsy
+\end{itemize}
 \textbf{Non-linear mixed}
 Numerical and binary features with non-linear effects on $y$ and abrupt and smooth two- and three-way interactions
 \begin{itemize}
-    \item $x_1, x_2 \sim U(-1,1)$, $x_3, ..., x_5 \sim Bern(0.5)$, $x_6, ... x_{10} \sim N(0,1)$,  \item $\epsilon \sim N(0, sd_{data})$
-    \item $y = 4   x_2 + exp(-2 x_4^2) + x_6 + 2 x_6^2 + 2   x_8 + 4   x_2   x_1 + 8   x_2   \mathbf{I}_{x_3 = 0} + 10   x_2   X_6    \mathbf{I}_{x_5 = 1} + 8   x_2   x_7 + 3   x_1   x_3 + 3   x_8   x_{10} + 3   x_7   x_9  + \epsilon$
+    \item $\textbf{x}_1, ..., \textbf{x}_5 \sim U(-1,1)$, $\textbf{x}_6 \sim Bern(0.5)$,  
+    \item $\epsilon \sim N(0, sd_{data})$
+    \item $y = \textbf{x}_1 + 2 \textbf{x}_2^2 + \textbf{x}_3log(abs(\textbf{x}_3)) + \textbf{x}_4\textbf{x}_5 + \textbf{x}_1\textbf{x}_4\mathbf{I}_{\textbf{x}_6 = 0}+ \epsilon$
 \end{itemize}
 use different objectives to fit SLIM Trees (standard linear Model, polynomial Lasso Regression, Spline-based regression).
 
 Question: How do the results differ in terms of performance and interpretability?
 
-When is a MBT well interpretable?
-\begin{itemize}
-    \item low number of leafnodes
-    \item Simple models in the leaf nodes, i.e. preferably models where the weights are directly interpretable (LM and (polynomial) LASSO). Less interpretability if it can only be done visually.
-    \item Separation of interactions and main effects, concretely: When splitting, I can make the interpretation that this variable is involved in an interaction. Not possible when linear models are used to model non-linear main effects.
-\end{itemize}
+
 
 
 

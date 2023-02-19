@@ -430,39 +430,203 @@ Are there differences between the algorithms when correlated data are included? 
 \begin{frame}{Correlated Data}
 \begin{table}
 
-\caption{Mean simulation results, in particular, the relative frequency that x1 was chosen as a splitting variable by an MBT algorithm, on 500 simulation runs as stand alone model on scenario Correlated Data with n = 1000, alpha = 0.001, impr = 0.01}
-\centering
-\begin{tabular}[t]{l|r|r|r|r|r}
+\caption{relative frequency that x1 was chosen as a splitting variable by an MBT algorithm, on 250 simulation runs as stand alone model on scenario Correlated Data with n = 1000, alpha = 0.001, impr = 0.01}
+\centering \tiny
+\begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
-MBT & rho & frequency of x1  & number of leaf nodes & R2 train & R2 test\\
+MBT & rho & x1 & n leaves & n leaves min & n leaves max & R2 train & R2 train sd & R2 test & R2 test sd\\
 \hline
-SLIM & 0.1 & 0.096 & 10.140 & 0.9860 & 0.9832\\
+SLIM Ridge & 0.1 & 0.096 & 9.756 & 4 & 15 & 0.9860 & 0.0057 & 0.9834 & 0.0063\\
 \hline
-GUIDE & 0.1 & 0.058 & 9.950 & 0.9859 & 0.9832\\
+SLIM & 0.1 & 0.088 & 10.012 & 3 & 16 & 0.9863 & 0.0055 & 0.9836 & 0.0061\\
 \hline
-MOB & 0.1 & 0.000 & 9.386 & 0.9898 & 0.9876\\
+MOB & 0.1 & 0.000 & 9.392 & 8 & 12 & 0.9898 & 0.0006 & 0.9876 & 0.0010\\
 \hline
-CTree & 0.1 & 0.000 & 11.294 & 0.9901 & 0.9881\\
+GUIDE & 0.1 & 0.052 & 9.792 & 3 & 15 & 0.9862 & 0.0057 & 0.9836 & 0.0061\\
 \hline
-SLIM & 0.5 & 0.144 & 9.892 & 0.9865 & 0.9839\\
+CTree & 0.1 & 0.000 & 11.312 & 9 & 14 & 0.9901 & 0.0006 & 0.9881 & 0.0010\\
 \hline
-GUIDE & 0.5 & 0.126 & 9.654 & 0.9864 & 0.9840\\
+SLIM Ridge & 0.5 & 0.112 & 9.612 & 3 & 15 & 0.9862 & 0.0051 & 0.9837 & 0.0056\\
 \hline
-MOB & 0.5 & 0.000 & 9.034 & 0.9899 & 0.9878\\
+SLIM & 0.5 & 0.152 & 10.052 & 3 & 15 & 0.9867 & 0.0050 & 0.9841 & 0.0055\\
 \hline
-CTree & 0.5 & 0.000 & 10.682 & 0.9900 & 0.9882\\
+MOB & 0.5 & 0.000 & 9.048 & 8 & 11 & 0.9899 & 0.0006 & 0.9878 & 0.0010\\
 \hline
-SLIM & 0.9 & 0.322 & 9.826 & 0.9866 & 0.9842\\
+GUIDE & 0.5 & 0.120 & 9.776 & 3 & 15 & 0.9870 & 0.0046 & 0.9846 & 0.0052\\
 \hline
-GUIDE & 0.9 & 0.384 & 9.784 & 0.9870 & 0.9848\\
+CTree & 0.5 & 0.000 & 10.776 & 9 & 14 & 0.9901 & 0.0006 & 0.9882 & 0.0010\\
 \hline
-MOB & 0.9 & 0.058 & 8.690 & 0.9899 & 0.9879\\
+SLIM Ridge & 0.9 & 0.292 & 9.968 & 4 & 16 & 0.9872 & 0.0043 & 0.9848 & 0.0048\\
 \hline
-CTree & 0.9 & 0.036 & 10.216 & 0.9900 & 0.9883\\
+SLIM & 0.9 & 0.328 & 10.216 & 4 & 16 & 0.9873 & 0.0043 & 0.9850 & 0.0046\\
+\hline
+MOB & 0.9 & 0.048 & 8.704 & 8 & 11 & 0.9899 & 0.0005 & 0.9879 & 0.0010\\
+\hline
+GUIDE & 0.9 & 0.448 & 9.996 & 3 & 17 & 0.9874 & 0.0042 & 0.9852 & 0.0047\\
+\hline
+CTree & 0.9 & 0.084 & 10.280 & 8 & 14 & 0.9901 & 0.0005 & 0.9882 & 0.0009\\
 \hline
 \end{tabular}
 \end{table}    
 \end{frame}
+
+\begin{frame}{Correlated Data}
+
+\begin{table}
+
+\caption{relative frequency that x1 was chosen as a splitting variable by an MBT algorithm, on 250 simulation runs as surrogate on lm predictions on scenario Correlated Data with n = 1000, alpha = 0.001, impr = 0.01}
+\centering \tiny
+\begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
+\hline
+MBT & rho & x1 & n leaves & n leaves min & n leaves max & R2 train & R2 train sd & R2 test & R2 test sd\\
+\hline
+SLIM Ridge & 0.1 & 0.000 & 11.388 & 5 & 16 & 0.9962 & 0.0049 & 0.9954 & 0.0057\\
+\hline
+SLIM & 0.1 & 0.000 & 12.060 & 5 & 16 & 0.9967 & 0.0047 & 0.9959 & 0.0055\\
+\hline
+MOB & 0.1 & 0.000 & 15.764 & 14 & 16 & 0.9994 & 0.0001 & 0.9993 & 0.0001\\
+\hline
+GUIDE & 0.1 & 0.000 & 12.132 & 5 & 16 & 0.9967 & 0.0047 & 0.9960 & 0.0055\\
+\hline
+CTree & 0.1 & 0.000 & 15.256 & 13 & 17 & 0.9993 & 0.0001 & 0.9992 & 0.0001\\
+\hline
+SLIM Ridge & 0.5 & 0.000 & 11.584 & 4 & 16 & 0.9967 & 0.0043 & 0.9960 & 0.0051\\
+\hline
+SLIM & 0.5 & 0.000 & 12.008 & 5 & 16 & 0.9970 & 0.0042 & 0.9963 & 0.0050\\
+\hline
+MOB & 0.5 & 0.000 & 15.768 & 14 & 16 & 0.9995 & 0.0001 & 0.9994 & 0.0001\\
+\hline
+GUIDE & 0.5 & 0.000 & 11.968 & 5 & 16 & 0.9974 & 0.0036 & 0.9968 & 0.0043\\
+\hline
+CTree & 0.5 & 0.000 & 15.220 & 13 & 17 & 0.9994 & 0.0001 & 0.9993 & 0.0001\\
+\hline
+SLIM Ridge & 0.9 & 0.000 & 11.772 & 5 & 16 & 0.9975 & 0.0034 & 0.9970 & 0.0039\\
+\hline
+SLIM & 0.9 & 0.000 & 12.212 & 5 & 16 & 0.9977 & 0.0033 & 0.9972 & 0.0039\\
+\hline
+MOB & 0.9 & 0.004 & 15.752 & 14 & 17 & 0.9996 & 0.0001 & 0.9995 & 0.0001\\
+\hline
+GUIDE & 0.9 & 0.000 & 12.364 & 5 & 16 & 0.9978 & 0.0033 & 0.9973 & 0.0038\\
+\hline
+CTree & 0.9 & 0.000 & 15.144 & 14 & 17 & 0.9995 & 0.0001 & 0.9994 & 0.0001\\
+\hline
+\end{tabular}
+\end{table}     
+\end{frame}
+
+
+\section{Linear Smooth with noise feature}
+\begin{frame}{Linear smooth with noise features}
+
+\begin{itemize}
+    \item Add features $\textbf{x}_{4}, ... \textbf{x}_{10} \sim U(-1,1)$, which have no effect on $\textbf{y}$ to scenario linear smooth ($ f_{ls}(x) = x_1 + 4   x_2 + 3   x_2   x_3 $)
+    \item min.split = 100, alpha = 0.001, impr = 0.1
+    
+\end{itemize}
+Question: Are noise variables selected for splitting? How does the use of a lasso model affect SLIM trees?
+    
+\end{frame}
+
+
+\begin{frame}{Linear smooth with noise features}
+ \begin{table}
+
+\caption{Mean simulation results on 100 simulation runs as stand alone model and surrogate on lm predictions on scenario Linear Smooth - noise features with n = 1000, alpha = 0.001, impr = 0.1, n = 2000}
+\centering \small
+\begin{tabular}[t]{l|r|r|r|r|r|r}
+\hline
+surrogate & MBT & x wrong & share x3 & n leaves & R2 train & R2 test\\
+\hline
+standalone & SLIM & 0.05 & 0.4356 & 11.97 & 0.9878 & 0.9851\\
+\hline
+standalone & SLIM Lasso & 0.06 & 0.4474 & 10.82 & 0.9869 & 0.9850\\
+\hline
+standalone & SLIM Lasso max df 2 & 0.03 & 0.9990 & 9.35 & 0.9858 & 0.9845\\
+\hline
+standalone & SLIM Lasso max df 3 & 0.03 & 0.4784 & 9.85 & 0.9864 & 0.9850\\
+\hline
+standalone & GUIDE & 0.13 &  & 11.87 & 0.9878 & 0.9852\\
+\hline
+standalone & MOB & 0.00 &  & 11.11 & 0.9901 & 0.9877\\
+\hline
+standalone & CTree & 0.00 &  & 13.14 & 0.9905 & 0.9881\\
+\hline
+lm & SLIM & 0.00 & 0.4489 & 14.14 & 0.9988 & 0.9985\\
+\hline
+lm & SLIM Lasso & 0.00 & 0.4236 & 13.65 & 0.9984 & 0.9981\\
+\hline
+lm & SLIM Lasso max df 2 & 0.00 & 1.0000 & 11.18 & 0.9977 & 0.9975\\
+\hline
+lm & SLIM Lasso max df 3 & 0.00 & 0.4698 & 13.95 & 0.9985 & 0.9983\\
+\hline
+lm & GUIDE & 0.00 &  & 14.18 & 0.9988 & 0.9985\\
+\hline
+lm & MOB & 0.00 &  & 15.97 & 0.9995 & 0.9993\\
+\hline
+lm & CTree & 0.00 &  & 15.54 & 0.9994 & 0.9992\\
+\hline
+\end{tabular}
+\end{table}   
+\end{frame}
+
+\begin{frame}{Nonlinear}
+\begin{itemize}
+    \item $\textbf{x}_1, ..., \textbf{x}_5 \sim U(-1,1)$, $\textbf{x}_6 \sim Bern(0.5)$,  
+    \item $\epsilon \sim N(0, sd_{data})$
+    \item $\textbf{y} = \textbf{x}_1 + 2 \textbf{x}_2^2 + \textbf{x}_3log(abs(\textbf{x}_3)) + \textbf{x}_4\textbf{x}_5 + \textbf{x}_1\textbf{x}_4\mathbf{I}_{\textbf{x}_6 = 0}+ \epsilon$
+\end{itemize}
+
+When is a MBT well interpretable?
+\begin{itemize}
+    \item low number of leafnodes
+    \item only few variables are used for splitting
+    \item sparse main effect models
+    \item Simple models in the leaf nodes, i.e. preferably models where the weights are directly interpretable (LM and (polynomial) LASSO)
+    \item Separation of interactions and main effects
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Nonlinear}
+\begin{table}
+
+\caption{Interpretability simulation results on 30 simulation runs as stand alone model on scenario nonlinear with n = 3000, impr = 0.1}
+\centering \tiny
+\begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r|r}
+\hline
+MBT & n leaves & n l min & n l max & n split var & n sf min & n sf max & \% main effect & df & df min & df max\\
+\hline
+basic\_lm & 34.0333 & 28 & 38 & 5.1 & 4 & 6 & 0.4975 & 6.5134 & 6.3125 & 6.6571\\
+\hline
+penalized\_poly & 28.1000 & 21 & 33 & 4.4 & 3 & 5 & 0.2145 & 8.7877 & 8.0000 & 9.2759\\
+\hline
+bsplines & 21.6000 & 13 & 26 & 4.2 & 2 & 6 & 0.0123 &  &  & \\
+\hline
+gam & 22.0000 & 15 & 29 & 4.0 & 2 & 5 & 0.0049 &  &  & \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}
+
+\caption{Performance simulation results on 30 simulation runs as stand alone model on scenario nonlinear with n = 3000, impr = 0.1}
+\centering
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+MBT & R2 train & R2 train sd & R2 test & R2 test sd\\
+\hline
+basic\_lm & 0.9553 & 0.0041 & 0.9464 & 0.0048\\
+\hline
+penalized\_poly & 0.9859 & 0.0012 & 0.9831 & 0.0014\\
+\hline
+bsplines & 0.9910 & 0.0012 & 0.9779 & 0.0018\\
+\hline
+gam & 0.9877 & 0.0016 & 0.9844 & 0.0013\\
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+    
 
 
 \begin{frame}{Bibliography}
