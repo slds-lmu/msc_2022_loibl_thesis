@@ -40,5 +40,4 @@ addExperiments(
   repls = 250)
 
 summarizeExperiments()
-testJob(1)
 submitJobs(1:100)

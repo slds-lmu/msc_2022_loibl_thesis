@@ -67,7 +67,9 @@ Node <- R6Class("Node", list(
   stop.criterion.met = FALSE,
   improvement.met = NULL,
   
-  intImp = NULL,
+  impr = NULL,
+  impr.target = NULL,
+  impr.relative = NULL,
   
   # Model information
   model.fit = NULL,
@@ -76,7 +78,7 @@ Node <- R6Class("Node", list(
 
   
   
-  initialize = function(id, depth = NULL, subset.idx, id.parent = NULL, child.type = NULL, objective.value.parent = NULL, objective.value = NULL, r2 = NULL, improvement.met, intImp, model.fit = NULL, term.predictions.parent = NULL, variable.importance = NULL) {
+  initialize = function(id, depth = NULL, subset.idx, id.parent = NULL, child.type = NULL, objective.value.parent = NULL, objective.value = NULL, r2 = NULL, improvement.met, impr, impr.target = NULL, impr.relative = NULL, model.fit = NULL, term.predictions.parent = NULL, variable.importance = NULL) {
     assert_numeric(id, len = 1)
     assert_numeric(depth, len = 1, null.ok = TRUE)
     
@@ -89,8 +91,9 @@ Node <- R6Class("Node", list(
     self$subset.idx = subset.idx
     self$id.parent = id.parent
     self$child.type = child.type
-    self$intImp = intImp
-    #self$rsqrt = rsqrt
+    self$impr = impr
+    self$impr.target = impr.target
+    self$impr.relative = impr.relative
     self$objective.value.parent = objective.value.parent
     self$objective.value = objective.value
     self$improvement.met = improvement.met
@@ -105,13 +108,20 @@ Node <- R6Class("Node", list(
   computeSplit = function(X, Y, objective, fit, impr.par, optimizer, min.split = 10, 
                           pruning, n.quantiles, penalization, fit.bsplines, 
                           df.spline, split.method, correction.factor, r2 = r2) {
-    self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
+    
     self$r2 = r_2(Y[self$subset.idx, , drop = FALSE],
                  fit(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ], .type = "fitted.values"))
     
-    if (length(self$subset.idx) < (2*min.split + 1) | (self$improvement.met == TRUE & pruning == "forward")  | (self$r2 >= r2 & pruning == "forward")) {
+    
+    if (length(self$subset.idx) < (2*min.split + 1) | (self$improvement.met == TRUE & pruning == "forward")  | 
+        (self$r2 >= r2 & pruning == "forward")) {
+      
+      self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
       self$stop.criterion.met = TRUE
       self$objective.value = NULL
+      self$impr = NULL
+      self$impr.target = NULL
+      self$impr.relative = NULL
       
     } else {
       self$objective.value.parent = objective(y = Y, x = X)
@@ -125,61 +135,43 @@ Node <- R6Class("Node", list(
                                   penalization = penalization, 
                                   fit.bsplines = fit.bsplines, df.spline = df.spline,
                                   split.method = split.method, correction.factor = correction.factor)
-        if(is.null(self$intImp)) {
-          #self$rsqrt = 0 
-          self$intImp = 0
-        }
-        intImp = (self$objective.value - split$objective.value[split$best.split][1]) / self$objective.value.parent
+
         
-        if(self$intImp == 0){
-          if ( (intImp < impr.par) & pruning == "forward"){
-            self$improvement.met = TRUE
-            self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
-            self$objective.value = NULL
-
-            
-          } else{
-            self$split.feature = split$feature[1]
-            self$split.type = split$split.type
-            if (self$split.type == "categorical"){
-              self$split.value = str_split(split$split.points, ",")[[1]]
-            } else if (self$split.type == "numerical"){
-              self$split.value = split$split.points
-            }
-            self$intImp = intImp
-            self$objective.value.parent = objective(y = Y[self$subset.idx, ,drop = FALSE], x = X[self$subset.idx, ])
-            self$objective.value = split$objective.value[1]
-            if(split.method == "guide"){
-              self$test.type = split$test.type
-            }
-              
-            
-          }
-        } else {
-          if (intImp < self$intImp*impr.par & pruning == "forward"){
-            self$improvement.met = TRUE
-            self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
-            self$objective.value = NULL
-
-                     
-          } else{
-            self$split.feature = split$feature
-            self$split.type = split$split.type
-            if (self$split.type == "categorical"){
-              self$split.value = str_split(split$split.points, ",")[[1]]
-            } else if (self$split.type == "numerical") {
-              self$split.value = split$split.points
-            }
-            self$intImp = intImp
-            self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
-            self$objective.value = split$objective.value[1]
-            
-            if(split.method == "guide"){
-              self$test.type = split$test.type
-            }
-                    
-          }
+        impr = (self$objective.value - split$objective.value[split$best.split][1]) / self$objective.value.parent
+        self$objective.value.parent = objective(y = Y[self$subset.idx, , drop = FALSE], x = X[self$subset.idx, ])
+        
+        if(is.null(self$impr)) {
+          self$impr = 0
         }
+        
+        if(self$impr == 0){
+          self$impr.target = impr.par
+          self$impr.relative = self$impr
+        } else{
+          self$impr.target = self$impr*impr.par
+          self$impr.relative = impr/self$impr
+        }
+          
+        if ((impr < self$impr.target) & pruning == "forward"){
+          self$improvement.met = TRUE
+          self$objective.value = NULL
+          
+        } else{
+          self$split.feature = split$feature[1]
+          self$split.type = split$split.type
+          if (self$split.type == "categorical"){
+            self$split.value = str_split(split$split.points, ",")[[1]]
+          } else if (self$split.type == "numerical"){
+            self$split.value = split$split.points
+          }
+          self$objective.value = split$objective.value[1]
+          if(split.method == "guide"){
+            self$test.type = split$test.type
+          }
+        }  
+         
+        self$impr = impr
+        
       },
       error = function(cond) {
         browser()
@@ -240,9 +232,12 @@ Node <- R6Class("Node", list(
         child.type.right = paste(self$child.type, child.type.right, sep = " & ")
       }
       left.child = Node$new(id = 1, depth = self$depth + 1, subset.idx = idx.left, id.parent = self$id, child.type = child.type.left,  improvement.met = self$improvement.met, 
-                            intImp = self$intImp, model.fit = model.left, term.predictions.parent = term.predictions.left, objective.value.parent = obj.left, r2 = r2.left, variable.importance = variable.importance.left)
+                            impr = self$impr, impr.target = self$impr.target, impr.relative = self$impr.relative, model.fit = model.left, 
+                            term.predictions.parent = term.predictions.left, objective.value.parent = obj.left, r2 = r2.left, variable.importance = variable.importance.left)
+      
       right.child = Node$new(id = 2, depth = self$depth + 1, subset.idx = idx.right, id.parent = self$id, child.type = child.type.right,  improvement.met = self$improvement.met, 
-                             intImp = self$intImp, model.fit = model.right, term.predictions.parent = term.predictions.right, objective.value.parent = obj.right, r2 = r2.right, variable.importance = variable.importance.right)
+                             impr = self$impr, impr.target = self$impr.target, impr.relative = self$impr.relative, model.fit = model.right, 
+                             term.predictions.parent = term.predictions.right, objective.value.parent = obj.right, r2 = r2.right, variable.importance = variable.importance.right)
       
       self$children = list("left.child" = left.child, "right.child" = right.child)
     }
@@ -347,7 +342,7 @@ compute_tree_slim = function(y,
   term.predictions.parent = predict.response(model.parent, input.data$X)
   
   
-  parent = Node$new(id = 0, depth = 1, subset.idx = seq_len(nrow(input.data$X)), improvement.met = FALSE, intImp = 0, model.fit = model.parent, 
+  parent = Node$new(id = 0, depth = 1, subset.idx = seq_len(nrow(input.data$X)), improvement.met = FALSE, impr = 0, model.fit = model.parent, 
                     term.predictions.parent = term.predictions.parent, variable.importance = round(apply(term.predictions.parent, MARGIN = 2, var), 4))
   
   # Perform splitting for the parent

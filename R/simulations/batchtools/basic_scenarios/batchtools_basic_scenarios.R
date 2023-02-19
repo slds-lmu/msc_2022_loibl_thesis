@@ -4,7 +4,7 @@ source("R/load_packages.R")
 # --- 1. SETUP REGISTRY ---
 if (!dir.exists("Data/simulations/batchtools/basic_scenarios")) dir.create("Data/simulations/batchtools/basic_scenarios", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scenarios/basic_scenarios",
+reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scenarios/batchtools",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/batchtools/helper_simulations.R",
@@ -12,7 +12,8 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scena
                              seed = 1
                              , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
                              )
-
+# reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools", writeable = TRUE,
+#                    conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
@@ -48,7 +49,7 @@ addExperiments(
 
 summarizeExperiments()
 testJob(27)
-submitJobs(10:500)
+submitJobs(447:1800)
 getJobTable(1:9)
 
 # pars = unwrap(getJobPars(reg = reg))
