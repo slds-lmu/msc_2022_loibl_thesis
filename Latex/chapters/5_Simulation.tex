@@ -184,6 +184,8 @@ In figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that, as expect
 Figure \ref{fig:ls_1000_standalone_r2_train} shows the accuracy depending on the number of leaf nodes for the four different MBTs.
 The numbers below each box indicate how many of the $100$ trees created with each of the four algorithms have the respective number of leafnodes. For example, 15 of the 100 SLIM trees have 8 leafnodes and the corresponding box was created from these 15 results. Note that the numbers do not add up to a hundred, as there are also a small number of trees with leafnodes outside the range shown here. The figure shows that accuracy is very high in all four procedures. The figure shows that the accuracy is high for all four methods. For MOB MBTs with $n=11$, the $R^2$ is even higher than for the correctly specified linear model.  Over the range shown, MOB and CTree (from number of leaves = 9) have slightly higher performance than SLIM and GUIDE with the same number of leaf nodes, i.e. MOB and CTree achieve a better trade-off between performance and interpretability in this scenario.
 
+\textbf{Asymmetrie vergleichen!}
+
 As can be seen in figure \ref{fig:ls_1000_standalone_r2_nleaves}, the number of leaf nodes fluctuates considerably more with SLIM and GUIDE than with MOB and CTree. 
 
 
@@ -217,8 +219,8 @@ This observation is already a sign of lower stability of SLIM and GUIDE compared
 
 \paragraph{Linear Categorical} 
 The results in the linear categorical scenario are very different from those in the previously considered scenario, as can be seen in table \ref{tab:linear_abrupt_summary}. The most noticeable difference is that the number of leafnodes remains very small with SLIM and GUIDE, even with a small value for $impr$, while much larger trees are fitted with MOB and CTree. Nevertheless, the accuracy of SLIM and GUIDE trees is on average considerable better than for the other MBTs for $impr \leq 0.10$.
-The variation in the number of leafnodes for fixed values of $impr$ also varies only slightly for SLIM and GUIDE, in contrast to the scenario linear smooth. This indicates a high stability of SLIM and CTree on this scenario. 
-The small number of splits with simultaneously high performance and stability in SLIM and GUIDE can be explained by the fact that SLIM and CTree perform splits according to $\textbf{x}_1$ and $\textbf{x}_3$ and thus already completely cover all interactions that are contained in the data generating process with $\textbf{x}_2$. MOB and CTree, on the other hand, use $\textbf{x}_2$, as a splitting variable as it is included in both interactions but thus have to perform considerable more splits to achieve a similar performance.
+The variation in the number of leafnodes for fixed values of $impr$ is also small for SLIM and GUIDE, in contrast to the scenario linear smooth. This indicates a high stability of SLIM and CTree on this scenario. 
+The small number of splits with simultaneously high performance and stability in SLIM and GUIDE can be explained by the fact that SLIM and CTree perform splits regarding the features $\textbf{x}_1$ and $\textbf{x}_3$ and thus already completely cover all interactions that are contained in the data generating process with $\textbf{x}_2$. MOB and CTree, on the other hand, use $\textbf{x}_2$, as a splitting variable as it is included in both interactions but thus have to perform considerable more splits to achieve a similar performance.
 $ y =  \textbf{x}_{1} - 8  \textbf{x}_2 + 16  \textbf{x}_2  \mathbf{I}_{\textbf{x}_3 = 0} + 8  \textbf{x}_2  \mathbf{I}_{\textbf{x}_1 > mean(\textbf{x}_1)} + \epsilon $
 \textbf{plot tree}
 
@@ -246,7 +248,7 @@ CTree & 0.001 & 11.87 & 10 & 14 & 0.9484 & 0.0030 & 0.9390 & 0.0052\\
 CTree & 0.010 & 12.82 & 11 & 15 & 0.9498 & 0.0030 & 0.9404 & 0.0051\\
 CTree & 0.050 & 13.61 & 11 & 16 & 0.9508 & 0.0029 & 0.9411 & 0.0048\\
 \hline
-lm & & & & & 0.9702 & 0.0018 & 0.9694 & 0.0029\\
+gam & & & & & 0.9702 & 0.0018 & 0.9694 & 0.0029\\
 xgboost & & & & & 0.9876 & 0.0015 & 0.9778 & 0.0031\\
 \hline
 \end{tabular}
@@ -254,13 +256,22 @@ xgboost & & & & & 0.9876 & 0.0015 & 0.9778 & 0.0031\\
 \end{table}
 
 
-Figure \ref{fig:la_1000_standalone_r2_test} shows the performance by number of leafnodes for impr = 0.05 and alpha = 0.001. There you can see again that SLIM and GUIDE achieve a very high r2 despite a low number of leafnodes. It is also noticeable that MOB performs better than CTree with the same number of leafnodes.
+Figure \ref{fig:la_1000_standalone_r2_test} shows the performance by number of leafnodes for impr = 0.05 and alpha = 0.001. There one can see again that SLIM and GUIDE achieve a very high $R^2$ despite tghe low number of leafnodes. 
+
+It is also noticeable that MOB performs better than CTree with the same number of leafnodes.
+This could be because, according to citep{\citep{Schlosser.2019}}, the M-flustuation test used in MOB has a higher ability in detecting abrupt changes than the linear test statistic used in CTree.
 
 \begin{figure} 
 \caption{Test accuracy $R^2$ vs number of leaf nodes scenario linear categorical with $n=1000, alpha = 0.001, impr = 0.05$}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_abrupt/la_1000_standalone_r2_test.pdf}
     \label{fig:la_1000_standalone_r2_test}
 \end{figure} 
+
+
+If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases. This indicates that the interactions with the GAM were not fitted well enough (despite $R^2_test = 0.97$ see table \ref{}).
+Nevertheless, the performance of SLIM and GUIDE is better than that of the other MBTs. Details are listed in the appendix. \textbf{Anhang!}
+
+
 
 
 \paragraph{Linear Mixed}
