@@ -8,8 +8,8 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/nonlinear/b
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/batchtools/nonlinear/helper_simulations_nonlinear.R"),
-                             seed = 1
-                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
+                             seed = 111
+                             # , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
 )
 
 
@@ -19,7 +19,7 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 
-addProblem(name = "nonlinear_data", fun = create_sim_data, reg = reg, seed = 123)
+addProblem(name = "nonlinear_data", fun = create_sim_data, reg = reg, seed = 222)
 pdes = list("nonlinear_data" = data.frame(n = c(4500), type = c("nonlinear_mixed")))
 
 
@@ -34,11 +34,11 @@ addAlgorithm(name = "get_sim_results_nonlinear", fun = get_sim_results_nonlinear
 addExperiments(
   reg = reg, 
   prob.designs = pdes,
-  algo.designs = NULL, 
-  repls = 30)
+  algo.designs = list("get_sim_results_nonlinear" = data.frame(r2 = c(1,0.95,0.9), impr.par = c(0.1, 0.05, 0.05))), 
+  repls = 50)
 
 summarizeExperiments()
 testJob(1)
 
-submitJobs()
+submitJobs(resources = list(walltime = 9000))
 # submitJobs(resources = list(walltime = 9000))
