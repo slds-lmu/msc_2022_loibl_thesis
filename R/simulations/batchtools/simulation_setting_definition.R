@@ -124,7 +124,14 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
     
     data = data.frame(mget(paste0("x",1:6)), y)
     fm = as.formula("y ~ x1 + x2 + x3 + ti(x2, x3) + ti(x1,x2,x4)")
-    lrn = lrn("regr.xgboost")
+    lrn = lrn("regr.xgboost",
+              max_depth = 4,
+              eta = 0.825,
+              alpha = 0.75,
+              gamma = 1,
+              nrounds = 700,
+              interaction_constraints = "[[3,4],[0,3,5]]")
+    
     
     search_space = ps()
     

@@ -79,10 +79,12 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
                  minsize = min.split, 
                  maxdepth = maxdepth, 
                  alpha = alpha)
+    mob_leaf_sizes = unlist(nodeapply(mob, ids = nodeids(mob, terminal = TRUE), function(nodes){info_node(nodes)$nobs}))
     mob_res$n_leaves = width(mob)
     mob_res$depth = NA
-    mob_res$max_leaf_size = NA
-    mob_res$min_leaf_size = NA
+    mob_res$max_leaf_size = max(mob_leaf_sizes)
+    mob_res$min_leaf_size = min(mob_leaf_sizes)
+    mob_res$sd_leaf_size = sd(mob_leaf_sizes)
     mobrule = partykit:::.list.rules.party(mob)
     mob_res$n_splitting_variables = length(unique(unlist(str_extract_all(mobrule,"(x+[1-9])"))))
     
@@ -110,11 +112,13 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
                                              data = cbind(x_train, y = y_train),
                                              ytrafo = fit_lm,
                                              control = partykit::ctree_control(minbucket = min.split, maxdepth = maxdepth - 1, alpha = alpha)))
-    
+    ctree_leaf_sizes = unlist(nodeapply(as.simpleparty(ctree), ids = nodeids(ctree, terminal = TRUE), function(nodes){info_node(nodes)$nobs}))
     ctree_res$n_leaves =  width(ctree)
-    ctree_res$depth = NA
-    ctree_res$max_leaf_size = NA
-    ctree_res$min_leaf_size = NA
+    ctree_res$depth = depth(ctree)
+    ctree_res$max_leaf_size = max(ctree_leaf_sizes)
+    ctree_res$min_leaf_size = min(ctree_leaf_sizes)
+    ctree_res$sd_leaf_size = min(sd_leaf_sizes)
+    
     ctreerule = partykit:::.list.rules.party(ctree)
     ctree_res$n_splitting_variables = length(unique(unlist(str_extract_all(ctreerule,"(x+[1-9])"))))
     fit_ctree = fit_ctree_leaves(ctree, x_train, y_train)
@@ -159,6 +163,8 @@ extract_results_slim = function(tree, x_train, x_test, y_train, y_test, data_sta
   tree_res$depth = split[split.feature != "leafnode", max(depth)]
   tree_res$max_leaf_size = split[split.feature == "leafnode", max(size)]
   tree_res$min_leaf_size = split[split.feature == "leafnode", min(size)]
+  tree_res$sd_leaf_size = sd(split[split.feature == "leafnode", min(size)])
+  
   tree_res$n_splitting_variables = length(unique(split$split.feature))-1 #substract "leafnode"
   
   tree_res$mse_train = mean((predict_slim(tree, x_train)- y_train)^2)
