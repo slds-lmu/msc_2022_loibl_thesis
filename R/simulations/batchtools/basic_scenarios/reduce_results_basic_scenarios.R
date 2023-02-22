@@ -31,7 +31,9 @@ reduce_trees = function(ades, pdes, savedir, reg){
     
     # # nur vorübergehend! muss dann in der Simulation korrigiert werden!
     # res_df = res_df[!is.na(n_leaves), ]
-    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test")    
+    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", "share_x2")   
+    measure_cols = measure_cols[measure_cols %in% colnames(res_df)]
+    
     group_cols = c("type", "n", "alpha", "impr", "surrogate", "mbt")
     group_cols = group_cols[group_cols %in% colnames(res_df)]
     
@@ -92,42 +94,43 @@ reduce_trees = function(ades, pdes, savedir, reg){
     if("stability" %in% colnames(res_df)){
       # create all possible pairs of simulation repititions
       pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
-      # set.seed(1)
-      # pair_ids_subset = sample(seq_along(pair_ids), 5000)
+      
       set_index = rep(1:100,50)
       # pair_ids = pair_ids[pair_ids_subset]
       stability_list = lapply(seq_along(pair_ids), function(p){
         pair = pair_ids[[p]]
         stability_df = data.frame(config_id = integer(), ri = double(), 
-                                  job.id = integer(), evaluationset_id = integer(), stability_same_size = logical())
+                                  job.id = integer(), evaluationset_seed = integer(), stability_same_size = logical())
 
+        set.seed(p+10000)
+        stability_index_set = sample(1:50000, 1000)
         for(conf in unique(res_df$config_id)){
-          set1_region =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]]
-          set2_region =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]]
+          s1_region =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]][stability_index_set]
+          s2_region =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]][stability_index_set]
           
-          if(length(set1_region)>1){
-            s1_region = set1_region[[set_index[p]]]
-            s2_region = set2_region[[set_index[p]]]
-            
-            
-            stability_same_size = (length(unique(s1_region)) == length(unique(s2_region)))
 
+            
+          if(length(s1_region)>1){
+            stability_same_size = (length(unique(s1_region)) == length(unique(s2_region)))
+            
             if(stability_same_size){
               ri = rand.index(as.numeric(s1_region), as.numeric(s2_region))
               
               stability_df = rbind(stability_df, 
                                    c(config_id = conf, ri = ri, job.id = pair[[1]], 
-                                     evaluationset_id = set_index[p], stability_same_size = stability_same_size),
+                                     evaluationset_seed = p+10000, stability_same_size = stability_same_size),
                                    c(config_id = conf, ri = ri, job.id = pair[[2]], 
-                                     evaluationset_id = set_index[p], stability_same_size = stability_same_size))
+                                     evaluationset_seed = p+10000, stability_same_size = stability_same_size))
             }
+          } 
+          
+          
             
-            
-          }
+
             
         }
 
-        colnames(stability_df) = c("config_id", "ri", "job.id", "evaluationset_id", "stability_same_size")
+        colnames(stability_df) = c("config_id", "ri", "job.id", "evaluationset_seed", "stability_same_size")
         return(stability_df)
       })
       stability_df = data.table(do.call("rbind", stability_list))
@@ -163,7 +166,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
       res_mean_exp = ijoin(res_mean_exp, share_x3)
       
     }
-
+    browser()
     res_mean_exp$experiment_id = exp
     res_mean_exp = cbind(experiments[exp,], res_mean_exp)
     res_sd_exp$experiment_id = exp

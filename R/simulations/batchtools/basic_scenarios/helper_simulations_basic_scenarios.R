@@ -58,9 +58,12 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   
   result_surrogate_lm = rbind(result_surrogate_lm, c(mbt = "lm", n_leaves = list(NA), 
                                                      depth = list(NA), max_leaf_size = list(NA), 
-                                                     min_leaf_size = list(NA), n_splitting_variables = list(NA),
+                                                     min_leaf_size = list(NA),
+                                                     sd_leaf_size = list(NA),
+                                                     n_splitting_variables = list(NA),
                                                      mse_train = list(mse_train_lm), r2_train = list(r2_train_lm), 
                                                      mse_test = list(mse_test_lm), r2_test = list(r2_test_lm),
+                                                     share_x2 = list(NA),
                                                      stability = list(NA)))
   result_surrogate_lm = cbind(surrogate = "lm", result_surrogate_lm)
   
@@ -91,9 +94,12 @@ get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", 
   
   result_surrogate_xgboost = rbind(result_surrogate_xgboost, c(mbt = "xgboost", n_leaves = list(NA), 
                                                                depth = list(NA), max_leaf_size = list(NA), 
-                                                               min_leaf_size = list(NA), n_splitting_variables = list(NA), 
+                                                               min_leaf_size = list(NA), sd_leaf_size = list(NA),
+                                                               n_splitting_variables = list(NA), 
                                                                mse_train = list(mse_train_xgboost), r2_train = list(r2_train_xgboost), 
                                                                mse_test = list(mse_test_xgboost), r2_test = list(r2_test_xgboost),
+                                                               share_x2 = list(NA),
+                                            
                                                                stability = list(NA)))
   result_surrogate_xgboost = cbind(surrogate = "xgboost", result_surrogate_xgboost)
   

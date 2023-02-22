@@ -81,7 +81,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
                  alpha = alpha)
     mob_leaf_sizes = unlist(nodeapply(mob, ids = nodeids(mob, terminal = TRUE), function(nodes){info_node(nodes)$nobs}))
     mob_res$n_leaves = width(mob)
-    mob_res$depth = NA
+    mob_res$depth = depth(mob)
     mob_res$max_leaf_size = max(mob_leaf_sizes)
     mob_res$min_leaf_size = min(mob_leaf_sizes)
     mob_res$sd_leaf_size = sd(mob_leaf_sizes)
@@ -96,12 +96,23 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     if(extract_variables){
       mob_res$x_wrong = ifelse(any(x_wrong %in% unique(unlist(str_extract_all(mobrule,"(x+[1-9])")))), TRUE, FALSE)
-      
     }
     
+    # calculate share of observations which where split by feature x2
+    mob_innernodes = nodeids(mob)[!(nodeids(mob) %in% nodeids(mob, terminal = TRUE))]
+    mob_obs = sapply(mob_innernodes, function(id) {
+      nrow(data_party(mob[id]))
+    })
+    mob_inner_rules = str_extract_all(partykit:::.list.rules.party(mob, i = mob_innernodes+1),"(x+[1-9])")
+    
+    mob_split_feature = unlist(sapply(mob_inner_rules,function(r){
+      tail(r,1)
+    }))
+    
+    mob_res$share_x2 = sum(mob_obs[mob_split_feature == "x2"]/sum(mob_obs))
+    
     if(!is.null(data_stability)){
-      mob_res$stability = lapply(data_stability, function(dat){as.character(predict(mob, dat, type = "node"))})
-      
+      mob_res$stability = as.character(predict(mob, data_stability, type = "node"))
     }
     
   } 
@@ -112,12 +123,12 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
                                              data = cbind(x_train, y = y_train),
                                              ytrafo = fit_lm,
                                              control = partykit::ctree_control(minbucket = min.split, maxdepth = maxdepth - 1, alpha = alpha)))
-    ctree_leaf_sizes = unlist(nodeapply(as.simpleparty(ctree), ids = nodeids(ctree, terminal = TRUE), function(nodes){info_node(nodes)$nobs}))
+    ctree_leaf_sizes = unlist(nodeapply(ctree, ids = nodeids(ctree, terminal = TRUE), function(nodes){info_node(nodes)$nobs}))
     ctree_res$n_leaves =  width(ctree)
     ctree_res$depth = depth(ctree)
     ctree_res$max_leaf_size = max(ctree_leaf_sizes)
     ctree_res$min_leaf_size = min(ctree_leaf_sizes)
-    ctree_res$sd_leaf_size = min(sd_leaf_sizes)
+    ctree_res$sd_leaf_size = sd(ctree_leaf_sizes)
     
     ctreerule = partykit:::.list.rules.party(ctree)
     ctree_res$n_splitting_variables = length(unique(unlist(str_extract_all(ctreerule,"(x+[1-9])"))))
@@ -129,6 +140,18 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     ctree_res$mse_test = mean((predict_ctree(ctree, fit_ctree, x_test)- y_test)^2)
     ctree_res$r2_test = r_2(y_test, predict_ctree(ctree, fit_ctree, x_test))
     
+    # calculate share of observations which where split by feature x2
+    ctree_innernodes = nodeids(ctree)[!(nodeids(ctree) %in% nodeids(ctree, terminal = TRUE))]
+    ctree_obs = sapply(ctree_innernodes, function(id) {
+      nrow(data_party(ctree[id]))
+    })
+    ctree_inner_rules = str_extract_all(partykit:::.list.rules.party(ctree, i = ctree_innernodes+1),"(x+[1-9])")
+    
+    ctree_split_feature = unlist(sapply(ctree_inner_rules,function(r){
+      tail(r,1)
+    }))
+    
+    ctree_res$share_x2 = sum(ctree_obs[ctree_split_feature == "x2"]/sum(ctree_obs))
     
     if(extract_variables){
       ctreerule = partykit:::.list.rules.party(ctree)
@@ -137,7 +160,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     
     
     if(!is.null(data_stability)){
-      ctree_res$stability = lapply(data_stability, function(dat){as.character(predict(ctree, dat, type = "node"))})
+      ctree_res$stability = as.character(predict(ctree, data_stability, type = "node"))
     }
   }
   
@@ -163,7 +186,7 @@ extract_results_slim = function(tree, x_train, x_test, y_train, y_test, data_sta
   tree_res$depth = split[split.feature != "leafnode", max(depth)]
   tree_res$max_leaf_size = split[split.feature == "leafnode", max(size)]
   tree_res$min_leaf_size = split[split.feature == "leafnode", min(size)]
-  tree_res$sd_leaf_size = sd(split[split.feature == "leafnode", min(size)])
+  tree_res$sd_leaf_size = sd(split[split.feature == "leafnode", size])
   
   tree_res$n_splitting_variables = length(unique(split$split.feature))-1 #substract "leafnode"
   
@@ -181,9 +204,12 @@ extract_results_slim = function(tree, x_train, x_test, y_train, y_test, data_sta
     tree_res$share_x3 = sum(split[split.feature == "x3", size])/sum(split[split.feature != "leafnode", size])
   }
   
+  tree_res$share_x2 = sum(split[split.feature == "x2", size])/sum(split[split.feature != "leafnode", size])
+  
+  
   if(!is.null(data_stability)){
     # tree varies across all repetitions due to slightly different data, but data_stability is identical across all repetitions
-    tree_res$stability = lapply(data_stability, function(dat){predict_slim(tree, dat, type = "node")})
+    tree_res$stability = predict_slim(tree, data_stability, type = "node")
   }
   
   return(tree_res)
