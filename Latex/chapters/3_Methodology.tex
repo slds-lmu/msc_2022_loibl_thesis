@@ -1,12 +1,12 @@
 \subsection{Model and Notation}
-Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((\mathbf{y}, \mathbf{x}), \theta)$ be a parametric model, that describes the target $\mathbf{y} \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x} = (\mathbf{x_1}, ... \mathbf{x_p})^T \in \mathcal{X}$  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $\mathbf{y}$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, we use the notation $\mathbf{y}^{bb}$. Given $n$ observations $(\mathbf{y}, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((\mathbf{y}, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
+Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((y, \mathbf{x}), \theta)$ be a parametric model, that describes the target $y \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x} = (\mathbf{x_1}, ... \mathbf{x_p})^T \in \mathcal{X}$  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, we use the notation $y^{bb}$. Given $n$ observations $(y, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((y, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
 \begin{align}
     \hat{\mathbf{\theta}} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta).
 \end{align}
 
-In this thesis we restrict $\mathcal{M}((\mathbf{y}, \mathbf{x}), \theta)$ to regression models, which include only main-effect models. However, if the data includes interactions, a single global model is not sufficient to fit all $n$ observations well.  To deal with interactions, the idea is to partition the feature space $\mathcal{X}$ into subregions $\{\mathcal{B}_b\}_{b = 1,...,B}$ and search for locally well fitting main-effect models in these regions. The global objective function thus expands to
+In this thesis we restrict $\mathcal{M}((y, \mathbf{x}), \theta)$ to regression models, which include only main-effect models. However, if the data includes interactions, a single global model is not sufficient to fit all $n$ observations well.  To deal with interactions, the idea is to partition the feature space $\mathcal{X}$ into subregions $\{\mathcal{B}_b\}_{b = 1,...,B}$ and search for locally well fitting main-effect models in these regions. The global objective function thus expands to
 \begin{align}
-    \sum_{b=1}^B\sum_{i \in I_b}\Psi(Y_{i}, \mathbf{X}_{i}, \theta_b)
+    \sum_{b=1}^B\sum_{i \in I_b}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_b)
 \end{align}
 and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with corresponding indexes $I_b, b = 1,...,B$) and local optimal parameter $\theta_b$ for each partition. As \citep{Zeileis.2008} points out, it is very difficult to find the optimal partition, because the number of possible partitions quickly becomes too large for an exhaustive search.
 
@@ -23,7 +23,7 @@ The resulting global models are called Model-based Trees (MBT).
 A recursive partitioning algorithm for MBTs can generally be divided into the following steps:
 \begin{enumerate}
     \item Start with the partition (node) $I_0 = 1,...,n$
-    \item Fit the model to all observations in the current node $\{y^{i}, \mathbf{x}^{i}\}, i \in I_b$ by estimating $\hat{\theta}_b$ via minimization of the objective function $\Psi$
+    \item Fit the model to all observations in the current node $\{y^{(i)}, \mathbf{x}^{(i)}\}, i \in I_b$ by estimating $\hat{\theta}_b$ via minimization of the objective function $\Psi$
     \item Find the local optimal splitpoint for this node 
     \item If no stop criterion is met (e.g. depth of the tree, improvement of the objective through split, significance of parameter instability) split the node in two child nodes and repeat the steps 2-4.
 \end{enumerate}
@@ -74,7 +74,7 @@ To investigate this, the so called score $\psi$ function is considered, which is
 gradient of the objective function regarding the parameter vector $\theta_b$ - provided that it exists:
 
 \begin{align}
-    \psi \left( \left(\mathbf{y}, \mathbf{x} \right), \theta_b \right) = \frac{\partial \Psi\left( \left(\mathbf{y}, \mathbf{x} \right), \theta_b \right)}{\partial \theta_b}.
+    \psi \left( \left(y, \mathbf{x} \right), \theta_b \right) = \frac{\partial \Psi\left( \left(y, \mathbf{x} \right), \theta_b \right)}{\partial \theta_b}.
 \end{align}
 
 \citep{Zeileis.2008}
@@ -92,28 +92,39 @@ MOB generally distinguishes between regressor variables $\mathbf{x}$, which are 
 
 
 According to \citep{Zeileis.2008} and \citep{Zeileis.2007}, under the null hypothesis of parameter stability the empirical fluctuation process $W_j(t)$ converges to a Brownian Bridge $W_0$. By applying a scalar test function to the empirical fluctuation process and the Brownian Bridge, a test statistic and the theoretical limiting distribution can be derived. An overview of possible scalar functions that can be used for this purpose can be found in \citep{Zeileis.2008} and in more detail in \citep{Zeileis.2007}.
-The variable for which the M-fluctuation test detects the most significant parameter instability is used as splitting variable. The choice of the optimal split point with respect to this variable is then made by means of an exhaustive search, analogous to slim
+The variable for which the M-fluctuation test detects the most significant parameter instability is used as splitting variable. 
+
+The choice of the optimal split point with respect to this variable is then made by means of an exhaustive search, analogous to SLIM.
+
+As a prepruning criterion, MOB uses the Bonferroni-adjusted p-value of the M-flucutation test. That means a split is only performed if the instability is significant at a given significance level $alpha$.
 
 
-A limitation of MOB that is considerably for this thesis is
-that only objective functions can be selected for which the gradient regarding $\theta_b$  exists. This means, for example, that it is not possible to fit LASSO models in the nodes.
+A limitation of MOB is that only objective functions can be selected for which the gradient regarding $\theta_b$  exists. This means, for example, that it is not possible to fit LASSO models in the nodes.
 
 
 
 \subsubsection{CTree}
-Ctree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
+CTree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
 CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $h()$ of the response $\textbf{y}$.
-A common transformation used in MBTs is the score function, i.e. $h(\textbf{y}) = \psi$, but another transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
+A common transformation used in MBTs is the score function, i.e. $h(y) = \psi$, but another transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
 
-To test the independence between the scores and the potential partition variables, Ctree uses a linear association test.
+To test the independence between the scores and the potential partition variables, CTree uses a linear association test.
 
-To measure the association between the scores $\textbf{y}$ and a potential splitting variable $\textbf{x}_{j}, j = 1,...,p$ a linear statistics of the form 
+To measure the association between the scores $y$ and a potential splitting variable $\textbf{x}_{j}, j = 1,...,p$ a linear statistics of the form 
 \begin{align}
-    T_{j}(\textbf{y},\textbf{x}) = vec\left(\sum_{i=1}^n \textbf{x}_j^{(i)}\hat{\psi}^{(i)T}\right) \in \mathbb{R}^{p_{j}q}
+    T_{j}(y,\textbf{x}) = vec\left(\sum_{i=1}^n \textbf{x}_j^{(i)}\hat{\psi}^{(i)T}\right) \in \mathbf{R}^{p_{j} q}
 \end{align}
-is used. \citep{Hothorn.2006}
+is used which is derived from the more general definition in \citep{Hothorn.2006}
 
-\citep{Schlosser.2019} state that the linear test used in Ctree has higher power in detecting smooth relationships between the scores and the splitting variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
+To standardize the teststatistic $T_{j}$, the conditional expectation and covariance of $T_{j}$ under the null hypothesis of independence between $y$ and $\textbf{x}_j$ given all permutations of $\{y,\textbf{x}\}$ are calculated.
+Different transformations can be used to to map the multivariate test statistic $T_{j}$ to a standardized univariate test statistic. The default setting in the R package \citep{.2015c} is a quadratic transformation. According to  \citep{Hothorn.2006} the transformed teststatistic follows an asymptotic $\chi^2$ distribution under the nullhypothesis.
+As in MOB, the splitting variable, for which the p-value of the test is the smallest is selected as splitting variable. A Bonferroni-adjusted p-value is again used as prepruning criterion.
+
+
+
+Unlike the other methods, the split point is not selected by an exhaustive search, but with the help of a linear test statistic. The discrepancy between two subsets is measured with a two-sample linear test statistic for each possible binary split. The split that maximises the discrepancy is chosen as the split point. \citep{Hothorn.2006}
+
+\citep{Schlosser.2019} state that the linear test used in CTree has higher power in detecting smooth relationships between the scores and the splitting variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
 
 
 \subsubsection{GUIDE}

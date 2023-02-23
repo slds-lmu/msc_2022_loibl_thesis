@@ -11,7 +11,7 @@ The concept of global surrogate models is very simple. To explain the underlying
 In addition, other promising high-performance models that can be interpreted to a certain degree are also being developed. Generalized additive models plus interactions (GA2M) of \citet{Lou.2013} are an example of an extension of generalized additive models that allow a small number of two-way interactions to be efficiently modeled in addition to the nonlinear main effects.
 
 
-One aspect that must not be forgotten when using global surrogate models is that only conclusions about the underlying black box model can be drawn, not about the actual data generating process \citep{Molnar.2019}.
+One aspect that must be remembered when using global surrogate models is that only conclusions about the underlying black box model can be drawn, not about the actual data generating process \citep{Molnar.2019}.
 
 %\subsection{Local surrogate model}
 
@@ -21,6 +21,8 @@ Like globale surrogates, Lime is very flexible in the choice of an appropriate s
 
 
 %\subsection{Sub-regional surrogate models}
-A possible approach to combine the advantages of global and local surrogate methods, i.e., to obtain models that are easy to understand on the one hand, but at the same time cover the entire feature space without sacrificing performance, is summarized here under the term subregional surrogate model.
+A approach that tries to combine the advantages of global and local surrogate methods, i.e., to obtain models that are easy to understand on the one hand, but at the same time cover the entire feature space without sacrificing performance, is summarized here under the term subregional surrogate model.
 The idea is to subdivide the feature space into appropriate subregions where fitting easy-to-interpret models is sufficient.
-\citet{Hall.2017}
+With K-LIME (K local interpretable model-agnostic explanations), \citet{Hall.2017}  pursue the approach of unsupervised partitioning of the feature space into K subregions using a K-means clustering algorithm. 
+SLIM \citep{Hu.2020}, on the other hand, uses a supervised approach (trees) to subdivides the feature space according to a given objective. According to \citep{Hu.2018}, SLIM is superior to K-LIME, which is mainly because K-LIME does not include the objective in the clustering.
+

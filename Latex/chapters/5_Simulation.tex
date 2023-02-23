@@ -182,7 +182,7 @@ In figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that, as expect
 
 
 Figure \ref{fig:ls_1000_standalone_r2_train} shows the accuracy depending on the number of leaf nodes for the four different MBTs.
-The numbers below each box indicate how many of the $100$ trees created with each of the four algorithms have the respective number of leafnodes. For example, 15 of the 100 SLIM trees have 8 leafnodes and the corresponding box was created from these 15 results. Note that the numbers do not add up to a hundred, as there are also a small number of trees with leafnodes outside the range shown here. The figure shows that accuracy is very high in all four procedures. The figure shows that the accuracy is high for all four methods. For MOB MBTs with $n=11$, the $R^2$ is even higher than for the correctly specified linear model.  Over the range shown, MOB and CTree (from number of leaves = 9) have slightly higher performance than SLIM and GUIDE with the same number of leaf nodes, i.e. MOB and CTree achieve a better trade-off between performance and interpretability in this scenario.
+The numbers below each box indicate how many of the $100$ trees created with each of the four algorithms have the respective number of leafnodes. For example, 15 of the 100 SLIM trees have 8 leafnodes and the corresponding box was created from these 15 results. Note that the numbers do not add up to a hundred, as there are also a small number of trees with leafnodes outside the range shown here. The figure shows that accuracy is very high in all four procedures. The figure shows that the accuracy is high for all four methods. For MOB MBTs with $n=11$, the $R^2$ is even higher than for the correctly specified linear model.  Over the range shown, MOB and CTree (from number of leaves = 9) have slightly higher performance than SLIM and GUIDE with the same number of leaf nodes, i.e. MOB and CTree achieve a better trade-off between performance and interpretability in this scenario as standalone model. However, when the models are used as surrogate models on lm predictions, the performance of the different MBTs with the same number of leafnodes is very close. (\textbf{siehe Anhang}
 
 \textbf{Asymmetrie vergleichen!}
 
@@ -268,7 +268,7 @@ This could be because, according to citep{\citep{Schlosser.2019}}, the M-flustua
 \end{figure} 
 
 
-If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases. This indicates that the interactions with the GAM were not fitted well enough (despite $R^2_test = 0.97$ see table \ref{}).
+If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases. This indicates that the interactions with the GAM were not fitted well enough (despite $R^2_test = 0.97$ see table \ref{tab:linear_abrupt_summary}).
 Nevertheless, the performance of SLIM and GUIDE is better than that of the other MBTs. Details are listed in the appendix. \textbf{Anhang!}
 
 
@@ -286,27 +286,27 @@ For a detailed comparison, we choose $alpha = 0.001$ and $impr = 0.05$, since th
 \hline
 MBT & \textbf{impr} & mean n leaves & n leaves min & n leaves max & mean R2 train & sd R2 train & mean R2 test & sd R2 test\\
 \hline
-SLIM & 0.15 & 2.27 & 2 & 5 & 0.9584 & 0.0072 & 0.9557 & 0.0076\\
-SLIM & 0.10 & 10.09 & 5 & 15 & 0.9860 & 0.0057 & 0.9835 & 0.0059\\
-SLIM & 0.05 & 14.75 & 12 & 18 & 0.9909 & 0.0006 & 0.9884 & 0.0009\\
-GUIDE & 0.15 & 2.25 & 2 & 5 & 0.9582 & 0.0071 & 0.9555 & 0.0072\\
-GUIDE & 0.10 & 9.81 & 5 & 14 & 0.9859 & 0.0058 & 0.9834 & 0.0060\\
-GUIDE & 0.05 & 14.60 & 11 & 17 & 0.9907 & 0.0006 & 0.9883 & 0.0009\\
+SLIM & 0.15 & 3.40 & 2 & 11 & 0.8853 & 0.0309 & 0.8771 & 0.0336\\
+SLIM & 0.10 & 13.07 & 8 & 16 & 0.9801 & 0.0073 & 0.9743 & 0.0083\\
+SLIM & 0.05 & 14.73 & 13 & 16 & 0.9830 & 0.0019 & 0.9774 & 0.0029\\
+GUIDE & 0.15 & 3.29 & 2 & 11 & 0.8839 & 0.0305 & 0.8758 & 0.0329\\
+GUIDE & 0.10 & 12.52 & 7 & 15 & 0.9789 & 0.0087 & 0.9732 & 0.0091\\
+GUIDE & 0.05 & 14.19 & 12 & 16 & 0.9822 & 0.0024 & 0.9766 & 0.0032\\
 \hline
  & \textbf{alpha} &  &  &  &  &  &  & \\
 \hline
-MOB & 0.001 & 9.48 & 8 & 13 & 0.9898 & 7e-04 & 0.9876 & 0.0011\\
-MOB & 0.010 & 11.02 & 8 & 14 & 0.9902 & 7e-04 & 0.9879 & 0.0011\\
-MOB & 0.050 & 12.54 & 9 & 15 & 0.9906 & 6e-04 & 0.9882 & 0.0010\\
-CTree & 0.001 & 11.35 & 9 & 14 & 0.9900 & 6e-04 & 0.9881 & 0.0010\\
-CTree & 0.010 & 12.74 & 10 & 15 & 0.9904 & 6e-04 & 0.9884 & 0.0010\\
-CTree & 0.050 & 13.76 & 11 & 16 & 0.9905 & 6e-04 & 0.9885 & 0.0010\\
+MOB & 0.001 & 14.52 & 13 & 17 & 0.9802 & 0.0017 & 0.9725 & 0.0027\\
+MOB & 0.010 & 14.73 & 13 & 17 & 0.9803 & 0.0017 & 0.9726 & 0.0028\\
+MOB & 0.050 & 14.80 & 13 & 17 & 0.9804 & 0.0017 & 0.9727 & 0.0028\\
+CTree & 0.001 & 14.80 & 12 & 17 & 0.9802 & 0.0017 & 0.9731 & 0.0023\\
+CTree & 0.010 & 14.98 & 13 & 17 & 0.9802 & 0.0017 & 0.9731 & 0.0023\\
+CTree & 0.050 & 15.03 & 13 & 17 & 0.9802 & 0.0017 & 0.9731 & 0.0023\\
 \hline
-lm & & & & & 0.9902 & 0.0006 & 0.9901 & 0.0008\\
-xgboost & & & & & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
+lm & & & & & 0.9902 & 0.0006 & 0.9898 & 0.0008\\
+xgboost & & & & & 0.9859 & 0.0014 & 0.9682 & 0.0042\\
 \hline
 \end{tabular}
-\label{tab:linear_smooth_summary}
+\label{tab:linear_mixed_summary}
 \end{table}
 
 \begin{figure}
