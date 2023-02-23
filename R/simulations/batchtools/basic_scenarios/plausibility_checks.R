@@ -28,36 +28,57 @@ ggpairs(overview_ls[!is.na(ri) & stability_same_size == TRUE ,.(n_leaves, ri, r2
             alpha = 0.9)) 
 
 
-result_list = list()
-result_table = c()
+result_list_slim = list()
+result_list_mob = list()
+result_table = data.table()
 for(i in 1:100){
   set.seed(i)
   data = create_sim_data(job = NULL, n = 1000, type = "linear_smooth")$data
   x = data[, colnames(data) != "y"]
   y = data$y
   
-  slim = compute_tree_slim(y, x ,n.split = 6, 
-                           impr.par = 0.1, min.split = 50, approximate = FALSE,
-                           split.method = "slim")
+  #slim
+  slim = compute_tree_slim(y, x, n.split = 6, min.split = 50)
   split = as.data.table(extract_split_criteria(slim))
-  n_leaves = sum(split$split.feature == "leafnode")
-  depth = split[split.feature != "leafnode", max(depth)]
-  max_leaf_size = split[split.feature == "leafnode", max(size)]
-  min_leaf_size = split[split.feature == "leafnode", min(size)]
-  size_ratio = max_leaf_size/min_leaf_size
-  r2 = r_2(y, predict_slim(slim, x))
+  
+  slim_res = data.table()
+  slim_res$slim_n_leaves = sum(split$split.feature == "leafnode")
+  slim_res$slim_n_leaves
+  slim_res$slim_depth = split[split.feature != "leafnode", max(depth)]
+  slim_res$slim_max_leaf_size = split[split.feature == "leafnode", max(size)]
+  slim_res$slim_min_leaf_size = split[split.feature == "leafnode", min(size)]
+  slim_res$slim_sd_leaf_size = sd(split[split.feature == "leafnode", size])
+  slim_res$slim_n_splitting_variables = length(unique(split$split.feature))-1 #substract "leafnode"
+  slim_res$slim_r2_train = r_2(y, predict_slim(slim, x))
+  
+  #mob
+  
+  mob = lmtree(fm_mob, data = data, minsize = 50, maxdepth = 6, alpha = 0.001)
+  mob_leaf_sizes = unlist(nodeapply(mob, ids = nodeids(mob, terminal = TRUE), function(nodes){info_node(nodes)$nobs}))
+  mob_res = data.table()
+  mob_res$mob_n_leaves = width(mob)
+  mob_res$mob_n_leaves
+  mob_res$mob_depth = depth(mob)
+  mob_res$mob_max_leaf_size = max(mob_leaf_sizes)
+  mob_res$mob_min_leaf_size = min(mob_leaf_sizes)
+  mob_res$mob_sd_leaf_size = sd(mob_leaf_sizes)
+  mobrule = partykit:::.list.rules.party(mob)
+  mob_res$mob_n_splitting_variables = length(unique(unlist(str_extract_all(mobrule,"(x+[1-9])"))))
+  
+  mob_res$mob_r2_train = r_2(y, predict(mob, x))
+  
+  
   result_table = rbind(result_table, 
-                       data.table("i" = i, n_leaves = n_leaves, r2 = r2, depth = depth, 
-                                  max_leaf_size = max_leaf_size, min_leaf_size = min_leaf_size, 
-                                  size_ratio = size_ratio))
-  result_list[[i]] = split
+                       cbind("i" = i, slim_res, mob_res))
+  result_list_slim[[i]] = split
+  result_list_mob[[i]] = mob
 }
 
 result_table = as.data.table(result_table)
-result_subset = result_table[n_leaves >= 5 & n_leaves < 11,]
-plot(result_subset$n_leaves, result_subset$r2)
+result_subset = result_table[slim_n_leaves >= 5 & slim_n_leaves < 11,]
+plot(result_subset$slim_n_leaves, result_subset$slim_r2)
 
-result_subset[n_leaves == 8, ]
+result_subset[slim_n_leaves == 8, ]
 # 1:   2        8 0.9871647
 # 2:   3        8 0.9874111
 # 3:  93        8 0.9874552
@@ -68,8 +89,8 @@ result_subset[n_leaves == 8, ]
 # 8: 184        8 0.9875932
 
 
-plot(result_subset[ , max_leaf_size], result_subset[ , r2])
-plot(result_subset[ , n_leaves], result_subset[ , size_ratio])
+plot(result_subset[ , slim_max_leaf_size], result_subset[ , slim_r2_train])
+plot(result_subset[ , slim_sd_leaf_size], result_subset[ , slim_r2_train])
 
 result_subset[n_leaves == 9, ]
 View(result_list[[102]])
@@ -80,3 +101,29 @@ View(result_list[[102]])
 # nicht mehr weiter gesplittet wird (d.h. ein großer leafnode mit vergleichweise schlechter Performance und 7 kleine)
 # oder aber, es werden 8 ähnlich große leafnodes erzeugt -> insgesamt bessere Performance
 
+
+
+colnames(result_table)
+result_table[slim_n_leaves == 11, .(slim_max_leaf_size, slim_sd_leaf_size, slim_r2_train)]
+result_table[mob_n_leaves == 11, .(mob_max_leaf_size, mob_sd_leaf_size, mob_r2_train)]
+
+
+nodeapply(mob, ids = nodeids(mob), function(nodes){nrow(data_party(nodes))})
+innernodes = nodeids(mob)[!(nodeids(mob) %in% nodeids(mob, terminal = TRUE))]
+obs = sapply(innernodes, function(id) {
+  nrow(data_party(mob[id]))
+})
+length(obs)
+
+innernodes
+
+rules = str_extract_all(partykit:::.list.rules.party(mob, i = innernodes+1),"(x+[1-9])")
+
+split_feature = unlist(sapply(rules,function(r){
+  tail(r,1)
+}))
+length(split_feature)
+
+
+share_x2 = nrow(data_party(mob,1))
+  

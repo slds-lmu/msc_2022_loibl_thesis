@@ -20,11 +20,11 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scena
 source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
-repls = 1L
+repls = 100L
 set.seed(49)
 data_stability = lapply(c(linear_smooth = "linear_smooth", linear_abrupt = "linear_abrupt", linear_mixed = "linear_mixed"),
                         function(t){
-                          lapply(1:100, function(i){create_sim_data(job = NULL, n = 1000, type = t)$data})
+                          create_sim_data(job = NULL, n = 50000, type = t)$data
                         })
 
 
@@ -48,9 +48,7 @@ addExperiments(
   repls = repls)
 
 summarizeExperiments()
-testJob(27)
-submitJobs(447:1800)
-getJobTable(1:9)
+submitJobs()
 
 # pars = unwrap(getJobPars(reg = reg))
 

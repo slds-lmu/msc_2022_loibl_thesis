@@ -31,7 +31,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     
     # # nur vorübergehend! muss dann in der Simulation korrigiert werden!
     # res_df = res_df[!is.na(n_leaves), ]
-    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", "share_x2")   
+    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", "share_x2", "n_leaves")   
     measure_cols = measure_cols[measure_cols %in% colnames(res_df)]
     
     group_cols = c("type", "n", "alpha", "impr", "surrogate", "mbt")
@@ -53,7 +53,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
    
     group_cols = c(group_cols, "config_id")
     
-    res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = c(measure_cols, "n_leaves")]
+    res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     res_sd_exp = res_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     
 
@@ -166,7 +166,6 @@ reduce_trees = function(ades, pdes, savedir, reg){
       res_mean_exp = ijoin(res_mean_exp, share_x3)
       
     }
-    browser()
     res_mean_exp$experiment_id = exp
     res_mean_exp = cbind(experiments[exp,], res_mean_exp)
     res_sd_exp$experiment_id = exp
