@@ -140,7 +140,7 @@ The RIs are calculated following the simulation based on pairwise comparisons of
 For a comparison of the different MBT algorithms as standalone model on the scenario linear smooth the aggregated results are listed in table \ref{tab:linear_smooth_summary} for sample size n = 1000. 
 
 \begin{table} 
-\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario linear smooth with sample size $n = 1000$ for different values of $impr$ and $alpha$}
+\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear smooth} with sample size $n = 1000$ for different values of $impr$ and $alpha$}
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r}
 \hline
@@ -240,7 +240,7 @@ MOB and CTree, on the other hand, split almost only with respect to the variable
 
 \begin{table}
 
-\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario linear categorical with sample size $n = 1000$ for different values of $impr$ and $alpha$}
+\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear categorical} with sample size $n = 1000$ for different values of $impr$ and $alpha$}
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
@@ -300,10 +300,8 @@ Nevertheless, the mean performance of SLIM and GUIDE is better than that of the 
 
 
 \paragraph{Linear Mixed}
-At in scenario linear smooth the variation in the number of leafnodes for different values of $impr$ for SLIM and GUIDE is also high here. 
-
 \begin{table} 
-\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario linear mixed with sample size $n = 1000$ for different values of $impr$ and $alpha$}
+\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear mixed} with sample size $n = 1000$ for different values of $impr$ and $alpha$}
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
@@ -342,7 +340,15 @@ lm & & & & & 0.9902 & 0.0006 & 0.9898 & 0.0008 &\\
 \label{tab:linear_mixed_summary}
 \end{table}
 
-For a detailed comparison, we choose $alpha = 0.001$ and $impr = 0.05$, since the mean number of leaf nodes is thus similar for all four MBT algorithms.
+The scenario linear mixed contains both smooth interactions that can only be handled by splits with respect to the numerical variables $\textbf{x}_1$ and $\textbf{x}_2$, and subgroups defined by the binary variables $\textbf{x}_3$ and $\textbf{x}_4$. 
+The average proportion of splits carried out with respect to the two numerical variables is shown in table \ref{tab:linear_mixed_summary}.
+For $alpha = 0.001$ and $impr = 0.05$ the mean number of leaf nodes is similar for all four MBT algorithms. The table shows that the average performance of SLIM and GUIDE for this setting is on average higher than that of the other two MBTs and at the same time the mean proportion of splits with respect to the numerical variable is lower.  This means that SLIM and GUIDE use the binary variables more often to reveal the subgroups defined by them, while MOB and even more pronounced CTree split almost exclusively along the numerical features and thus perform worse despite having the same mean number of leafnodes. 
+
+In this example, SLIM and GUIDE achieve a better tradeoff between performance and interpretability than MOB and CTree.
+
+
+In the figures \ref{fig:lm_1000_standalone_r2_test}  and \ref{fig:lm_1000_standalone_share_x3x4} this is broken down in more detail.
+
 
 \begin{figure}
 \caption{Test accuracy $R^2$ vs number of leaf nodes scenario linear mixed with $n=1000, alpha = 0.001, impr = 0.05$}
@@ -351,7 +357,21 @@ For a detailed comparison, we choose $alpha = 0.001$ and $impr = 0.05$, since th
 \end{figure} 
 
 
-In figure \ref{fig:lm_1000_standalone_r2_test} it can be seen that SLIM and GUIDE achieve better test accuracy than MOB and CTree with the same number of leafnodes. If we also look at Figure \ref{fig:lm_1000_standalone_share_x3_x4.png}, in which the proportion of observations split by $x_1$ or $x_2$ is plotted against the number of leafnodes, it becomes clear that SLIM and GUIDE use the abrupt changepoints defined through the features $x_3$ and $x_4$ for the split more often than the other two methods, which could explain the better performance of SLIM and GUIDE.
+\begin{figure}
+\caption{Share of splitted observations by features $\textbf{x}_3, \textbf{x}_4$ vs number of leaf nodes scenario linear mixed with $n=1000, alpha = 0.001, impr = 0.05$}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_share_x3x4.png}
+    \label{fig:lm_1000_standalone_share_x3x4}
+\end{figure} 
+
+
+
+For the comparison of stability we look at figure 5
+\begin{figure}
+\caption{Rand Indices for scenario linear mixed}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_sta.png}
+    \label{fig:lm_1000_standalone_lm_sta}
+\end{figure}
+
 
 
 
