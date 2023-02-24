@@ -12,8 +12,8 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scena
                              seed = 1
                              , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
                              )
-# reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools", writeable = TRUE,
-#                    conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
+reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools", writeable = TRUE,
+                   conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
@@ -48,7 +48,9 @@ addExperiments(
   repls = repls)
 
 summarizeExperiments()
-submitJobs()
+submitJobs(1201:1800)
+
+testJob(1205)
 
 # pars = unwrap(getJobPars(reg = reg))
 

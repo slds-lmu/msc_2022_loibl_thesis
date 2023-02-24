@@ -13,12 +13,14 @@ reduce_trees = function(ades, pdes, savedir, reg){
   if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
   res_mean = data.table()
+
   res_sd = data.table()
+
   
   for(exp in 1:nrow(experiments)){
     # find all job ids which contain repititions of the experiment
     pars = unwrap(getJobPars(reg = reg))
-    toreduce = ijoin(experiments[exp,], pars)[1:100,]
+    toreduce = ijoin(experiments[exp,], pars)
     # toreduce = ijoin(toreduce$job.id, findDone(reg = reg))
     reduce = function(res) rbind(res)
     res = reduceResultsDataTable(ids = toreduce$job.id, fun = reduce, reg = reg)
@@ -31,7 +33,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     
     # # nur vorübergehend! muss dann in der Simulation korrigiert werden!
     # res_df = res_df[!is.na(n_leaves), ]
-    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", "share_x2", "n_leaves")   
+    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", paste0("share_x",1:4), "n_leaves")   
     measure_cols = measure_cols[measure_cols %in% colnames(res_df)]
     
     group_cols = c("type", "n", "alpha", "impr", "surrogate", "mbt")
@@ -94,12 +96,12 @@ reduce_trees = function(ades, pdes, savedir, reg){
     if("stability" %in% colnames(res_df)){
       # create all possible pairs of simulation repititions
       pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
-      
+
       set_index = rep(1:100,50)
       # pair_ids = pair_ids[pair_ids_subset]
       stability_list = lapply(seq_along(pair_ids), function(p){
         pair = pair_ids[[p]]
-        stability_df = data.frame(config_id = integer(), ri = double(), 
+        stability_df = data.frame(config_id = integer(), ri = double(),
                                   job.id = integer(), evaluationset_seed = integer(), stability_same_size = logical())
 
         set.seed(p+10000)
@@ -107,35 +109,38 @@ reduce_trees = function(ades, pdes, savedir, reg){
         for(conf in unique(res_df$config_id)){
           s1_region =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]][stability_index_set]
           s2_region =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]][stability_index_set]
-          
 
-            
+
+
           if(length(s1_region)>1){
             stability_same_size = (length(unique(s1_region)) == length(unique(s2_region)))
-            
+
             if(stability_same_size){
               ri = rand.index(as.numeric(s1_region), as.numeric(s2_region))
-              
-              stability_df = rbind(stability_df, 
-                                   c(config_id = conf, ri = ri, job.id = pair[[1]], 
+
+              stability_df = rbind(stability_df,
+                                   c(config_id = conf, ri = ri, job.id = pair[[1]],
                                      evaluationset_seed = p+10000, stability_same_size = stability_same_size),
-                                   c(config_id = conf, ri = ri, job.id = pair[[2]], 
+                                   c(config_id = conf, ri = ri, job.id = pair[[2]],
                                      evaluationset_seed = p+10000, stability_same_size = stability_same_size))
             }
-          } 
-          
-          
-            
+          }
 
-            
+
+
+
+
         }
 
         colnames(stability_df) = c("config_id", "ri", "job.id", "evaluationset_seed", "stability_same_size")
         return(stability_df)
       })
-      stability_df = data.table(do.call("rbind", stability_list))
-      res_save = ojoin(res_df, stability_df, by = c("job.id", "config_id"))
-      res_save[, ":="(stability = NULL)]
+     stability_df = data.table(do.call("rbind", stability_list))
+    
+      
+      res_df[, ":="(stability = NULL)]
+      
+      res_save = ijoin(res_df, stability_df, by = c("job.id", "config_id"))
       
       saveRDS(res_save, paste0(savedir, exp, "_res_experiments.rds" ))
       
@@ -161,21 +166,17 @@ reduce_trees = function(ades, pdes, savedir, reg){
       
     }
     
-    if("share_x3" %in% colnames(res_df)){
-      share_x3 = res_df[, .(share_x3 = mean(as.numeric(share_x3))), by = config_id]
-      res_mean_exp = ijoin(res_mean_exp, share_x3)
-      
-    }
     res_mean_exp$experiment_id = exp
     res_mean_exp = cbind(experiments[exp,], res_mean_exp)
     res_sd_exp$experiment_id = exp
     res_sd_exp = cbind(experiments[exp,], res_sd_exp)
     
     
-    res_mean = rbind(res_mean, res_mean_exp)
-    res_sd = rbind(res_sd, res_sd_exp)
+    res_mean = rbind(res_mean, res_mean_exp, fill = TRUE)
+    res_sd = rbind(res_sd, res_sd_exp, fill = TRUE)
     
   }
+  
   
   saveRDS(list(mean = res_mean, sd = res_sd), paste0(savedir, "result_summary.rds" ))
   
@@ -216,7 +217,9 @@ reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools
 ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
 pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
 
-savedir_basic = "Data/simulations/batchtools/basic_scenarios/results/"
+# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results/"
+savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_new/"
+
 
 result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
 

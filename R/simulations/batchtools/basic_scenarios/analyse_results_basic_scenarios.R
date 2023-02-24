@@ -9,7 +9,8 @@ library(ggpubr)
 
 
 
-colors_mbt =c("SLIM" = 'purple', "GUIDE" = 'olivedrab3', "MOB" ='skyblue', "CTree" = 'salmon')
+colors_mbt =c("SLIM" = 'purple', "SLIM low symmetry" = "purple3", "GUIDE" = 'olivedrab3', "GUIDE low symmetry" = 'olivedrab4', 
+              "MOB" ='skyblue', "CTree" = 'salmon')
 colors_surrogate = c("standalone" = "white", "lm" = "lightgrey", xgboost = "cornsilk")
 
 
@@ -22,11 +23,13 @@ experiments = merge(ades_basic, pdes_basic, by = NULL)
 # ----- 1. Linear Smooth -----
 # stand-alone
 
-result_basic = readRDS("Data/simulations/batchtools/basic_scenarios_18_02/results/result_summary.rds")
+result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
 result_basic_mean = result_basic$mean
 result_basic_sd = result_basic$sd
-setnames(result_basic_sd, c("r2_train", "r2_test"), c("r2_train_sd", "r2_test_sd"))
-result_basic_mean = cbind(result_basic_mean, result_basic_sd[,.(r2_train_sd, r2_test_sd)])
+setnames(result_basic_sd, c("r2_train", "r2_test", paste0("share_x",1:4), "n_leaves"), 
+         c("r2_train_sd", "r2_test_sd", paste0("share_x",1:4,"_sd"), "n_leaves_sd"))
+result_basic_mean = cbind(result_basic_mean, 
+                          result_basic_sd[,.(r2_train_sd, r2_test_sd, share_x2_sd, n_leaves_sd)])
 result_basic_mean[type == "linear_mixed" & mbt == "SLIM" & n == 1500]
 
 list.files("Data/simulations/batchtools/basic_scenarios/results/")
@@ -37,14 +40,14 @@ View(result_basic$mean[n == 1500 & type == "linear_smooth" & surrogate == "stand
                   .(mbt, alpha , impr, n_leaves, r2_train, r2_test, ri)])
 
 
-result_basic_mean[n == 1500 & type == "linear_smooth" &  ((surrogate == "standalone" & mbt %in% c("SLIM", "GUIDE")) |
+result_basic_mean[n == 7500 & type == "linear_smooth" &  ((surrogate %in% c("standalone", "lm", "xgboost") & mbt %in% c("SLIM", "GUIDE", "MOB", "CTree")) |
                                                             (mbt == "lm" & surrogate =="lm") |
                                                             (mbt == "xgboost" & surrogate =="xgboost")),
-.(mbt, impr, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>% 
-  arrange(.,desc(mbt))%>%
-  kbl(caption="Mean simulation results on 100 simulation runs for SLIM and GUIDE as stand alone model on scenario Linear smooth with n = 1000 for different values of impr ",
+.(surrogate, mbt, impr, alpha, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>% 
+  arrange(.,surrogate, desc(mbt))%>%
+  kbl(caption="Mean simulation results on 100 simulation runs as stand alone models on scenario linear smooth with sample size n = 1000 for different values of impr and alpha",
       format="latex",
-      col.names = c("MBT", "alpha","mean n leaves", "n leaves min", "n leaves max", "mean R2 train", "sd R2 train", "mean R2 test", "sd R2 test"),
+      col.names = c("black box","MBT","impr", "alpha","mean n leaves", "n leaves min", "n leaves max", "mean R2 train", "sd R2 train", "mean R2 test", "sd R2 test"),
       align="r",
       digits = 4) %>%
   kable_minimal(full_width = F)
@@ -54,9 +57,9 @@ result_basic_mean[n == 1500 & type == "linear_smooth" &  ((surrogate == "standal
 save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_smooth/"
 if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
 
-res_ls_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios_18_02/results/1_res_experiments.rds")
+res_ls_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios/results/1_res_experiments.rds")
 
-res_ls_n1500_alpha01 = readRDS("Data/simulations/batchtools/basic_scenarios_18_02/results/2_res_experiments.rds")
+res_ls_n1500_alpha01 = readRDS("Data/simulations/batchtools/basic_scenarios/results/2_res_experiments.rds")
 
 # standalone
 overview_ls = rbind(unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE"),
@@ -112,7 +115,7 @@ p_ls_1000_int = ggplot(interpretabiliy_ls[surrogate %in% c("standalone", "lm", "
   scale_color_manual(values = colors_mbt, guide = "none") +
   scale_fill_manual(values = colors_surrogate)+
   labs(x="MBT", y="Number of leafnodes",
-       fill = "surrogate")
+       fill = "black box")
 ggexport(p_ls_1000_int, filename = paste0(save_dir, "ls_1000_int.png"), width = 800, height = 300)
 
 
@@ -189,7 +192,7 @@ p_ls_1000_lm_sta = ggplot(stability_ls[surrogate %in% c("standalone", "lm")& sta
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = colors_surrogate)+
-  labs(x="MBT", y="RI", fill = "surrogate", color = "MBT")
+  labs(x="MBT", y="RI", fill = "black box", color = "MBT")
 ggexport(p_ls_1000_lm_sta, filename = paste0(save_dir, "ls_1000_lm_sta.png"), width = 1200, height = 450)
 
 
@@ -211,7 +214,7 @@ p_ls_1000_xgboost_sta = ggplot(stability_ls[surrogate %in% c("standalone", "xgbo
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = c("standalone" = "white", "xgboost" = "lightgrey"))+
-  labs(x="MBT", y="RI", fill = "surrogate", color = "MBT")
+  labs(x="MBT", y="RI", fill = "black box", color = "MBT")
 ggexport(p_ls_1000_xgboost_sta, filename = paste0(save_dir, "ls_1000_standalone_xgboost_sta.png"), width = 1200, height = 450)
 
 
@@ -228,14 +231,26 @@ ggexport(p_ls_1000_standalone, filename = paste0(save_dir, "ls_1000_standalone_r
 
 
 
-performance_ls = rbind(unique(res_ls_n1500_alpha001[mbt %in% c("MOB", "CTree"),.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves, max_leaf_size)]),
-                       unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE"),.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves, max_leaf_size)]), use.names = FALSE)
+performance_ls = rbind(unique(res_ls_n1500_alpha001[mbt %in% c("MOB", "CTree"),
+                                                    .(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves, max_leaf_size)]),
+                       unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE"),
+                                                   .(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves, max_leaf_size)]), use.names = FALSE)
+
+plot(performance_ls[mbt == "SLIM", max_leaf_size], performance_ls[mbt == "SLIM", r2_train])
+performance_ls[, mbt_incl_assymmetry := mbt]
+performance_ls[mbt %in% c("SLIM", "GUIDE") & n_leaves %in% 7:9 & max_leaf_size > 350, 
+               mbt_incl_assymmetry := paste0(mbt, " low symmetry")]
+
+
+
 
 # Standalone
 p_ls_1000_standalone_r2_train = ggplot(performance_ls[surrogate == "standalone" & n_leaves %in% 8:11],
                                   aes(x = as.factor(n_leaves), 
                                       y = r2_train,
-                                      fill = factor(mbt, levels = c("SLIM", "GUIDE", "MOB", "CTree"))
+                                      fill = factor(mbt_incl_assymmetry, 
+                                                    levels = c("SLIM", "SLIM low symmetry", "GUIDE", "GUIDE low symmetry",
+                                                                    "MOB", "CTree"))
                                   )) +
   stat_boxplot(geom = "boxplot") +
   scale_fill_manual(values = c(colors_mbt, colors_surrogate)) +
@@ -257,7 +272,9 @@ ggexport(p_ls_1000_standalone_r2_train, filename = paste0(save_dir, "ls_1000_sta
 p_ls_1000_standalone_r2_test = ggplot(performance_ls[surrogate == "standalone" & n_leaves > 7 & n_leaves < 12],
                                        aes(x = as.factor(n_leaves), 
                                            y = r2_test,
-                                           fill = factor(mbt, levels = c("SLIM", "GUIDE", "MOB", "CTree"))
+                                           fill = factor(mbt_incl_assymmetry, 
+                                                         levels = c("SLIM", "SLIM low symmetry", "GUIDE", "GUIDE low symmetry",
+                                                                    "MOB", "CTree"))
                                        )) +
   stat_boxplot(geom = "boxplot") +
   scale_fill_manual(values = colors_mbt) +
@@ -326,17 +343,18 @@ ggexport(p_ls_1000_lm_r2_test, filename = paste0(save_dir, "ls_1000_lm_r2_test.p
 
 
 
-result_basic_mean[n == 1500 & type == "linear_abrupt" &  ((surrogate == "standalone" & mbt %in% c("SLIM", "GUIDE")) |
+result_basic_mean[n == 1500 & type == "linear_abrupt" &  ((surrogate %in% c("lm", "xgboost") & mbt %in% c("SLIM", "GUIDE", "MOB", "CTree")) |
                                                             (mbt == "lm" & surrogate =="lm") |
                                                             (mbt == "xgboost" & surrogate =="xgboost")),
-                  .(mbt, impr, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>% 
-  arrange(.,desc(mbt))%>%
-  kbl(caption="Mean simulation results on 100 simulation runs for MOB and CTree as stand alone model on scenario Linear smooth with n = 1000 for different values of impr ",
+                  .(surrogate, mbt, impr, alpha, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd, share_x2)] %>% 
+  arrange(., desc(mbt))%>%
+  kbl(caption="Mean simulation results on 100 simulation runs as stand alone models on scenario linear categorical with sample size n = 1000 for different values of impr and alpha",
       format="latex",
-      col.names = c("MBT", "impr","mean n leaves", "n leaves min", "n leaves max", "mean R2 train", "sd R2 train", "mean R2 test", "sd R2 test"),
+      col.names = c("black box","MBT","impr", "alpha","mean n leaves", "n leaves min", "n leaves max", "mean R2 train", "sd R2 train", "mean R2 test", "sd R2 test", "share_x2"),
       align="r",
       digits = 4) %>%
   kable_minimal(full_width = F)
+
 
 # --- overview ----
 save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_abrupt/"
@@ -344,10 +362,10 @@ if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
 
 
 # alpha = 0.001 for mob and ctree
-res_la_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios_18_02/results/7_res_experiments.rds")
+res_la_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios/results/7_res_experiments.rds")
 
 # alpha = 0.05 i.e. impr = 0.05 for slim and guide
-res_la_n1500_alpha05 = readRDS("Data/simulations/batchtools/basic_scenarios_18_02/results/9_res_experiments.rds")
+res_la_n1500_alpha05 = readRDS("Data/simulations/batchtools/basic_scenarios/results/9_res_experiments.rds")
 
 # standalone
 overview_la = rbind(unique(res_la_n1500_alpha05[mbt %in% c("SLIM", "GUIDE") ,
@@ -379,7 +397,7 @@ p_la_1000_int = ggplot(interpretabiliy_la[surrogate %in% c("standalone", "lm", "
   stat_boxplot(geom = "boxplot") +
   scale_color_manual(values = colors_mbt, guide = "none") +
   scale_fill_manual(values = colors_surrogate)+
-  labs(x="MBT", y="Number of leafnodes", fill = "surrogate")
+  labs(x="MBT", y="Number of leafnodes", fill = "black box")
 ggexport(p_la_1000_int, filename = paste0(save_dir, "la_1000_int.png"), width = 800, height = 300)
 
 
@@ -433,7 +451,7 @@ p_la_1000_standalone_lm_sta = ggplot(stability_la[surrogate %in% c("standalone",
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = colors_surrogate)+
-  labs(x="MBT", y="RI", fill = "surrogate", color = "MBT")
+  labs(x="MBT", y="RI", fill = "black box", color = "MBT")
 ggexport(p_la_1000_standalone_lm_sta, filename = paste0(save_dir, "la_1000_standalone_lm_sta.png"), width = 2000, height = 450)
 
 
@@ -542,38 +560,34 @@ ggexport(p_la_1000_lm_r2_test, filename = paste0(save_dir, "la_1000_lm_r2_test.p
 
 # ----- 3. Linear Mixed -----
 
-result_basic_mean[n == 1500 & type == "linear_mixed" & surrogate == "standalone" & mbt %in% c("MOB", "CTree"),
-                  .(mbt, impr, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>% 
-  arrange(.,desc(mbt))%>%
-  kbl(caption="Mean simulation results on 100 simulation runs for MOB and CTree as stand alone model on scenario Linear smooth with n = 1000 for different values of impr ",
-      format="latex",
-      col.names = c("MBT", "alpha","mean n leaves", "n leaves min", "n leaves max", "mean R2 train", "sd R2 train", "mean R2 test", "sd R2 test"),
-      align="r",
-      digits = 4) %>%
-  kable_minimal(full_width = F)
-
-
-
-result_basic_mean[n == 1500 & type == "linear_mixed" &  ((surrogate == "standalone" & mbt %in% c("SLIM", "GUIDE")) |
+result_basic_mean[,":="(share_x1_x2 = share_x1 + share_x2,
+                        share_x3_x4 = share_x3 + share_x4)]
+result_basic_mean[n == 1500 & type == "linear_mixed" &  ((surrogate %in% c("standalone") & mbt %in% c("SLIM", "GUIDE", "MOB", "CTree")) |
                                                            (mbt == "lm" & surrogate =="lm") |
                                                            (mbt == "xgboost" & surrogate =="xgboost")),
-                  .(mbt, impr, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>% 
-  arrange(.,desc(mbt))%>%
-  kbl(caption="Mean simulation results on 100 simulation runs for SLIM and GUIDE as stand alone model on scenario Linear smooth with n = 1000 for different values of impr ",
+                  .(mbt, impr, alpha, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd, share_x1_x2)] %>% 
+  arrange(., desc(mbt))%>%
+  kbl(caption="Mean simulation results on 100 simulation runs as stand alone models on scenario linear mixed with sample size n = 1000 for different values of impr and alpha",
       format="latex",
-      col.names = c("MBT", "alpha","mean n leaves", "n leaves min", "n leaves max", "mean R2 train", "sd R2 train", "mean R2 test", "sd R2 test"),
+      col.names = c("MBT","impr", "alpha","mean n leaves", "n leaves min", "n leaves max", "mean R2 train", "sd R2 train", "mean R2 test", "sd R2 test", "share_x1_x2"),
       align="r",
-      digits = 4) %>%
+      digits = 4,
+      midrule = "" )  %>%
   kable_minimal(full_width = F)
+
+
+
+
+
 
 
 # --- overview ---
 save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_mixed/"
 if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
 
-res_lm_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios_18_02/results/13_res_experiments.rds")
+res_lm_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios/results/13_res_experiments.rds")
 
-res_lm_n1500_alpha05 = readRDS("Data/simulations/batchtools/basic_scenarios_18_02/results/15_res_experiments.rds")
+res_lm_n1500_alpha05 = readRDS("Data/simulations/batchtools/basic_scenarios/results/15_res_experiments.rds")
 
 
 # --- Overview ----
@@ -607,7 +621,7 @@ p_lm_1000_int = ggplot(interpretabiliy_lm[surrogate %in% c("standalone", "lm", "
   stat_boxplot(geom = "boxplot") +
   scale_color_manual(values = colors_mbt, guide = "none") +
   scale_fill_manual(values = colors_surrogate)+
-  labs(x="MBT", y="Number of leafnodes", fill = "surrogate")
+  labs(x="MBT", y="Number of leafnodes", fill = "black box")
 ggexport(p_lm_1000_int, filename = paste0(save_dir, "lm_1000_int.png"), width = 800, height = 300)
 
 
@@ -666,14 +680,14 @@ p_lm_1000_standalone_lm_sta = ggplot(stability_lm[surrogate %in% c("standalone",
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = colors_surrogate)+
-  labs(x="MBT", y="RI", fill = "surrogate", color = "MBT")
+  labs(x="MBT", y="RI", fill = "black box", color = "MBT")
 ggexport(p_lm_1000_standalone_lm_sta, filename = paste0(save_dir, "lm_1000_standalone_lm_sta.png"), width = 1500, height = 450)
 
 
 # ---- Performance ----
-performance_lm = rbind(unique(res_lm_n1500_alpha001[mbt %in% c("MOB", "CTree"),.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves)]),
-                       unique(res_lm_n1500_alpha05[mbt %in% c("SLIM", "GUIDE"),.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves)]),
-                       unique(res_lm_n1500_alpha05[mbt %in% c("lm", "xgboost") ,.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves)]), use.names = FALSE)
+performance_lm = rbind(unique(res_lm_n1500_alpha001[mbt %in% c("MOB", "CTree"),.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves, share_x2)]),
+                       unique(res_lm_n1500_alpha05[mbt %in% c("SLIM", "GUIDE"),.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves, share_x2)]),
+                       unique(res_lm_n1500_alpha05[mbt %in% c("lm", "xgboost") ,.(r2_train, r2_test, mbt, job.id, config_id, surrogate, n_leaves, share_x2)]), use.names = FALSE)
 
 p_lm_1000_standalone = ggpairs(unique(overview_lm[ surrogate == "standalone",.(n_leaves, r2_train, r2_test, mbt, job.id, config_id)]),
                                columns = 1:3,        # Columns
@@ -684,7 +698,7 @@ ggexport(p_lm_1000_standalone, filename = paste0(save_dir, "lm_1000_standalone_r
 # Standalone
 p_lm_1000_standalone_r2_train = ggplot(performance_lm[surrogate == "standalone"],
                                        aes(x = as.factor(n_leaves), 
-                                           y = r2_train,
+                                           y = share_x2,
                                            fill = factor(mbt, levels = c("SLIM", "GUIDE", "MOB", "CTree"))
                                        )) +
   stat_boxplot(geom = "boxplot") +
@@ -699,7 +713,7 @@ p_lm_1000_standalone_r2_train = ggplot(performance_lm[surrogate == "standalone"]
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
-  labs(x="number of leafnodes", y="R2", fill = "MBT")
+  labs(x="number of leafnodes", y="share", fill = "MBT")
 
 ggexport(p_lm_1000_standalone_r2_train, filename = paste0(save_dir, "lm_1000_standalone_r2_train.png"), width = 800, height = 300)
 

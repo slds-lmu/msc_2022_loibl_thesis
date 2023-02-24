@@ -109,7 +109,11 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
       tail(r,1)
     }))
     
+    mob_res$share_x1 = sum(mob_obs[mob_split_feature == "x1"]/sum(mob_obs))
     mob_res$share_x2 = sum(mob_obs[mob_split_feature == "x2"]/sum(mob_obs))
+    mob_res$share_x3 = sum(mob_obs[mob_split_feature == "x3"]/sum(mob_obs))
+    mob_res$share_x4 = sum(mob_obs[mob_split_feature == "x4"]/sum(mob_obs))
+    
     
     if(!is.null(data_stability)){
       mob_res$stability = as.character(predict(mob, data_stability, type = "node"))
@@ -151,7 +155,11 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
       tail(r,1)
     }))
     
+    ctree_res$share_x1 = sum(ctree_obs[ctree_split_feature == "x1"]/sum(ctree_obs))
     ctree_res$share_x2 = sum(ctree_obs[ctree_split_feature == "x2"]/sum(ctree_obs))
+    ctree_res$share_x3 = sum(ctree_obs[ctree_split_feature == "x3"]/sum(ctree_obs))
+    ctree_res$share_x4 = sum(ctree_obs[ctree_split_feature == "x4"]/sum(ctree_obs))
+    
     
     if(extract_variables){
       ctreerule = partykit:::.list.rules.party(ctree)
@@ -200,11 +208,12 @@ extract_results_slim = function(tree, x_train, x_test, y_train, y_test, data_sta
     tree_res$x_wrong = ifelse(any(x_wrong %in% unique(split[,split.feature])), TRUE, FALSE)
   }
   
-  if(lasso){
-    tree_res$share_x3 = sum(split[split.feature == "x3", size])/sum(split[split.feature != "leafnode", size])
-  }
+  tree_obs = sum(split[split.feature != "leafnode", size])
   
-  tree_res$share_x2 = sum(split[split.feature == "x2", size])/sum(split[split.feature != "leafnode", size])
+  tree_res$share_x1 = sum(split[split.feature == "x1", size])/tree_obs
+  tree_res$share_x2 = sum(split[split.feature == "x2", size])/tree_obs
+  tree_res$share_x3 = sum(split[split.feature == "x3", size])/tree_obs
+  tree_res$share_x4 = sum(split[split.feature == "x4", size])/tree_obs
   
   
   if(!is.null(data_stability)){
