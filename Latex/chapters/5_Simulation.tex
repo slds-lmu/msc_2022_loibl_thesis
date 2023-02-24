@@ -189,12 +189,14 @@ In figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that, as expect
 \begin{figure} 
 \caption{Test accuracy $R^2$ vs number of leaf nodes scenario linear smooth with $n=1000, alpha = 0.001, impr = 0.1$}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_test.png}
-    \label{fig:ls_1000_standalone_r2_train}
+    \label{fig:ls_1000_standalone_r2_test}
 \end{figure} 
 
-Figure \ref{fig:ls_1000_standalone_r2_train} shows the accuracy depending on the number of leaf nodes for the four different MBTs.
+Figure \ref{fig:ls_1000_standalone_r2_test} shows the accuracy depending on the number of leaf nodes for the four different MBTs.
 The numbers below each box indicate how many of the $100$ trees created with each of the four algorithms have the respective number of leafnodes. For example, 8 of the 100 SLIM trees have 10 leafnodes and the corresponding box was created from these 10 results. Note that the numbers do not add up to a hundred, as there are also a small number of trees with leafnodes outside the range shown here. The results of SLIM and GUIDE are divided into two groups for 8 and 9 leafnodes for this plot. Trees with low symmetry are here defined as trees in which the largest leafnode contains at least 350 observations. The results between the two groups differ greatly, as already recognised in figure \ref{fig:ls_1000_standalone_r2_nleaves}.
-The figure shows that accuracy is very high in all four MBT.   Over the range shown, MOB and CTree (from number of leaves = 9) have slightly higher performance than SLIM and GUIDE with the same number of leaf nodes, i.e. MOB and CTree achieve a better trade-off between performance and interpretability in this scenario as standalone model. However, when the models are used as surrogate models on lm predictions, the performance of the different MBTs with the same number of leafnodes is very close. (\textbf{siehe Anhang}
+The figure shows that accuracy is very high in all four MBT. Over the range shown, MOB and CTree (from number of leaves = 9) have slightly higher performance than SLIM and GUIDE with the same number of leaf nodes, i.e. MOB and CTree achieve a better trade-off between performance and interpretability in this scenario as standalone model.
+As can be seen in figure \ref{fig:ls_1000_standalone_symmetrie}, SLIM and GUIDE have a higher average maximum leafsize (lower symmetrie) over the entire comparable range of leafnodes than MOB and GUIDE, which could be a reason for the slightly worse performance.
+However, when the models are used as surrogate models on lm predictions, the performance of the different MBTs with the same number of leafnodes is very close. (\textbf{siehe Anhang}
 Overall, it should  be noted that the number of leafnodes required to achieve a similar performance as the correctly specified linear model is very high, considering that it is actually a very simple data generating process. This is because the smooth interaction can only be well approximated through many binary splits. 
 
 
@@ -349,7 +351,7 @@ For a detailed comparison, we choose $alpha = 0.001$ and $impr = 0.05$, since th
 \end{figure} 
 
 
-
+In figure \ref{fig:lm_1000_standalone_r2_test} it can be seen that SLIM and GUIDE achieve better test accuracy than MOB and CTree with the same number of leafnodes. If we also look at Figure \ref{}, in which the proportion of observations split by $x_1$ or $x_2$ is plotted against the number of leafnodes, it becomes clear that SLIM and GUIDE use the abrupt changepoints defined through the features $x_3$ and $x_4$ for the split more often than the other two methods, which could explain the better performance of SLIM and GUIDE.
 
 
 
