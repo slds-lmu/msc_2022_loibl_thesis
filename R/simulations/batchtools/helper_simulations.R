@@ -172,12 +172,13 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
     }
   }
   
-  res = rbind(slim_res, guide_res, mob_res, ctree_res)
   if ("slim_ridge" %in% tree_methods){
     res = rbind(res, slim_ridge_res)
   }
   if ("slim_lasso" %in% tree_methods){
-    res = rbind(slim_res, slim_lasso_res, slim_lasso_max_df_res_complete, cbind(rbind(guide_res, mob_res, ctree_res), share_x3 = NA))
+    res = rbind(slim_res, slim_lasso_res, slim_lasso_max_df_res_complete, guide_res, mob_res, ctree_res)
+  } else{
+    res = rbind(slim_res, guide_res, mob_res, ctree_res)
   }
   
   

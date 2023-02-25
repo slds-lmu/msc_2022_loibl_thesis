@@ -62,6 +62,11 @@ get_sim_results_lasso = function(data, job, instance,
                                    extract_variables = TRUE,  
                                    tree_methods = c("slim", "mob", "ctree", "guide", "slim_lasso", "slim_lasso_max_df"),
                                    df.max = df.max)
+  result_surrogate_lm = rbind(result_surrogate_lm, c(mbt = "lm", n_leaves = NA, depth = NA, max_leaf_size = NA,
+                                                     min_leaf_size = NA, sd_leaf_size = NA, n_splitting_variables = NA,
+                                                     mse_train = mse_train_lm, r2_train = r2_train_lm, 
+                                                     mse_test = mse_test_lm, r2_test = r2_test_lm,
+                                                     x_wrong = FALSE, share_x1 = NA, share_x2 = NA, share_x3 = NA, share_x4 = NA))
   
 
   result_surrogate_lm = cbind(surrogate = "lm", result_surrogate_lm)

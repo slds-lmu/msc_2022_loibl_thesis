@@ -22,7 +22,12 @@ predict_slim = function(tree, newdata, type = "response", degree.poly = 1, fit.b
   
   predictions = c()
   for (n in 1:nrow(nodes)){
-    node_data = as.data.frame(newdata[eval(parse(text = nodes[n, "child.type"])),])
+    if(nrow(nodes) == 1){
+      node_data = as.data.frame(newdata)
+    } else{
+      node_data = as.data.frame(newdata[eval(parse(text = nodes[n, "child.type"])),])
+    }
+    
     node_id = as.character(nodes[n,"id.node"])
     if (nrow(node_data) > 0){
       if (type == "response"){
