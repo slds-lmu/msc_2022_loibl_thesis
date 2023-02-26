@@ -1,6 +1,7 @@
 # reduce data simulation 
 library(batchtools)
 library(fossil)
+library(data.table)
 source("R/helper_stability.R")
 
 
@@ -31,8 +32,6 @@ reduce_trees = function(ades, pdes, savedir, reg){
     })
     res_df = data.table(do.call("rbind", res_list))
     
-    # # nur vorübergehend! muss dann in der Simulation korrigiert werden!
-    # res_df = res_df[!is.na(n_leaves), ]
     measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", paste0("share_x",1:4), "n_leaves")   
     measure_cols = measure_cols[measure_cols %in% colnames(res_df)]
     
@@ -44,10 +43,12 @@ reduce_trees = function(ades, pdes, savedir, reg){
     }
     
     cols_unwrap = colnames(res_df)[sapply(res_df, is.list) & colnames(res_df) != "stability"]
-    res_df = unwrap(res_df, cols = cols_unwrap)
-    setnames(res_df, paste0(cols_unwrap, ".1"),
-             cols_unwrap)
-    # save raw result data
+    if(length(cols_unwrap>0)){
+      res_df = unwrap(res_df, cols = cols_unwrap)
+      setnames(res_df, paste0(cols_unwrap, ".1"),
+               cols_unwrap)
+    }
+    
     res_df[, config_id:=.GRP,by = group_cols]
     
     
@@ -55,8 +56,8 @@ reduce_trees = function(ades, pdes, savedir, reg){
    
     group_cols = c(group_cols, "config_id")
     
-    res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
-    res_sd_exp = res_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
+    res_mean_exp = res_df[, lapply(.SD, function(col){mean(as.numeric(col), na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
+    res_sd_exp = res_df[, lapply(.SD, function(col){sd(as.numeric(col), na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     
 
     
@@ -64,13 +65,13 @@ reduce_trees = function(ades, pdes, savedir, reg){
     lower_bound = function(col){
       df =  length(col)-1
       t_score = qt(p=0.05/2, df = df,lower.tail=F)
-      mean(col)-t_score*(sd(col)/sqrt(length(col)))
+      mean(as.numeric(col))-t_score*(sd(as.numeric(col))/sqrt(length(col)))
     }
     
     upper_bound = function(col){
       df =  length(col)-1
       t_score = qt(p=0.05/2, df = df,lower.tail=F)
-      mean(col)+t_score*(sd(col)/sqrt(length(col)))
+      mean(as.numeric(col))+t_score*(sd(as.numeric(col))/sqrt(length(col)))
     }
     
     res_lower_bound_exp = res_df[, lapply(.SD, lower_bound), by = group_cols, .SDcols = measure_cols]
@@ -78,14 +79,14 @@ reduce_trees = function(ades, pdes, savedir, reg){
     res_upper_bound_exp = res_df[, lapply(.SD, upper_bound), by = group_cols, .SDcols = measure_cols]
     setnames(res_upper_bound_exp, measure_cols, paste0(measure_cols, "_95"))
     
-    res_n_leaves = res_df[, .(n_leaves_min = min(n_leaves),
-                              n_leaves_max = max(n_leaves)), by = group_cols]
+    res_n_leaves = res_df[, .(n_leaves_min = min(as.numeric(n_leaves)),
+                              n_leaves_max = max(as.numeric(n_leaves))), by = group_cols]
     
     if("n_splitting_variables" %in% colnames(res_df)){
       res_split_feat = res_df[, .(
-        n_splitting_variables = mean(n_splitting_variables),
-        n_splitting_variables_min = min(n_splitting_variables),
-        n_splitting_variables_max = max(n_splitting_variables)), by = group_cols]
+        n_splitting_variables = mean(as.numeric(n_splitting_variables)),
+        n_splitting_variables_min = min(as.numeric(n_splitting_variables)),
+        n_splitting_variables_max = max(as.numeric(n_splitting_variables))), by = group_cols]
     }
 
     res_int_exp = ijoin(res_lower_bound_exp, res_upper_bound_exp, by = group_cols)
@@ -161,7 +162,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     }
     
     if("x_wrong" %in% colnames(res_df)){
-      x_wrong_mean = res_df[, .(x_wrong = mean(as.numeric(x_wrong))), by = config_id]
+      x_wrong_mean = res_df[, .(x_wrong = mean(as.logical(x_wrong))), by = config_id]
       res_mean_exp = ijoin(res_mean_exp, x_wrong_mean)
       
     }
@@ -195,35 +196,26 @@ reduce_trees = function(ades, pdes, savedir, reg){
 # result_lasso = reduce_trees(ades_lasso, pdes_lasso, savedir_lasso, reg_lasso)$mean
 # 
 # 
-# result_lasso = readRDS("Data/simulations/batchtools/lasso/results/result_summary.rds")$mean
-# 
-# 
-# result_lasso[,.(surrogate, mbt, x_wrong, share_x3, n_leaves, r2_train, r2_test)] %>%
-#   arrange(., desc(surrogate))%>%
-#   kbl(caption="Mean simulation results on 100 simulation runs as stand alone model and surrogate on lm predictions on scenario Linear Smooth - noise features with n = 1000, alpha = 0.001, impr = 0.01",
-#       format="latex",
-#       col.names = c("surrogate","MBT", "x wrong", "share x3", "n leaves","R2 train","R2 test"),
-#       align="r",
-#       digits = 4) %>%
-#   kable_minimal(full_width = F)
-# 
+
+
+
 
 
 # basic scenarios
-reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
-                         ,conf.file = NA
-                         )
-
-ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
-pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
-
-# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results/"
-savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_new/"
-
-
-result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
-
-result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
+# reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
+#                          ,conf.file = NA
+#                          )
+# 
+# ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
+# pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
+# 
+# # savedir_basic = "Data/simulations/batchtools/basic_scenarios/results/"
+# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_new/"
+# 
+# 
+# result_basic = reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
+# 
+# result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
 
 
 
@@ -248,11 +240,11 @@ result_corr_mean = cbind(result_corr$mean, result_corr_sd[,.(r2_train_sd, r2_tes
 
 
 
-result_corr_mean[surrogate == "lm",.(mbt, rho, x_wrong, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>%
-  arrange(., rho, desc(mbt)) %>%
-  kbl(caption="Mean simulation results on 250 simulation runs as stand alone model on scenario Linear Smooth - Correlated with n = 1000, alpha = 0.001, impr = 0.01",
+result_corr_mean[,.(surrogate,mbt, rho, x_wrong, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>%
+  arrange(.,desc(surrogate), rho, desc(mbt)) %>%
+  kbl(caption="Mean simulation results on 250 simulation runs as stand alone model and surrogate on lm predictions on scenario Linear Smooth - Correlated with n = 1000, alpha = 0.001, impr = 0.01",
       format="latex",
-      col.names = c("MBT", "rho", "x1", "n leaves", "n leaves min", "n leaves max", "R2 train", "R2 train sd", "R2 test", "R2 test sd"),
+      col.names = c("black box", "MBT", "rho", "x1", "n leaves", "n leaves min", "n leaves max", "R2 train", "R2 train sd", "R2 test", "R2 test sd"),
       align="r",
       digits = 4) %>%
   kable_minimal(full_width = F)

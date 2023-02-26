@@ -21,7 +21,7 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
 
-addProblem(name = "noisy_data", fun = create_sim_data, reg = reg, seed = 123)
+addProblem(name = "noisy_data", fun = create_sim_data, reg = reg, seed = 100)
 pdes = list("noisy_data" = data.frame(n = c(3000), type = c("linear_smooth_lasso")))
 
 
@@ -40,4 +40,5 @@ addExperiments(
   repls = 250)
 
 summarizeExperiments()
-submitJobs(1:100)
+testJob(1)
+submitJobs()
