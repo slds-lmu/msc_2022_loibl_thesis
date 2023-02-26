@@ -359,7 +359,19 @@ xgboost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
 
 \subsubsection{Correlated features}
 
-\subsubsection{Big number of noise features}
+\subsubsection{Linear smooth with noise features}
+
+\begin{figure} 
+\caption{Test accuracy $R^2$ of MBTs on scenario Linear smooth with noise features with $n=2000, alpha = 0.001, impr = 0.1$ with $n leaves \geq 11$}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/lasso/lasso_standalone_r2_test.png}
+    \label{fig:lasso_standalone_r2_test}
+\end{figure} 
+
+\begin{figure} 
+\caption{Test accuracy $R^2$ of SLIM and GUIDE MBTs on scenario Linear smooth with noise features with $n=2000, alpha = 0.001, impr = 0.1$ with $n leaves \leq 11$}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/lasso/lasso_standalone_r2_test_slim.png}
+    \label{fig:lasso_standalone_r2_test_slim}
+\end{figure} 
 
 \subsubsection{Nonlinear mixed}
 
