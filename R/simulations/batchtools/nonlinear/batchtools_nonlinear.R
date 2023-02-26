@@ -8,9 +8,12 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/nonlinear/b
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/batchtools/nonlinear/helper_simulations_nonlinear.R"),
-                             seed = 111
+                             seed = 111,
+                             conf.file = NA
                              # , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
 )
+
+# reg = loadRegistry("Data/simulations/batchtools/nonlinear/batchtools", writeable = TRUE, conf.file = NA)
 
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
@@ -38,7 +41,8 @@ addExperiments(
   repls = 50)
 
 summarizeExperiments()
-testJob(1)
+pars = unwrap(getJobPars(reg = reg))
+testJob(101)
 
 submitJobs(resources = list(walltime = 9000))
 # submitJobs(resources = list(walltime = 9000))
