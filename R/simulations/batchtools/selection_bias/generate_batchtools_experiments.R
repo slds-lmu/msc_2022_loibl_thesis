@@ -62,7 +62,8 @@ testJob(id = 5)
 # submit jobs
 submitJobs(reg = reg)
 
-# reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools")
+reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools",conf.file = NA)
+
 
 # reduce jobs/ summarise results
 reduce = function(res) res

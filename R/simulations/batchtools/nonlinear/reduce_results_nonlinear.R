@@ -21,10 +21,10 @@ reduce_trees_nonlinear = function(ades, pdes, savedir, reg){
       return(job.df)
     })
     res_df = data.table(do.call("rbind", res_list))
-    # saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
+    saveRDS(res_df, paste0(savedir, exp, "_res_experiments.rds" ))
     
 
-    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", "share_main_effect_split", "time")    
+    measure_cols = c("mse_train", "r2_train", "mse_test", "r2_test", "share_main_effect_split", "df", "time")    
     group_cols = c("model", "surrogate")
   
     # save gourp result data
@@ -32,7 +32,7 @@ reduce_trees_nonlinear = function(ades, pdes, savedir, reg){
     
     
     # summarize results
-    res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = c(measure_cols, "n_leaves")]
+    res_mean_exp = res_df[, lapply(.SD, function(col){mean(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     res_sd_exp = res_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     setnames(res_sd_exp, measure_cols, paste0(measure_cols, "_sd"))
     
@@ -59,17 +59,20 @@ reduce_trees_nonlinear = function(ades, pdes, savedir, reg){
                               n_leaves_max = max(n_leaves)), by = group_cols]
     
     if("n_splitting_variables" %in% colnames(res_df)){
-      res_split_feat = res_df[, .(
+      res_discrete = res_df[, .(
         n_splitting_variables = mean(n_splitting_variables),
         n_splitting_variables_min = min(n_splitting_variables),
-        n_splitting_variables_max = max(n_splitting_variables)), by = group_cols]
+        n_splitting_variables_max = max(n_splitting_variables),
+        n_leaves = mean(n_leaves),
+        n_leaves_min = min(n_leaves),
+        n_leaves_max = max(n_leaves)
+        ), by = group_cols]
     }
     
     res_int_exp = ijoin(res_lower_bound_exp, res_upper_bound_exp, by = group_cols)
-    res_int_exp = ijoin(res_int_exp, res_n_leaves, by = group_cols)
+    res_int_exp = ijoin(res_int_exp, res_discrete, by = group_cols)
     res_mean_exp = ijoin(res_mean_exp, res_int_exp, by = group_cols)
-    res_mean_exp = ijoin(res_mean_exp, res_split_feat, by = group_cols)
-    
+
     res_mean_exp$experiment_id = exp
     res_mean_exp = cbind(experiments[exp,], res_mean_exp)
     result_exp = ijoin(res_mean_exp, res_sd_exp)
@@ -95,4 +98,3 @@ savedir = "Data/simulations/batchtools/nonlinear/results/"
 
 
 reduce_trees_nonlinear(ades, pdes, savedir, reg_nonlinear)
-test = readRDS("Data/simulations/batchtools/nonlinear/batchtools/results/1.rds")

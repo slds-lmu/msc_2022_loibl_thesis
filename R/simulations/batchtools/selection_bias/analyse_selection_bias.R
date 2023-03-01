@@ -1,45 +1,48 @@
 # load results
 
-list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
-tab = readRDS("Data/simulations/batchtools/selection_bias_general/results/selection_bias_general.rds")
+list.files("Data/simulations/batchtools/selection_bias_general_10_01/results/", full.names = TRUE)
+tab = readRDS("Data/simulations/batchtools/selection_bias_general_10_01/results/selection_bias_general.rds")
 
-savedir = "Data/simulations/batchtools/selection_bias_general/results/"
-figuredir = "Figures/simulations/batchtools/selection_bias_general/"
+savedir = "Data/simulations/batchtools/selection_bias_general_10_01/results/"
+figuredir = "Figures/simulations/batchtools/selection_bias_general_10_01/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 cols_split = str_subset(colnames(tab), "split")
-cols_split = c("split_slim_exact", "split_slim_100", "split_guide_excl_cat_corr", 
-               "split_guide_incl_cat_corr", "split_mob", "split_ctree")
+cols_split = c("SLIM", "GUIDE", "MOB", "CTree")
+setnames(tab, c("split_slim_exact", "split_guide_excl_cat_corr", 
+                "split_mob", "split_ctree"), c("SLIM", "GUIDE", "MOB", "CTree"))
 
+colors_mbt =c("SLIM" = 'purple', "SLIM low symmetry" = "purple3", "GUIDE" = 'olivedrab3', "GUIDE low symmetry" = 'olivedrab4', 
+              "MOB" ='skyblue', "CTree" = 'salmon')
 
 for (t in unique(tab$type)){
   for (n_data in unique(tab[type == t , n])){
     tab_t_n = tab[type == t & n == n_data, ]
-    result = list(slim = table(tab_t_n$split_slim_exact),
-                  slim_100 = table(tab_t_n$split_slim_100),
-                  slim_10 = table(tab_t_n$split_slim_10),
-                  mob = table(tab_t_n$split_mob),
-                  ctree = table(tab_t_n$split_ctree),
-                  guide_inclcat = table(tab_t_n$impr_guideincl_cat_corr),
-                  guide_excllcat = table(tab_t_n$impr_guide_excl_cat_corr)
-                  # ,
-                  # guide_biased_inclcat = table(tab_t_n$impr_guideincl_cat_biased),
-                  # guide_biased_excllcat = table(tab_t_n$impr_guide_excl_cat_biased)
-                  
-                  )
-    saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), ".rds"))
+    # result = list(slim = table(tab_t_n$split_slim_exact),
+    #               slim_100 = table(tab_t_n$split_slim_100),
+    #               slim_10 = table(tab_t_n$split_slim_10),
+    #               mob = table(tab_t_n$split_mob),
+    #               ctree = table(tab_t_n$split_ctree),
+    #               guide_inclcat = table(tab_t_n$impr_guideincl_cat_corr),
+    #               guide_excllcat = table(tab_t_n$impr_guide_excl_cat_corr)
+    #               # ,
+    #               # guide_biased_inclcat = table(tab_t_n$impr_guideincl_cat_biased),
+    #               # guide_biased_excllcat = table(tab_t_n$impr_guide_excl_cat_biased)
+    #               
+    #               )
+    # saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), ".rds"))
     
     
     
     p = ggplot(stack(tab_t_n[,cols_split, with = FALSE]),
-               aes(x = values, color=ind, fill = ind)) +
+               aes(x = values, fill = ind)) +
       stat_count(position = "dodge") +
-      ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "))) +
-      labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
+      scale_fill_manual(values = colors_mbt) +
+      labs(x="splitting variable", y="frequency", fill = "MBT")
     
-    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ".pdf"), width = 8, height = 3.8)
+    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ".png"), width = 800, height = 300)
     
   }
 }
