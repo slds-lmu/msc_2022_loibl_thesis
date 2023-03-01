@@ -29,7 +29,7 @@ A recursive partitioning algorithm for MBTs can generally be divided into the fo
 \end{enumerate}
 
 
-The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in Step 3. This can lead to the phenomenon, that variables with many possible split points are chosen more often as splitting variables than variables with few possible split points. This phenomenon is called selection bias and is explained in more detail in Chapter 3 and examined for the algorithms considered here.
+The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in Step 3. This can lead to the phenomenon that, even if the strength of all feature effects (or in our case interaction effects) are the same, fetaures with many possible split points are more often chosen as split variables than fetaures with few possible split points. This phenomenon is called selection bias and is explained in more detail in Chapter 3 and examined for the algorithms considered here.
 MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of comparing the objective for all possible split points and variables, step 3 of algorithm is split into 2 steps:
 
 \begin{enumerate}
