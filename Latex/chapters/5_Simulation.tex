@@ -24,18 +24,11 @@ Accuracy and fidelity are measured on both training and test data in order to ma
 \vspace{0.5cm}
 \subsubsection{Interpretability}
 When evaluating the suitability of an MBT algorithm as a surrogate model, the trade-off between performance and interpretability is the central aspect. While performance is easy to measure, the concept of interpretability is much more abstract.
-According to \citet{DoshiVelez.2017} interpretability is defined as the ability to explain or present something to a person in understandable terms. Tf, for different MBT algorithms to be compared, the models in the leaf nodes are defined as equally complex (e.g. linear regression models), these do not have to be taken into account when comparing interpretability, but only the structure of the tree is relevant. We then use the number of leafnodes as the most important criterion for interpretability.  The underlying assumption is: the fewer leafnodes a tree has, the easier its structure is to understand.
+According to \citet{DoshiVelez.2017} interpretability is defined as the ability to explain or present something to a person in understandable terms. If, for different MBT algorithms to be compared, the models in the leaf nodes are defined as equally complex (e.g. linear regression models), these do not have to be taken into account when comparing interpretability, but only the structure of the tree is relevant. We then use the number of leafnodes as the most important criterion for interpretability.  The underlying assumption is: the fewer leafnodes a tree has, the easier its structure is to understand.
 
 As an additional measure, we include the number of different features used for splitting. The idea here is that the splitting of the feature space is easier to understand if it is done in few dimensions.
 
-\vspace{0.5cm}
 
-In order to assess how the choice of the objective function affects the interpretability of a given SLIM MBT, additional criteria are applied, which are:
-\begin{itemize}
-    \item effective degrees of freedoms of the leaf node models
-    \item proportion of observation splits where the split is actually due to an interaction rather than an incompletely modelled main effect
-    \item interpretable weights versus merely visually interpretability
-\end{itemize}
 
 \subsubsection{Stability}
 A well-known weakness of recursive partitioning algorithms is that the resulting decision trees are often unstable, meaning that slight fluctuations in the training data can lead to large differences in the models \citep{Fokkema.2020}.
@@ -449,7 +442,7 @@ lm & CTree & 0.9 & 0.000 & 15.144 & 14 & 17 & 0.9995 & 0.0001 & 0.9994 & 0.0001\
 
 
 Table \ref{tab:linear_smooth_correlated_summary} shows the average performance and the number of leaf nodes of MBTs  as well as the proportion of trees "freq $\textbf{x}_1$" where $\textbf{x}_1$ is wrongly chosen as the splitting variable.
-If the MBTs are used as standalone, SLIM and GUIDE choose feature $\textbf{x}_1$ as splitting variable already at a very low correlation of 0.1 in some cases. As the correlation increases, this frequeny increases. MOB and CTree, on the other hand, only use the variables actually involved in the interaction for the splits at $rho \in \{0.1, 0.5\}$, but at a very high correlation $rho = 0.9$ they also include $x_1$ for the split in a small number of cases. 
+If the MBTs are used as standalone, SLIM and GUIDE choose feature $\textbf{x}_1$ as splitting variable already at a very low correlation of 0.1 in some cases. As the correlation increases, this frequeny increases. MOB and CTree, on the other hand, only use the variables actually involved in the interaction for the splits at $\rho \in \{0.1, 0.5\}$, but at a very high correlation $rho = 0.9$ they also include $x_1$ for the split in a small number of cases. 
 Since the use of ridge regression for correlated features is becoming more common, SLIM was also fitted with ridge regression models in the nodes. The choice of the penalization parameter is made in each recursion step by minimising the BIC. Instead of the SSE, the penalised SSE is used as objective function. However, this does not result in any systematic improvement. 
 If the MBTs are used as surrogates for the lm predictions instead of standalone models, there are hardly any false splits in this scenario. So it seems that the problem of correlated features is reduced when the models are used as surrogates.
 
@@ -504,30 +497,156 @@ As in the correlated data scenario, wrong variables are only used as splitting v
 An interesting effect of using a LASSO model with a maximum of 2 effective degrees of freedom is that for the splitting almost exclusively variable $x_3$ is used, although otherwise $x_2$ and $x_3$ are mostly chosen similarly often. This could be because $x_3$ does not have a main effect on the response, but $x_2$ and $x_1$ do.  Due to the strong penalisation, only these two features are used for modelling in the leafs. Since $x_3$ is not included in the modelling, it is instead more often used as a splitting variable.
 The interpretability of this MBT is thus increased on the one hand by the very sparse models in the leaf nodes and on the other hand by the fact that the splits are almost only carried out with respect to $x_3$, which is easier to keep track of than if the feature space is split with respect to several different variables.
 The average number of leafnodes for SLIM with LASSO df 2 is smaller than for the standard SLIM MBT, which is why the performance cannot be directly compared.  However, it can be seen that the training performance of SLIM with LASSO df 2 is further below that of the standard SLIM than the test performance. This means that with the strong penalisation, the overfitting can also be reduced.
-In the appendix in the figures ... there is a more detailed presentation of the individual results. It is particularly noticeable that, as with the basic scenario linear smooth, all SLIM MBTs and GUIDE also generate strongly asymmetrical trees here, which then have a considerable poorer performance.
+In the appendix in the figures \ref{fig:lasso_standalone_r2_test} and \ref{fig:lasso_standalone_r2_test_slim} there is a more detailed presentation of the individual results. It is particularly noticeable that, as with the basic scenario linear smooth, all SLIM MBTs and GUIDE generate some strongly asymmetrical trees, which then have a considerable poorer performance.
 
 
 
 
 \subsection{Non-linear Effects}
-When is a MBT well interpretable?
-\begin{itemize}
-    \item low number of leafnodes
-    \item only few variables are used for splitting
-    \item sparse main effect models
-    \item Simple models in the leaf nodes, i.e. preferably models where the weights are directly interpretable (LM and (polynomial) LASSO)
-    \item Separation of interactions and main effects
-\end{itemize}
-\textbf{Non-linear mixed}
-Numerical and binary features with non-linear effects on $y$ and abrupt and smooth two- and three-way interactions
-\begin{itemize}
-    \item $\textbf{x}_1, ..., \textbf{x}_5 \sim U(-1,1)$, $\textbf{x}_6 \sim Bern(0.5)$,  
-    \item $\epsilon \sim N(0, sd_{data})$
-    \item $y = \textbf{x}_1 + 2 \textbf{x}_2^2 + \textbf{x}_3log(abs(\textbf{x}_3)) + \textbf{x}_4\textbf{x}_5 + \textbf{x}_1\textbf{x}_4\mathbf{I}_{\textbf{x}_6 = 0}+ \epsilon$
-\end{itemize}
-use different objectives to fit SLIM Trees (standard linear Model, polynomial Lasso Regression, Spline-based regression).
+While the main goal so far has been to compare the different MBT algorithms on simple scenarios with linear maineffects, the following scenario will investigate how the choice of different objective functions affects the interpretability and performance of SLIM MBTs when non-linear maineffects enter the data generating process. 
+As it is very flexible in the selection of the objective, only the SLIM algorithm is used.
 
-Question: How do the results differ in terms of performance and interpretability?
+\begin{itemize}
+    \item $\textbf{x}_1, ..., \textbf{x}_5 \sim U(-1,1)$, $\textbf{x}_6 \sim Bern(0.5)$, 
+    \item $ f_{nl}(\textbf{x}) = \textbf{x}_1 + 2 \textbf{x}_2^2 + \textbf{x}_3log(abs(\textbf{x}_3)) + \textbf{x}_4\textbf{x}_5 + \textbf{x}_1\textbf{x}_4\mathbf{I}_{\textbf{x}_6 = 0}$
+    \item $\epsilon \sim N(0,  0.1 \cdot sd(f_{nl}(x))$
+    \item $y = f_{nl}(\textbf{x}) + \epsilon$     
+\end{itemize}
+
+SLIM is fitted here with four different objectives.
+\begin{enumerate}
+    \item linear regression model (lm)
+    \item polynomial regression of degree $2$ with LASSO penalization (penalized poly)
+    \item linear regression with bspline transformations of the features (bsplines)
+    \item GAM 
+\end{enumerate}
+
+
+Since the models in the leafnodes are of different complexity for different objectives, it is not sufficient in this case to use only the number of leafnodes as a measure of interpretability. In addition, the following criteria are considered:
+\begin{itemize}
+    \item effective degrees of freedoms of the leaf node models (lm and penalized poly), as sparse models are easier to interpret
+    \item proportion of observation splits where the split is actually due to an interaction rather than an incompletely modelled main effect
+    \item interpretable weights versus merely visually interpretability
+\end{itemize}
+
+In order to enable a comparison of the interpretability, the $R^2$ is used for prepruning in this scenario in addition to the prepruning by means of minimum loss reduction. As soon as the $R^2$ exceeds a certain value in a node, it is no longer split. 
+
+Three different settings were simulated
+\begin{table}[!htt]
+    \centering
+    \begin{tabular}{l|r|r}
+        \hline
+        scenario  &  impr & $R^2$ \\
+        \hline
+        scenario 1 & 0.05 & 0.9 \\
+        scenario 2 & 0.05 & 0.95 \\
+        scenario 3 & 0.10 & 1  \\
+        \hline
+
+    \end{tabular}
+    \caption{simulation setting nonlinear}
+    \label{tab:}
+\end{table}
+
+For all three scenarios a sample size of 3000 is used and the simulation is repeated 50 times. The MBTs are fitted both as standalone models and as surrogate models on predictions of an xgboost model.
+
+
+
+\begin{table}[!htb]
+
+\caption{mean interpretability simulation results nonlinear scenario 1}
+\centering \tiny
+\begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
+\hline
+black box & model & n leaves & n l min & n l max & n split feat & n sf min & n sf max & \% main effect & df & sd df\\
+\hline
+standalone & basic lm & 17.48 & 13 & 28 & 4.76 & 4 & 6 & 0.4525 & 6.5763 & 0.1578\\
+standalone & penalized\_poly & 4.36 & 3 & 7 & 2.16 & 2 & 3 & 0.3605 & 8.1847 & 0.8960\\
+standalone & bsplines & 2.04 & 2 & 3 & 1.00 & 1 & 1 & 0.0000 &  & \\
+standalone & gam & 2.04 & 2 & 3 & 1.00 & 1 & 1 & 0.0000 &  & \\
+\hline
+xgboost & basic\_lm & 19.82 & 2 & 33 & 4.76 & 1 & 6 & 0.6125 & 6.8671 & 0.1438\\
+xgboost & penalized\_poly & 3.58 & 2 & 7 & 2.08 & 1 & 4 & 0.3880 & 8.5499 & 1.1147\\
+xgboost & bsplines & 1.86 & 1 & 3 & 0.84 & 0 & 1 & 0.0000 &  & \\
+xgboost & gam & 1.90 & 1 & 4 & 0.88 & 0 & 2 & 0.0000 &  & \\
+
+\hline
+\end{tabular}
+\end{table}
+
+
+
+\begin{table}[!htb]
+
+\caption{mean performance simulation results nonlinear scenario 1}
+\centering \small
+\begin{tabular}[t]{l|l|r|r|r|r|r}
+\hline
+black box & MBT & R2 train & R2 train sd & R2 test & R2 test sd & time\\
+\hline
+standalone & basic lm & 0.9243 & 0.0062 & 0.9113 & 0.0054 & 53.9438\\
+standalone & penalized poly & 0.9204 & 0.0092 & 0.9161 & 0.0108 & 46.6282\\
+standalone & bsplines & 0.9282 & 0.0036 & 0.9195 & 0.0049 & 15.2456\\
+standalone & gam & 0.9253 & 0.0034 & 0.9226 & 0.0048 & 417.2874\\
+\hline
+xgboost & basic lm & 0.9200 & 0.0228 & 0.9023 & 0.0190 & 55.7771\\
+xgboost & penalized poly & 0.9213 & 0.0079 & 0.9150 & 0.0087 & 35.4093\\
+xgboost & bsplines & 0.9382 & 0.0118 & 0.9296 & 0.0120 & 11.4670\\
+xgboost & gam & 0.9348 & 0.0118 & 0.9289 & 0.0117 & 384.7403\\
+\hline
+xgboost & xgboost & 0.9386 & 0.0295 & 0.9199 & 0.0362 & 3.1163\\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+
+\begin{table}
+
+\caption{mean interpretability simulation results nonlinear scenario 3}
+\centering \tiny
+\begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
+\hline
+black box & model & n leaves & n l min & n l max & n split feat & n sf min & n sf max & \% main effect & df & sd df\\
+\hline
+standalone & basic lm & 43.06 & 36 & 48 & 5.68 & 4 & 6 & 0.5089 & 6.5804 & 0.1249\\
+standalone & bsplines & 18.38 & 13 & 22 & 4.26 & 3 & 6 & 0.0126 & & \\
+standalone & gam & 17.60 & 12 & 22 & 3.44 & 2 & 4 & 0.0007 & & \\
+standalone & penalized poly & 19.32 & 16 & 22 & 4.26 & 3 & 5 & 0.2374 & 8.8768 & 0.3681\\
+\hline
+xgboost & basic lm & 30.38 & 2 & 47 & 4.56 & 1 & 6 & 0.6732 & 6.8519 & 0.1558\\
+xgboost & bsplines & 17.38 & 2 & 25 & 4.70 & 1 & 6 & 0.0597 & &\\
+xgboost & gam & 15.28 & 2 & 24 & 4.00 & 1 & 6 & 0.0191 & &\\
+xgboost & penalized poly & 20.66 & 16 & 24 & 4.70 & 3 & 6 & 0.2327 & 9.2909 & 0.4347\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table} \small
+
+\caption{mean performance simulation results nonlinear scenario 3}
+\centering
+\begin{tabular}[t]{l|l|r|r|r|r|r}
+\hline
+black box & model & $R^2_{train}$  & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & time in sec\\
+\hline
+standalone & basic lm & 0.9633 & 0.0035 & 0.9469 & 0.0048 & 102.2842\\
+standalone & penalized poly & 0.9824 & 0.0015 & 0.9781 & 0.0020 & 195.4385\\
+standalone & bsplines & 0.9929 & 0.0013 & 0.9714 & 0.0029 & 113.2447\\
+standalone & gam & 0.9880 & 0.0016 & 0.9835 & 0.0017 & 1544.3393\\
+\hline
+xgboost & basic lm & 0.9198 & 0.0516 & 0.9030 & 0.0417 & 72.3790\\
+xgboost & penalized poly & 0.9750 & 0.0033 & 0.9634 & 0.0051 & 206.5870\\
+xgboost & bsplines & 0.9865 & 0.0141 & 0.9591 & 0.0092 & 97.9321\\
+xgboost & gam & 0.9786 & 0.0127 & 0.9672 & 0.0115 & 1728.6021\\
+\hline
+xgboost & xgboost & 0.9392 & 0.0342 & 0.9216 & 0.0405 & 3.0131\\
+\hline
+\end{tabular}
+\end{table}
+
 
 
 

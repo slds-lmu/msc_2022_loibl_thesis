@@ -1,9 +1,32 @@
+According to \citep{Hothorn.2006} an algorithm for recursive partitionig is called unbiased when, under the conditions of the null hypothesis of independence between a response $y$ an feature $\textbf{x}_{1},...\textbf{x}_{p}$ the probability of selecting feature $\textbf{x}_{1}$ is $1/p$ for all $j = 1,...,p$ regardless of the measurement scales or number of missing values. 
+
+This definition may be surprising at first, since if there really is no dependency between the target and the features, one would not want to perform a split anyway and would try to prevent this through appropriate pruning procedures.
+However, the idea behind this is that if, in the case of independence, a feature with, for example, a large number of possible splitpoints is selected more frequently as a splitting variable than a feature with a smaller number of splitpoints, the former could also be incorrectly selected more frequently as a splitting variable if there is a dependency on the response for the second feature.
+\citep{Loh.2014}
+
+
+In order to empirically investigate whether the four algorithms presented actually correspond to the respective groups (biased and unbiased), the following simulation was carried out:
+\begin{itemize}
+    \item $\textbf{x}_{1}, \textbf{x}_{2} \sim U(0,1), \textbf{x}_3$ uniformly distributed on the set ${0, 0.1,..., 0.9, 1}$, $\textbf{x}_4$ uniformly distributed on the set ${0, 0.01,..., 0.99, 1}$
+    \item $y \sim N(0,1)$
+    \item sample size $n = 1000$
+    \item 1000 simulation runs
+\end{itemize}
+
+
+
+
+
+
+In the discussion on the Paper Fifty Years of Classification and Regression Trees of \citep{Loh.2014}, Carolin Strobl's statement on selection bias is therefore very clear:
+\textit{"One should think that the results shown here, and in many previous studies that Wei-Yin Loh has summarized in his paper, are so clear that any statistically educated person should never
+want to use a biased recursive partitioning algorithm again."}
 
 
 
 
 % Seite 6664
-According to \citep{Hothorn.2006} an algorithm for recursive partitionig is called unbiased when, under the conditions of the null hypothesis of independence between a response $Y$ an covariates $X_{1},...X_{m}$ the probability of selecting covariate $X_{j}$ is $1/m$ for all $j = 1,...,m$ regardless of the measurement scales or number of missing values. 
+
 
 \vspace{1cm}
 
