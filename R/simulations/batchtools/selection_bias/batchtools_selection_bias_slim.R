@@ -46,7 +46,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = ades, 
-  repls = 10L)
+  repls = 1000L)
 
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
