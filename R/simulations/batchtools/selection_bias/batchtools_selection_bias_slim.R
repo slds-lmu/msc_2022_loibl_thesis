@@ -54,12 +54,12 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 
 # test jobs
 ids = getJobTable(reg = reg)[, .(job.id, problem, algorithm)]
-ids[, chunk := batchtools::chunk(job.id, chunk.size = 30)]
+ids[, chunk := batchtools::chunk(job.id, n.chunks = 250)]
 
-testJob(1)
+testJob(4)
 
 # submit jobs
-submitJobs(ids = ids, list(walltime = 2700, memory = 512))
+submitJobs(ids = ids, list(walltime = 2000, memory = 512))
 
 
 
