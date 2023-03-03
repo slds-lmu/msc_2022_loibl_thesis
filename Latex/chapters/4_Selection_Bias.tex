@@ -58,8 +58,12 @@ However, as a possible correction approach for the selection bias in SLIM, I inv
     \item 1000 simulation runs
 \end{itemize}
 
-The addition of categorical features in this scenario results in a different picture for the frequencies, as shown in Figure \ref{fig:selection_bias_independence_mixed}. Although the numerical variables are chosen with approximately equal frequency in the so-called "unbiased" methods, there are large deviations in the binary and categorical variables espacially for MOB and CTree, which calls the designation "unbiased" into question.
+The addition of categorical features in this scenario results in a different picture for the frequencies, as shown in Figure \ref{fig:selection_bias_independence_mixed}. Although the numerical variables are chosen with approximately equal frequency in the so-called "unbiased" methods, there are large deviations in the binary and categorical variables especially for MOB and CTree, which calls the designation "unbiased" into question. 
 A possible explanation for this selection bias could be that due to the larger number of parameters that have to be estimated for the categorical features in the modelling step, random dependencies to the target variable are already caught in the model and therefore these variables are used less frequently as splitting variables.
+
+
+In \citep{Hothorn.2006} the unbiasedness of CTree is empirically investigated for cases, in which a strict separation between regressor variables and partitioning variables is kept. Therefore, I do not want to principally question the label, but it does not seem appropriate when there is an overlap or, as in our case, even congruence between the two roles.
+
 
 \begin{figure}[!htb]
     \centering
@@ -95,6 +99,14 @@ The features that are responsible for the subgroups vary and the definitions of 
         \item $f(\textbf{x})= \mathbf{I}_{\textbf{x}_1 \leq  mean(\textbf{x}_1)}\textbf{x}_2  +  \mathbf{I}_{\textbf{x}_3 \leq  mean(\textbf{x}_3)}\textbf{x}_4 $        
     \end{itemize}
 
+    \item Scenario "binary vs categorical"
+    \begin{itemize}
+        \item $\textbf{x}_{1}, \sim Bern(0.5)$
+        \item $\textbf{x}_3$ uniformly distributed on 6 factor levels 
+        $\{1,...,6\}$
+        \item $f(\textbf{x})= \mathbf{I}_{\textbf{x}_1 = 0}\textbf{x}_2  +  \mathbf{I}_{\textbf{x}_3 \in \{1,2,3}\}\textbf{x}_4 $        
+    \end{itemize}
+
     \item Scenario "numerical vs binary"
     \begin{itemize}
         \item $\textbf{x}_{1}, \sim U(0,1)$
@@ -110,16 +122,10 @@ The features that are responsible for the subgroups vary and the definitions of 
         \item $f(\textbf{x})= \mathbf{I}_{\textbf{x}_1 \leq  mean(\textbf{x}_1)}\textbf{x}_2  +  \mathbf{I}_{\textbf{x}_3 \in \{1,2,3}\}\textbf{x}_4 $        
     \end{itemize}
 
-    \item Scenario "binary vs categorical"
-    \begin{itemize}
-        \item $\textbf{x}_{1}, \sim Bern(0.5)$
-        \item $\textbf{x}_3$ uniformly distributed on 6 factor levels 
-        $\{1,...,6\}$
-        \item $f(\textbf{x})= \mathbf{I}_{\textbf{x}_1 = 0}\textbf{x}_2  +  \mathbf{I}_{\textbf{x}_3 \in \{1,2,3}\}\textbf{x}_4 $        
-    \end{itemize}
+    
 \end{enumerate}
 
-For all Scenarios
+All experiments are repeated 1000 times and 
 \begin{itemize}
      \item $\epsilon \sim N(0, 0.1 \cdot sd(f(\textbf{x}))$
     \item $y = f(\textbf{x}) + \epsilon$   
@@ -137,15 +143,26 @@ First of all, there is the question of how selection bias should be defined in t
     \label{fig:selection_bias_interactions}
 \end{figure}
 
-% Seite 6664
+Figure \ref{fig:selection_bias_interactions} shows the frequencies of the first selected split variable in each scenario for each MBT. It can be seen that in none of the scenarios and for none of the MBTs are the results distributed among all four features. 
+As a general rule, it is noticeable that SLIM and GUIDE always use the subgroupdefining variables for splitting, while CTree always prefers the smooth variables. For MOB, the behaviour varies depending on the feature type.
+
+In Scenario "numerical vs numerical", the distribution for MOB and CTree is at least evenly distributed between the two interactions. One could therefore speak of unbiasedness here. However, while CTree only uses the linear features $\textbf{x}_2$ and $\textbf{x}_4$ as the first split variable, MOB always splits according to the subgroup-defining features, which is preferable in practice.
+In GUIDE and SLIM, only the features $\textbf{x}_1$ and $\textbf{x}_3$ are selected, but there is a preference for the variable $\textbf{x}_1$, which has a larger number of potential splitpoints.
 
 
-\subsection{Simulation pruning}
-These results are sobering at first, if one accepts the requirement to use only unbiased recursive partitioning algorithms. However, the underlying concern should be considered more closely, which is that selection bias will prevail even when dependencies exist and features are falsely preferred only because of their number of potential splitpoints.
-This will be empirically examined in the following chapter.
+In the scenario binary vs categorical, the distribution between the two interactions is roughly equal for SLIM, MOB and CTree. In contrast to the first scenario, MOB does not split according to the subgroup-defining variables but according to the linear features.
+In GUIDE, only the binary variable is selected, so there is a clear preference for the binary variable over the categorical variable.
+
+In the remaining scenarios, a strong selection bias is evident in all MBTs. SLIM, for example, gives considerable preference to numerical subgroupdefining variables over binary and categorical variables.
 
 
-\vspace{1cm}
+
+
+
+Obviously, these scenarios do not represent a complete overview of possible interactions. Since we hope that the MBTs will provide good subgroup detection, only such scenarios were compared. On the one hand, the results show certain tendencies and characteristics in the split selection of the different methods. In addition, the simulation should sensitise us to the fact that in certain cases variables could only be selected as splitting variables because they have certain properties and not because their share in an interaction is actually the largest, even with the so-called unbiased methods.
+
+
+
 
 
 
