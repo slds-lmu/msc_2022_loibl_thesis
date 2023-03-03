@@ -1,3 +1,5 @@
+\subsection{Definition and motivation}
+
 According to \citep{Hothorn.2006} an algorithm for recursive partitionig is called unbiased when, under the conditions of the null hypothesis of independence between a response $y$ an feature $\textbf{x}_{1},...\textbf{x}_{p}$ the probability of selecting feature $\textbf{x}_{1}$ is $1/p$ for all $j = 1,...,p$ regardless of the measurement scales or number of missing values. 
 
 This definition may be surprising at first, since if there is no dependency between the target and the features, one would not want to perform a split anyway and would try to prevent this through appropriate pruning procedures.
@@ -15,7 +17,7 @@ So if SLIM is the only unbiased algorithm, it would have to be discarded immedia
 
 
 
-\subsection{Simulation selection bias independence}
+\subsection{Simulation independency}
 In order to empirically investigate whether the four algorithms presented actually correspond to the respective groups (biased and unbiased) using the definition of \citep{Hothorn.2006}, two different simulation were carried out.
 
 In the first scenario only numerical features are used, whereas in the second scenario numerical features and additionally one binary and two categorical features are considered.
@@ -56,7 +58,8 @@ However, as a possible correction approach for the selection bias in SLIM, I inv
     \item 1000 simulation runs
 \end{itemize}
 
-The addition of categorical features in this scenario results in a different picture for the frequencies, as shown in Figure \ref{fig:selection_bias_independence_mixed}. Although the numerical variables are chosen with approximately equal frequency in the so-called "unbiased" methods, there are large deviations in the binary and categorical variables, which calls the designation "unbiased" into question.
+The addition of categorical features in this scenario results in a different picture for the frequencies, as shown in Figure \ref{fig:selection_bias_independence_mixed}. Although the numerical variables are chosen with approximately equal frequency in the so-called "unbiased" methods, there are large deviations in the binary and categorical variables espacially for MOB and CTree, which calls the designation "unbiased" into question.
+A possible explanation for this selection bias could be that due to the larger number of parameters that have to be estimated for the categorical features in the modelling step, random dependencies to the target variable are already caught in the model and therefore these variables are used less frequently as splitting variables.
 
 \begin{figure}[!htb]
     \centering
@@ -65,11 +68,19 @@ The addition of categorical features in this scenario results in a different pic
     \label{fig:selection_bias_independence_mixed}
 \end{figure}
 
+For GUIDE two different variants were evaluated in this scenario. "GUIDE excl cat" corresponds to the original version, in which categorial variables are only used as splitting and not as regressor variables. In "GUIDE incl cat", on the other hand, the categorial variables are also used as regressors. The fact that the frequencies of the categorical variables are smaller in "GUIDE incl. cate" could be explained analogously.
+
+The binary variable $\textbf{x}_4$ of SLIM, in contrast to the other variables, is almost never chosen as a splitting variable. However, this can be attributed to the selection bias in numerical features with different numbers of split points. What is more interesting, however, is that the numerical variable $\textbf{x}_2$ with 10 possible split points is chosen by SLIM much more frequently as a split variable than the variable $\textbf{x}_6$ with 128 possible splits, so that the bias cannot be determined by the number of possible splits alone.
+
+The difference between the categorical ($\textbf{x}_5$ and $\textbf{x}_6$) and the numerical variables can probably be explained in a similar way as with the other methods, but in reverse. With SLIM, the potential split is executed first and then models in the childnodes are adjusted.  If a numerical variable is split, the parameters for all factor levels are estimated in both childmodels, whereby random dependencies with $y$ can be modelled very accurately. If, on the other hand, splitting is done according to a categorical variable, only a subset of the factor levels can be adjusted in both childnodes.
 
 
 
+These results are sobering at first, if one accepts the requirement to use only unbiased recursive partitioning algorithms. However, the underlying concern should be considered more closely, which is that selection bias will prevail even when dependencies exist and features are falsely preferred only because of their number of potential splitpoints.
+This will be empirically examined in the following chapter.
 
 
+\subsection{Simulation dependency}
 
 
 
