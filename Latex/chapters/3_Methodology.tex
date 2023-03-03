@@ -133,13 +133,18 @@ Subsequently, a bootstrap selection bias correction is performed.
 In the original GUIDE algorithm developed by \citep{.2002}, numerical variables can be used both as regressor variables and as splitting variables. Categorical variables, on the other hand, can only take on the role of splitting variables. This is justified by the fact that a disproportionately large number of degrees of freedom are consumed in the parameter estimation of categorical variables.
 In the following simulations, both a GUIDE implementation in which categorical variables can only serve as splitting variables and a variant in which categorical variables can also take on both roles are considered. 
 
-One advantage of GUIDE is that the score function does not have to exist. This makes the choice of objective very flexible and allows, for example, LASSO regression models to be adapted in the nodes.
+One advantage of GUIDE is that the score function does not have to exist. This makes the choice of objective very flexible and allows, for example, to fit LASSO regression models  in the nodes.
+
+The software implementation of GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}. The binary executable is available under \url{https://pages.stat.wisc.edu/~loh/guide.html}.  Unfortunately, the source code is not accessible and the method cannot be easily adapted to other objectives, although this would be theoretically possible.
+
+For this reason, I have incorporated the residual based $\chi^2$- independence tests for finding the best split variable as an option of the SLIM implementation in R in this work. Bootstrap bias correction was also adopted. To the best of my knowledge, I followed the original paper \citep{.2002}. However, the results differ somewhat from the results in the paper, as can be seen in the appendix in figure \ref{}. 
+Whenever GUIDE is discussed in the following, it always refers to my implementation. 
 
 
 
 
-\subsection{Software Implementation}
-GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}
+
+
 
 \subsection{Comparison}
 \begin{table}[ht]
