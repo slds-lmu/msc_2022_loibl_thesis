@@ -103,6 +103,7 @@ A limitation of MOB is that only objective functions can be selected for which t
 
 
 
+
 \subsubsection{CTree}
 CTree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
 CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $h()$ of the response $\textbf{y}$.
@@ -135,13 +136,19 @@ In the following simulations, both a GUIDE implementation in which categorical v
 
 One advantage of GUIDE is that the score function does not have to exist. This makes the choice of objective very flexible and allows, for example, to fit LASSO regression models  in the nodes.
 
+
+
+
+\subsection{Software implementation}
+
+No implementation of SLIM was found, which is why an implementation in R was carried out as part of this work. The source code for this can be found at \url{https://github.com/slds-lmu/msc_2022_loibl_thesis}. 
+
 The software implementation of GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}. The binary executable is available under \url{https://pages.stat.wisc.edu/~loh/guide.html}.  Unfortunately, the source code is not accessible and the method cannot be easily adapted to other objectives, although this would be theoretically possible.
 
 For this reason, I have incorporated the residual based $\chi^2$- independence tests for finding the best split variable as an option of the SLIM implementation in R in this work. Bootstrap bias correction was also adopted. To the best of my knowledge, I followed the original paper \citep{.2002}. However, the results differ somewhat from the results in the paper, as can be seen in the appendix in figure \ref{}. 
 Whenever GUIDE is discussed in the following, it always refers to my implementation. 
 
-
-
+MOB and CTree are implemented in the R package $\mathtt{partykit}$ \citep{.2015}
 
 
 
