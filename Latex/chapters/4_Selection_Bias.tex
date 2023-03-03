@@ -36,7 +36,7 @@ The resulting frequencies are shown in Figure \ref{fig:selection_bias_independen
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/selection_bias_general_10_01/independence_small.png}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/selection_bias_general/independence_numerical.png}
     \caption{Simulated frequencies of selected splitting features for scenario independence numeric}
     \label{fig:selection_bias_independence_numeric}
 \end{figure}
@@ -63,7 +63,7 @@ A possible explanation for this selection bias could be that due to the larger n
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/selection_bias_general_10_01/independence.png}
+    \includegraphics[width=16cm]{Figures/simulations/batchtools/selection_bias_general/independence_mixed.png}
     \caption{Simulated frequencies of selected splitting features for scenario independence mixed}
     \label{fig:selection_bias_independence_mixed}
 \end{figure}
@@ -76,16 +76,35 @@ The difference between the categorical ($\textbf{x}_5$ and $\textbf{x}_6$) and t
 
 
 
-These results are sobering at first, if one accepts the requirement to use only unbiased recursive partitioning algorithms. However, the underlying concern should be considered more closely, which is that selection bias will prevail even when dependencies exist and features are falsely preferred only because of their number of potential splitpoints.
-This will be empirically examined in the following chapter.
 
 
-\subsection{Simulation dependency}
+\subsection{Simulation interactions}
+While we have so far only looked at the frequency with which different feature types are selected in the case of independence, in the following we will empirically investigate which feature types the different MBTs tend to select when interactions are actually present.
+Four different scenarios are examined for this. In all scenarios, the data generating process consists of two pairs of interactions, whereby the interactions have the same strength. Each pair consists of a numerical variable that enters linearly into the interaction and another variable that splits the linear effect into two subgroups.
+In all four scenarios the numerical variables which define the linear effect are 
+\begin{itemize}
+    \item $\textbf{x}_{2}, \textbf{x}_{4} \sim U(0,1)$ .
+\end{itemize}
+The features that are responsible for the subgroups vary.
+
+\begin{enumerate}
+    \item 
+\end{enumerate}
 
 
-
+\begin{figure}
+    \centering
+    \includegraphics{}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
 
 % Seite 6664
+
+
+\subsection{Simulation pruning}
+These results are sobering at first, if one accepts the requirement to use only unbiased recursive partitioning algorithms. However, the underlying concern should be considered more closely, which is that selection bias will prevail even when dependencies exist and features are falsely preferred only because of their number of potential splitpoints.
+This will be empirically examined in the following chapter.
 
 
 \vspace{1cm}
