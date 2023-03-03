@@ -556,7 +556,7 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
   else if (type == "selection_bias_interaction_numerical_vs_numrical"){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = sample(seq(0, 1, 0.01), size = n, replace = TRUE) 
+    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE) 
     x4 = runif(n, 0, 1)
     formula = ifelse(x1 <= mean(x1), x2, 0) + ifelse(x3 <= mean(x3), x4, 0)
     

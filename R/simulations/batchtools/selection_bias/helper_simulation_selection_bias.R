@@ -9,7 +9,7 @@ get_sim_results_selection_bias = function(data, job, instance, tree_methods = c(
   } else {
     data = as.data.frame(data)
   }
-  
+
   if(mse_test){
     split_point = nrow(data)/3*2
     train = data[1:split_point,]
