@@ -1,21 +1,22 @@
 # load results
 
-list.files("Data/simulations/batchtools/selection_bias_general_10_01/results/", full.names = TRUE)
-tab = readRDS("Data/simulations/batchtools/selection_bias_general_10_01/results/selection_bias_general.rds")
+list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
+tab = readRDS("Data/simulations/batchtools/selection_bias_general/results/selection_bias_general.rds")
 
-savedir = "Data/simulations/batchtools/selection_bias_general_10_01/results/"
-figuredir = "Figures/simulations/batchtools/selection_bias_general_10_01/"
+savedir = "Data/simulations/batchtools/selection_bias_general/results/"
+figuredir = "Figures/simulations/batchtools/selection_bias_general/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
-cols_split = str_subset(colnames(tab), "split")
-cols_split = c("SLIM", "GUIDE", "MOB", "CTree")
-setnames(tab, c("split_slim_exact", "split_guide_excl_cat_corr", 
-                "split_mob", "split_ctree"), c("SLIM", "GUIDE", "MOB", "CTree"))
+cols_split = c("SLIM", "MOB", "CTree")
+setnames(tab, c("split_slim_exact",  
+                "split_mob", "split_ctree"), c("SLIM", "MOB", "CTree"))
 
-colors_mbt =c("SLIM" = 'purple', "SLIM low symmetry" = "purple3", "GUIDE" = 'olivedrab3', "GUIDE low symmetry" = 'olivedrab4', 
+colors_mbt =c("SLIM" = 'purple', "SLIM low symmetry" = "purple3", "GUIDE" ='olivedrab3',  "GUIDE excl cat" = 'olivedrab3', "GUIDE incl cat" = 'olivedrab4', 
               "MOB" ='skyblue', "CTree" = 'salmon')
+
+
 
 for (t in unique(tab$type)){
   for (n_data in unique(tab[type == t , n])){
@@ -35,8 +36,15 @@ for (t in unique(tab$type)){
     # saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), ".rds"))
     
     
-    
-    p = ggplot(stack(tab_t_n[,cols_split, with = FALSE]),
+    # if(t == "selection_bias_independence"){
+      setnames(tab_t_n, c("split_guide_excl_cat_corr", "split_guide_incl_cat_corr"),c("GUIDE excl cat", "GUIDE incl cat"))
+      
+      cols_split_new = c(cols_split, "GUIDE excl cat", "GUIDE incl cat")
+    # } else{
+    #   setnames(tab_t_n, "split_guide_excl_cat_corr","GUIDE")
+    #   cols_split_new =  c(cols_split, "GUIDE")
+    # }
+    p = ggplot(stack(tab_t_n[,cols_split_new, with = FALSE]),
                aes(x = values, fill = ind)) +
       stat_count(position = "dodge") +
       scale_fill_manual(values = colors_mbt) +

@@ -7,7 +7,7 @@ if (!dir.exists("Data/simulations/batchtools/selection_bias_general")) dir.creat
 reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_general/batchtools",
                              source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R"),
-                             conf.file = NA,
+                             conf.file = "Data/simulations/batchtools/.batchtools.conf.R",
                              seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
@@ -17,35 +17,39 @@ source("R/simulations/batchtools/simulation_setting_definition.R")
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
 pdes = expand.grid(n = 1000, type = rep(c(
-  # "selection_bias_independence", 
-  # "selection_bias_independence_small",
+  "selection_bias_independence",
+  "selection_bias_independence_small",
   # "selection_bias_full_interaction",
   # "selection_bias_guide",
   # "selection_bias_interaction_categorical_numeric",
   # "selection_bias_interaction_numeric",
   # "selection_bias_interaction_numeric_2",
-  "selection_bias_interaction_categorical_numeric_small",
-  "selection_bias_interaction_numeric_small",
-  "selection_bias_interaction_numeric_2_small"), each = 1))
+  # "selection_bias_interaction_categorical_numeric_small",
+  # "selection_bias_interaction_numeric_small",
+  # "selection_bias_interaction_numeric_2_small",
+  "selection_bias_interaction_numerical_vs_numrical", 
+  "selection_bias_interaction_numerical_vs_binary", 
+  "selection_bias_interaction_numerical_vs_categorical", 
+  "selection_bias_interaction_binary_vs_categorical"), each = 1))
 pdes = list("selection_bias" = pdes)
 
 
 # add algorithm
 source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
-formals(get_sim_results_selection_bias)$n.quantiles = c(NA, 100, 50, 10)
-formals(get_sim_results_selection_bias)$exclude.categoricals = c(TRUE, FALSE)
-formals(get_sim_results_selection_bias)$correct.bias = c(TRUE, FALSE)
 
-addAlgorithm(name = "selection_bias", fun = get_sim_results_selection_bias)
+addAlgorithm(name = "get_results_selection_bias", fun = get_sim_results_selection_bias)
 
-
+ades = list(get_results_selection_bias = data.frame(pruning = "none", alpha = 1))
+ades$get_results_selection_bias$n.quantiles = list(c(NA, 100, 50, 10))
+ades$get_results_selection_bias$exclude.categoricals = list(c(TRUE, FALSE))
+ades$get_results_selection_bias$correct.bias = list(c(TRUE, FALSE))
 
 # add experiments
 addExperiments(
   reg = reg, 
   prob.designs = pdes,
-  algo.designs = NULL, 
-  repls = 1L)
+  algo.designs = ades, 
+  repls = 1000L)
 
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
@@ -55,14 +59,15 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 id1 = head(findExperiments(algo.name = "selection_bias"), 1)
 print(id1)
 
-testJob(id = 5)
+testJob(id = 300)
 
 
 
 # submit jobs
 submitJobs(reg = reg)
 
-reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools",conf.file = NA)
+# reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools",
+#                    conf.file = "Data/simulations/batchtools/.batchtools.conf.R", writeable = TRUE)
 
 
 # reduce jobs/ summarise results
