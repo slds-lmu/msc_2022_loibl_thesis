@@ -1,66 +1,270 @@
 # Helper functions
 
-predict_slim = function(tree, newdata, type = "response", degree.poly = 1, fit.bsplines = FALSE, df.spline = 15){
-  if(type == "response"){
-    models = extract_models(tree)
-  }
-  nodes = extract_split_criteria(tree)
-  nodes = nodes[nodes$split.feature == "leafnode",c("child.type", "id.node")]
-  if (degree.poly > 1) {
-    features = names(newdata)
-    for(f in features){
-      if (is.numeric(newdata[[f]])){
-        for(d in 2:degree.poly){
-          newdata = cbind(newdata, "new" = newdata[[f]]^d)
-          colnames(newdata)[which(names(newdata) == "new")] = paste0(f,"_",d)
-        }
+# Get predictions of SLIM tree (type response or node)
+predict_slim = function(tree, newdata, type = "response", degree.poly = 1){
+  node_list = data_to_nodes(tree, newdata, nodes = "leafnode", degree.poly = degree.poly)
+  prediction_list = lapply(node_list, function(node){
+    if(type == "response"){
+      
+      new_data_n = node$newdata
+      if("glmnet" %in% class(node$model)){
+        new_data_n = subset(node$newdata, select = rownames(node$model$beta))					   																															  																					 
       }
+      y_hat = predict(node$model, new_data_n)
+      
+    } else if(type == "node"){
+      y_hat = node$node_id
     }
-  } 
+    
+    pred = cbind(node$newdata, y_hat = as.vector(y_hat))
+    return(pred)
+  })
+  
+  predictions = as.data.frame(do.call(rbind, prediction_list))
+  
+  predictions = predictions[order(predictions[,"row_id"]),]
+  rownames(predictions) = predictions[,"row_id"]
+  return(predictions$y_hat)
+}													  
+
+
+# Assign new data to the correct nodes and transform them if necessary for prediction.
+# Helper function for predict_slim an plot_slim_pdp
+
+data_to_nodes = function(tree, newdata, nodes = "leafnode", degree.poly = 1){
+  
+  models = extract_models(tree)
+  split = extract_split_criteria(tree)
+  if(length(nodes) == 1L){
+    if(nodes == "all"){
+      split_nodes = split[,c("child.type", "id.node")]
+      
+    } else if(nodes %in% c("leafnode", "leafnodes")){
+      split_nodes = split[split$split.feature == "leafnode",c("child.type", "id.node")]
+    } 
+  } else {
+    split_nodes = split[split$id.node %in% nodes,c("child.type", "id.node")]
+  }
+  
   newdata = as.data.table(newdata)
   newdata$row_id = 1:nrow(newdata)
   
-  predictions = c()
-  for (n in 1:nrow(nodes)){
-    if(nrow(nodes) == 1){
+  node_list = list()
+  
+  for (n in 1:nrow(split_nodes)){
+    node_id = as.character(split_nodes[n,"id.node"])
+    node_list[[node_id]] = list()
+    
+    if(nrow(split_nodes) == 1){
       node_data = as.data.frame(newdata)
     } else{
-      node_data = as.data.frame(newdata[eval(parse(text = nodes[n, "child.type"])),])
+      if(split_nodes[n, "child.type"] == "rootnode"){
+        node_data = as.data.frame(newdata)
+      } else{
+        node_data = as.data.frame(newdata[eval(parse(text = split_nodes[n, "child.type"])),])
+      }
     }
     
-    node_id = as.character(nodes[n,"id.node"])
+											  
     if (nrow(node_data) > 0){
-      if (type == "response"){
-        newdata_n = subset(node_data, select = -c(row_id))
-        if(class(models[[node_id]]$model)[1] %in% c("elnet", "glmnet")){
-          if(fit.bsplines){
-            features = names(newdata_n)
-            for(f in features){
-              if (is.numeric(newdata_n[[f]])){
-                splined = bs(newdata_n[[f]], df = df.spline, degree = 1)
-                df_splined = as.data.frame(splined)
-                colnames(df_splined) = paste0(f,"_",colnames(df_splined))
-                newdata_n[[f]]= NULL
-                newdata_n = cbind(newdata_n, df_splined)
+							  
+      newdata_n = subset(node_data, select = -c(row_id))
+      
+      # if penalized polynomial regression was used, the data must be transformed
+      if(class(models[[node_id]]$model)[1] %in% c("elnet", "glmnet")){
+        if (degree.poly > 1) {
+          features = names(newdata_n)
+          for(f in features){
+            if (is.numeric(newdata_n[[f]])){
+              for(d in 2:degree.poly){
+                newdata_n = cbind(newdata_n, "new" = newdata_n[[f]]^d)
+                colnames(newdata_n)[which(names(newdata_n) == "new")] = paste0(f,"_",d)
+									
+														
               }
             }
           }
-          newdata_n = newdata_n[, colnames(newdata_n) %in% rownames(models[[node_id]]$model$beta)]
-          newdata_n = as.matrix(newdata_n)
-        }
-        y_hat = predict(models[[node_id]]$model, newdata_n)
+        } 
+        
+        # newdata_n = newdata_n[, colnames(newdata_n) %in% rownames(models[[node_id]]$model$beta)]
+        newdata_n = as.matrix(newdata_n)
+		 
+														   
+	   
+							   
+					   
       }
-      else if (type == "node"){
-        y_hat = node_id
-      }
+      newdata_n = cbind(newdata_n, row_id = node_data$row_id)
       
-      predictions = rbind(predictions, cbind(node_data, y_hat = as.vector(y_hat)))
+      # save node_id, model data and chlidtype for ever node
+      node_list[[node_id]]$node_id = node_id
+      node_list[[node_id]]$newdata = newdata_n
+      node_list[[node_id]]$model = models[[node_id]]$model
+      node_list[[node_id]]$child_type = split_nodes[n, "child.type"]
+      node_list[[node_id]]$effects = models[[node_id]]$effects
+      node_list[[node_id]]$subset.idx = models[[node_id]]$subset.idx
     }
   }
-  predictions = predictions[order(predictions$row_id),]
-  rownames(predictions) = predictions$row_id
-  return(predictions$y_hat)
+  return(node_list)
+											
+						   
 }
+
+
+# Function to plot tree structure of a SLIM Tree
+# include_coefficiants options: "leafnodes", "all", "none"
+
+plot_slim = function(tree, include_coefficiants = "leafnodes", digits = 3,
+                     vertex.size = 40, vertex.size2 = 50, vertex.label.cex = 0.8,
+                     edge.label.cex = 0.8,...){
+  split = as.data.table(extract_split_criteria(tree))
+  models = extract_models(tree)
+  
+  # create tree data.frame
+  tree_data = data.frame(parent = split$id.node.parent, node = split$id.node, 
+                         text = apply(str_split_fixed(str_trim(str_extract(split$child.type, "[^&]+$")), " ", 2), 
+                                      1,
+                                      function(rule){
+                                        paste0(rule, collapse = "\n")
+                                      })
+                         )[-1,]
+                           
+  g = graph.data.frame(tree_data)
+  
+  # define vertex labels
+  vertex.label = c()
+  
+  for(n in 1:nrow(split)){
+    vertex.label[n] = paste0(
+      "id: ", split[n,id.node],
+      "\nsize: ", split[n,size])
+    
+    if(include_coefficiants == "all" | 
+       (include_coefficiants == "leafnodes" & split[n, split.feature] == "leafnode")){
+
+    # print more info in the leafnodes
+      id = split[n,as.character(id.node)]
+      model = models[[id]]$model
+      coeffs = coef(model)
+      coeffs_output = c()
+      
+      if("glmnet" %in% class(model)){
+        # keep only non-zero coefficiants
+        coeffs = coeffs[(coeffs@i+1),]
+      }
+
+      # only include coefficiants, if there are maximal 10
+      if(length(coeffs)<10){
+        for(co in 1:length(coeffs)){
+          coeffs_output = paste0(coeffs_output, "\n", 
+                                 paste0(names(coeffs)[co], ": ", round(coeffs[co], digits)))
+        }
+        vertex.label[n] = paste0(vertex.label[n], coeffs_output)
+      }
+    }
+  }
+
+  # match vertex ids with new labels
+  names(vertex.label) = as.character(0:(length(vertex.label)-1))
+  V(g)$label = vertex.label[V(g)$name]
+  
+  
+  
+  plot(g, layout = layout_as_tree, 
+       edge.label=E(g)$text, 
+       # vertex.label = vertex.label,
+       vertex.color = "grey",
+       vertex.label.cex = vertex.label.cex,
+       vertex.label.color = "black",
+       vertex.size= vertex.size,
+       vertex.size2 = vertex.size2,
+       vertex.shape = "rectangle",
+       edge.arrow.size=0.1,
+       edge.label.cex = edge.label.cex,
+       edge.label.color = "blue",
+       
+       
+       ...)
+  
+}
+
+
+# plot feature input/output dependency
+plot_slim_effects = function(tree, data, features, nodes = "leafnode"){
+  node_list = data_to_nodes(tree, data, nodes = nodes, degree.poly = degree.poly)
+  effect_list = lapply(node_list, function(node){
+    effect = node$effects
+    colnames(effect) = paste0("effect.", colnames(effect))
+    cbind(data[node$subset.idx, features], effect, child_type = node$child_type)
+  })
+  
+  effect_df = do.call(rbind.fill, effect_list)
+
+  plot_list = list()
+  for(feat in features){
+
+    effect_feat = effect_df[,c(feat, paste0("effect.", feat), "child_type")]
+    colnames(effect_feat) = c("x", "effect", "child_type")
+    
+    plot_list[[feat]] = ggplot(effect_feat, aes(x = x, y = effect, color = child_type)) + 
+      theme_bw()+ 
+      geom_point() + 
+      geom_line(lwd = 1.5) + 
+      theme(legend.position="bottom", legend.text=element_text(size=9)) + 
+      labs(x = feat, y = "", color = "rule") +
+      guides(color=guide_legend(ncol=1, byrow=TRUE))
+    
+
+  }
+  
+  return(plot_list)
+    
+}
+
+
+
+# create plot list with pdp plots by node or by feature
+plot_slim_pdp = function(tree, newdata, features, target, nodes = "leafnode", degree.poly = 1, method = "pdp", by = "feature"){
+											  
+  node_list = data_to_nodes(tree, newdata, nodes = nodes, degree.poly = degree.poly)
+  pdp_nodes_plot = lapply(node_list, function(node){
+    predictor = Predictor$new(node$model, data = as.data.frame(node$newdata[, features]), y = as.data.frame(node$newdata[,target]))
+    pdp = FeatureEffects$new(predictor, method = "pdp")
+  })
+
+  if(by == "feature"){
+    pdp_features = list()
+    pdp_feature_plot = list()
+    for(feat in features){
+      pdp_features[[feat]] = lapply(names(pdp_nodes_plot), function(node_id){
+        pdp = pdp_nodes_plot[[node_id]]
+        res = pdp$results[[feat]]
+        res$node_id = node_id
+							   
+        res$child_type = node_list[[node_id]]$child_type
+        return(res)
+      })
+      
+      pdp_features[[feat]] = do.call(rbind, pdp_features[[feat]])
+      pdp_feature_plot[[feat]] = ggplot(pdp_features[[feat]], aes(x = .borders, y = .value, color = child_type)) + 
+        geom_line(lwd = 1.5) + 
+        theme_bw()+ 
+        theme(legend.position="bottom", legend.text=element_text(size=9)) + 
+        ggtitle(paste0("PDP feature ", feat)) +
+        labs(x = feat, y = "", color = "rule") +
+        guides(color=guide_legend(ncol=2, byrow=TRUE))
+      
+    }
+    return(pdp_feature_plot)
+  } else {
+    return(pdp_nodes_plot)
+  }
+													   
+											
+						   
+}
+
+
 
 
 extract_split_criteria = function(tree){
@@ -107,8 +311,22 @@ extract_split_criteria = function(tree){
   df.split.criteria$id.node = 0:(nrow(df.split.criteria)-1)
   row.names(df.split.criteria) = df.split.criteria$id.node
   df.split.criteria[] = lapply(df.split.criteria, unlist)
-  # print(paste0("RSS:",(sum(unlist(df.split.criteria[df.split.criteria$split.feature=="leafnode",]$objective.value.parent)))))
-  return(df.split.criteria)
+  df.split.criteria = as.data.table(df.split.criteria)
+  
+  
+  # Add unique parent ids
+  if(nrow(df.split.criteria)>3){
+    id.node.parent = c(0,0,0)
+    for(n in 4:nrow(df.split.criteria)){
+      split_parent = str_extract(df.split.criteria$child.type[n], "^.*(?=( &))")
+      id.node.parent[n] = df.split.criteria[child.type == split_parent, id.node]
+    }
+    df.split.criteria$id.node.parent = id.node.parent
+  } else{
+    df.split.criteria$id.node.parent = 0
+  }
+  
+  return(as.data.frame(df.split.criteria))
 }
 
 extract_models = function(tree){
@@ -119,7 +337,9 @@ extract_models = function(tree){
         l = list("depth" = node$depth, "id" = node$id,
                  "id.parent" = ifelse(is.null(node$id.parent), "rootnode", node$id.parent),
                  "child.type" = ifelse(is.null(node$child.type), "leafnode", node$child.type),
-                 "model" = node[["model.fit"]])
+                 "model" = node[["model.fit"]],
+                 "effects" = node$term.predictions.parent,
+                 "subset.idx" = node$subset.idx)														  												
         
       }
       l
@@ -723,20 +943,31 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
   if (.exclude.categoricals){
     x = x %>% dplyr::select(where(~ !is.factor(.)))
   }
-  numeric.names = c()
-  poly = c()
-  splines = c()
-
-  if (.degree.poly > 1) {
-    numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > .degree.poly+1))]
-    poly = paste0("poly(",numeric.names, ", degree =", .degree.poly,")")
-  } else if (.fit.bsplines) {
-    numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval)))]
-    if(length(numeric.names)>0){
-      splines = paste0("bs(", numeric.names, ", df = ", .df.spline, ", degree = 1)")  
+  
+  fm_vec = c()
+  
+  for(i in 1:ncol(x)){
+    xval = x[,i]
+    xname = colnames(x)[i]
+    if(.degree.poly > 1){
+      if(is.numeric(xval) & length(unique(xval)) > .degree.poly+1){
+        fm_vec[i] = paste0("poly(", xname, ", degree =", .degree.poly,", raw = TRUE)")
+      } else{
+        fm_vec[i] = xname
+      } 
+    } else if(.fit.bsplines){
+      if(is.numeric(xval) & length(unique(xval)) > 2){
+        fm_vec[i] = paste0("bs(", xname, ", df = ", .df.spline, ", degree = 1)")
+      } else{
+        fm_vec[i] = xname
+        
+      }
+    } else{
+      fm_vec[i] = xname
     }
   }
-  fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], poly, splines), collapse = "+")))
+
+  fm = as.formula(paste("y ~", paste(fm_vec, collapse = "+")))
   data = cbind(y,x)
   model = lm(fm, data)
   if(.type == "fitted.values"){
@@ -762,8 +993,31 @@ get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
   if (.exclude.categoricals){
     x = x %>% select(where(~ !is.factor(.)))
   }
+  x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
+  # predict.lm "terms" centres the featureeffects and there is no option to "uncenter" 
   prediction = predict.lm(model, x, type = "terms")
-  return(prediction)
+  colnames(prediction) = colnames(x)
+
+  # Therefore calculate manually
+
+  # easy for simple lm
+  # prediction =  t(t(model$model)*as.vector(model$coefficients))[,-1] # delete intercept column
+  # # for bsplines, all spline effects corresponding to one feature muss be sumed up
+  # prediction_compact = data.table()
+  # if(any(str_detect(colnames(prediction), "bs\\("))){
+  #   for(feat in colnames(x)){
+  #     if(sum(str_detect(colnames(prediction), feat)) == 1){
+  #       prediction_compact = cbind(prediction_compact, "newfeat" = prediction[, str_detect(colnames(prediction), feat)])
+  #       setnames(prediction_compact, "newfeat", feat)
+  #     } else {
+  #       prediction_compact = cbind(prediction_compact, "newfeat" = rowSums(prediction[, str_detect(colnames(prediction), feat)], na.rm = TRUE))
+  #       setnames(prediction_compact, "newfeat", feat)
+  #     }
+  #   }
+  #   prediction = prediction_compact
+  # }
+
+  return(data.frame(prediction))
 }
 
 get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .df.spline, .fit.bsplines, .exclude.categoricals, .lambda, .df.max, .type = "model", ...) {
@@ -926,6 +1180,10 @@ get_objective_lad = function(y, x, .exclude.categoricals,  ...){
   return(sae)
 }
 
+get_prediction_lad = function(model, x, .exclude.categoricals, ...) {
+  prediction =  t(t(model$x)*as.vector(model$coefficiants))
+  return(prediction)
+}																	   
 
 
 get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, .type = "model", ...) {
@@ -958,7 +1216,9 @@ get_objective_gam = function(y, x, .family, .df.spline, .exclude.categoricals,  
 }
 
 get_prediction_gam = function(model, x, .exclude.categoricals, ...) {
+  x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   prediction = predict.gam(model, x, type = "terms")
+  colnames(prediction) = colnames(x)
   return(prediction)
 }
 

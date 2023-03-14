@@ -5,10 +5,10 @@ fit_lm = function(y, x, start = NULL, weights = NULL, offset = NULL, ...) {
   lm(y ~ x , ...)
 }
 
-fit_spline = function(y, x, start = NULL, weights = NULL, offset = NULL, degree = 1, df = 5,  ..., estfun = TRUE, object = TRUE) {
+fit_spline = function(y, x, start = NULL, weights = NULL, offset = NULL, degree = 1, df = 10,  ..., estfun = TRUE, object = TRUE) {
   term = c()
   for (n in colnames(x)[-1]){
-    if (is.numeric(x[,n])){
+    if (is.numeric(x[,n]) & length(unique(x[,n]))>2){
       newterm = paste0("bs(", n, ", df =", df, ", degree =",  degree, ")")
     } else {
       newterm = n
@@ -26,50 +26,44 @@ fit_spline = function(y, x, start = NULL, weights = NULL, offset = NULL, degree 
 }
 
 
-fit_lasso = function(y, x, start = NULL, weights, offset, estfun = TRUE, object = FALSE, ...) {
-  if (is.null(weights)) weights <- rep(1, NROW(y))
-  n = nrow(x)
-  y = unlist(y)
-  x = as.matrix(x)
-  
-  # lambda = cv.glmnet(x, y, alpha = 1, weights = weights)$lambda.min
-  
-  fit<-glmnet(x,y,nlambda=100)
-  RSS<-deviance(fit)
-  BIC <- n*log(RSS/n) + log(n)*fit$df
-  lambda<-fit$lambda[which.min(BIC)]
-  
-  # lambda_perm<-rep(NA,100)
-  # for(i in 1:100){
-  #   lambda_perm[i]<- (1/n)* max( abs( t(x)%*%sample(y) ) )
-  # }
-  # lambda = median(lambda_perm)
-  
-  model = glmnet(x, y, alpha = 1, lambda = lambda, weights = weights)
-  
-  y_hat = predict.glmnet(model, newx = x, s = lambda)
-  residuals = as.vector(y - y_hat)
-  coef = coef(model)
-  obj = sum(residuals^2) + lambda * glmnet:::pen_function(coef[-1], 1, 1)
-  
-  # Use a subgradient as score
-  
-  s = residuals*cbind(1,x) - lambda*matrix(rep(c(0,sign(coef[-1])), length(residuals)), nrow = length(residuals))
-  # s = s[, !(as.vector(coef)) == 0]
-  
-  # For MOB scores must fluctuate around 0 -> substract means
-  s = apply(s, 2, function(col){
-    score = col - mean(col)
+
+# fit models to ctree leaves
+fit_ctree_leaves = function(ctree, x, y, fit.bsplines = FALSE, df.spline){
+  node_model = cbind(x, y = y, node = predict(ctree, type = "node"))
+  node_model_list = split(node_model, node_model$node, drop = TRUE)
+  node_model_list = lapply(node_model_list, function(node){
+    x = node[, !(colnames(node) %in% c("y", "node"))]
+    x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
+    numeric.names = c()
+    splines = c()
+    
+    if (fit.bsplines) {
+      numeric.names = names(x)[sapply(x,function(xval)(is.numeric(xval) & length(unique(xval)) > 2))]
+      if(length(numeric.names)>0){
+        splines = paste0("bs(", numeric.names, ", df = ", df.spline, ", degree = 1)")  
+      }
+    }
+    fm = as.formula(paste("y ~", paste(c(names(x)[!(names(x) %in% numeric.names)], splines), collapse = "+")))
+    model = lm(fm, data = node)
+
   })
+  return(node_model_list)
+}
+
+
+
+# get model predictions for ctree
+predict_ctree = function(ctree, fit_ctree, newdata){
+  newdata$row_id = 1:nrow(newdata)
+  nodes = predict(ctree, newdata = newdata, type = "node")
+  newdata_list = split(newdata, nodes)
+  for(node in names(newdata_list)){
+    newdata_list[[node]]$y_hat = predict(fit_ctree[[node]], newdata = newdata_list[[node]])
+  }
   
-  estfun <- matrix(0, nrow = length(weights), ncol = NCOL(s))
-  estfun[weights > 0, ] <- s
-  
-  return(list(estfun = estfun,
-              coefficients = coef,
-              objfun = obj,
-              object = model))
-  
-  # return(list(estfun = estfun,
-  #             converged = TRUE))
+  predictions = lapply(newdata_list, function(el) el[, c("row_id", "y_hat")])
+  predictions = do.call(rbind, predictions)
+  predictions = predictions[order(predictions$row_id),]
+  rownames(predictions) = predictions$row_id
+  return(predictions$y_hat)
 }

@@ -18,10 +18,9 @@ library(BBmisc)
 #' @param min.split minimum number of observations per node
 #' @param n.quantiles number of quantile splits to be evaluated per splitting variable
 #' @param approximate should approximate splitting algorithm be used
-#' @param split.method how should splits be performed? "slim" for exhaustive search, "anova" for zwo step approach with modelcomparison via F-Test. 
-#' "R2" for Model comparison with r squared an "R2_adj" for model comparison with adjusted r squared
+#' @param split.method how should splits be performed? "slim" for exhaustive search with SLIM Algorithm, "guide" for using chi-sqare independence test to find the splitting variable
 #' @param pruning select pruning method ('forward', 'none')
-#' @param objective character string with objective function to use ('MSE', 'MAE')
+#' @param objective character string with objective function to use ('MSE', 'MAE') "MAE" is only implemented for linear models and polynomial models
 #' @param family a description of the error distribution and link function to be used in the model. This can be a character string naming a family function, a family function or the result of a call to a family function
 #' @param degree.poly degree of included polynomials
 #' @param fit.bsplines should bsplines be fitted
@@ -219,7 +218,7 @@ Node <- R6Class("Node", list(
       predictions = rbind(term.predictions.left[,intersection, drop = FALSE], term.predictions.right[, intersection, drop = FALSE])
 
       self$term.predictions = predictions[order(as.numeric(rownames(predictions))),, drop = FALSE]
-      self$split.effect = calculate_split_effects(self$term.predictions.parent, self$term.predictions, exclude = self$split.feature)
+      self$split.effect = calculate_split_effects(self$term.predictions.parent, self$term.predictions, exclude = NULL)
       
       variable.importance.left = round(apply(term.predictions.left, MARGIN = 2, var), 4)
       variable.importance.right = round(apply(term.predictions.right, MARGIN = 2, var), 4)
@@ -271,8 +270,8 @@ compute_tree_slim = function(y,
                              exclude.categoricals = FALSE,
                              correct.bias = FALSE) {
   time.start = Sys.time()
-  input.data = list(X=as.data.frame(x), Y=as.data.frame(y))
-
+  input.data = list(X=as.data.frame(x), Y=data.frame(y = as.vector(y)))
+  
   alpha = 0
   if (objective == "MSE"){
     
@@ -302,6 +301,8 @@ compute_tree_slim = function(y,
   } else if (objective == "MAE"){
     split.objective = get_objective_lad
     fit.model = get_model_lad
+	predict.response = get_prediction_lad
+									 
   }
   else {
     stop(paste("objective", objective, "is not supported."))
