@@ -1,30 +1,35 @@
-Motivation:
-\begin{itemize}
-    \item Performance of complex black box models vs. increasing importance of interpretability.
-    \item Approach: use (well interpretable) surrogate models to explain the predictions of black box models. 
-\end{itemize}
+Various machine learning algorithms achieve outstanding predictive performance nowadays. However, most of them are complex black box models that, unlike traditional statistical methods such as linear regression, are not intrinsically interpretable \citep{Hu.2020}.
+Especially in highly regulated industries such as insurance, this is a problem \citep{Henckaerts.2022}.
+In order to maintain the good performance of complex black-box models but still achieve a certain degree of interpretability, there exist different methods with which models can be interpreted post-hoc. 
+One way to interpret complex blackbox models post-hoc is to use surrogate models. The idea is to approximate the predictions of black box models by intrinsically interpretable models \citep{Molnar.2019}.
+But in order for a surrogate model's explanations to be trusted, it must itself perform well in approximating the black box predictions. 
 
 
-Goal: additive decomposition of a black box function by combining decision rules and additive models.
-Find subregions in the feature space so that the global blackbox model can be replaced by subregional main effect models.
+Model-based trees (MBT) are a promising class of models for this purpose. 
+The concept of MBTs is based on classical regression trees like CART \citep{Breiman.1984} but contains models instead of constant values in the leafnodes.
+It is hence a combination of decision rules and models. If intrinsically interpretable models are chosen for the models, a principally interpretable model is derived. The degree of interpretability and performance, though, depends on the complexity of the decision rules (i.e. depth of the tree or number of leaf nodes) and of the models.
+
+
+In order to enable a good interpretability of the models in the leaf nodes, this thesis sets the constraint that only main-effect models are fitted in the nodes. 
+In the ideal case, interactions should then be handled by  splits, so that the models in the leafnodes are free from interaction effects.
+
+To ensure that the splits are actually due to interactions and not to non-linearities, it is necessary that potentially non-linear main-effects are modelled appropriately.
+Although in some cases linear modelling of the main effects is sufficient, it should also be possible to fit more complex models, such as (penalised) polynomial models or generalised additive models (GAM).
+The goal is thus an additive decomposition of a black-box function by combining decision rules and additive main effect models.  In other words
+subregions in the feature space should be found, so that the global black box model can be replaced by subregional main effect models.
+
+
+In my research, I found four different algorithms that can generate model-based trees. 
+The most recent approach Surrogate Locally-Interpretable Models (SLIM) by \cite{Hu.2020} allows a high flexibility in the choice of model classes in the leafnodes. SLIM uses a exhaustive search for the best splitting point through all possible splitting variables. 
+In this thesis SLIM is contrasted with three common algorithms for creating MBTs: Model-based recursive Partitioning (MOB) \citep{Zeileis.2008}, Conditional Inference Trees (CTree) \citep{Hothorn.2006} and Regression tress with unbiased variable selection and interaction detection (GUIDE) \citep{Loh.2002}. These algorithms differ from SLIM mainly in that the search for the best split point is a two-step process. First, the best split variable is selected by a hypothesis test. Then, in a second step, the best split point for this variable is searched. The three methods differ from each other again mainly in the respective hypothesis test. Since certain prerequisites must be fulfilled for the hypothesis tests, the choice of model classes for these algorithms is limited to some extent.
 
 
 
-requirements:
-\begin{itemize}
-    \item main effect models should be chosen as flexibly as possible (e.g. simple linear models, splines, penalized models, choice of a different loss function (e.g. least absolute deviations regression).
-    \item Possible interactions should be handled by the splits, so that the models in the leafnodes are free from interaction effects.
-\end{itemize}
 
-Approaches:
-Recursive partitioning
-\begin{itemize}
-    \item an approach that allows great flexibility in model selection are Surrogate Locally-Interpretable Models (SLIM) \citep{Hu.2020} (exhaustive search for the best splitting point through all possible splitting variables)
-    \item This method is contrasted with three common algorithms for creating model-based trees (MOB, CTree, GUIDE). These differ from SLIM mainly in that the search for the best split point is a two-step process. First, the best split variable is selected by a hypothesis test. Then, in a second step, the best split point for this variable is searched. The three methods differ from each other again mainly in the respective hypothesis test.
-\end{itemize}
+The aim of this thesis is to investigate to what extent the four MBT algorithms are suitable as surrogate models. In addition to performance and interpretability, stability and potential selection bias are important criteria. The differences between the algorithms with respect to these criteria are examined empirically by means of simulations and applied to two data sets from the life insurance sector. 
 
-Comparison of methods with respect to selection bias, performance, stability, interpretability and flexibility
+
 
 The thesis is structured as follows:
-Related work regarding surrogate models in chapter \ref{related}.
-Model-Definition and description of the different MBT Algorithms in chapter \ref{background}. 
+In chapter \ref{related}, an overview of surrogate models is given and MBTs are placed in this setting. Thereafter, the four MBT algorithms are described in chapter \ref{background}. Chapter \ref{selection} examines the extent to which the various algorithms suffer from selection bias. In chapter \ref{simulation}, different simulation scenarios are used to examine how the algorithms differ in terms of performance, interpretability and stability. In addition, the interpretability and performance of the SLIM algorithm are examined when the complexity of the leaf node models is varied. Finally, the algorithms in chapter \ref{usecase} are used as surrogate models for the modelling of insurance data. 
+

@@ -303,7 +303,7 @@ In contrast to the scenario linear smooth, the variation in the number of leafno
 Figure \ref{fig:la_1000_standalone_r2_test} shows the performance by number of leafnodes for impr = 0.05 and alpha = 0.001. There one can see again that SLIM and GUIDE achieve a very high $R^2$ despite the low number of leafnodes. 
 
 It is also noticeable that MOB performs better than CTree with the same number of leafnodes.
-This could be because, according to citep{\citep{Schlosser.2019}}, the M-fluctuation test used in MOB has a higher ability in detecting abrupt changes than the linear test statistic used in CTree.
+This could be because, according to \citep{Schlosser.2019}, the M-fluctuation test used in MOB has a higher ability in detecting abrupt changes than the linear test statistic used in CTree.
 
 
 
@@ -531,8 +531,8 @@ SLIM is fitted here with four different objectives.
 \begin{enumerate}
     \item linear regression model (lm)
     \item polynomial regression of degree $2$ with LASSO penalization (penalized poly)
-    \item linear regression with bspline transformations of the features (bsplines)
-    \item GAM 
+    \item linear regression with linear bspline transformations of the features (bsplines)
+    \item Generalized additive models with integrated smoothness estimation \citep{Wood.2011} (GAM)
 \end{enumerate}
 
 
@@ -593,8 +593,12 @@ Table \ref{tab:linear_mixed_1_interpretability} lists the mean results regarding
 In addition, in average $45\%$ ($61\%$ if used as surrogate) of all split observations were not split with respect to an interaction, but with respect to an insufficiently modelled maineffect. Moreover, in some simulation runs all features are used as splitting variables, which further increases the lack of interpretability.
 The fact that the models in the leaf nodes are very simple can hardly compensate for this. 
 
- SLIM in conjunction with penalised polynomial regression in the nodes, on the other hand, achieves comparable performance with far fewer splits.
- There are also considerable fewer different features used for splitting, but the proportion of observations where the splits were performed with respect to a main effect variable is still high, albeit better than with SLIM lm.
+SLIM in conjunction with penalised polynomial regression in the nodes, on the other hand, achieves comparable performance with far fewer splits.
+There are also considerable fewer different features used for splitting, but the proportion of observations where the splits were performed with respect to a main effect variable is still high, albeit better than with SLIM lm.
+
+Both SLIM with linear bspline transformed variables and GAMs require on average only two leafnodes, i.e. one split, to achieve an $R^2$ of $0.9$. The models in the leafnodes can only be interpreted visually, but since the number of models is very small, the degree of interpretability is comparatively high. Moreover, these models actually only split by interactions, as the non-linear main effects are already modelled sufficiently well. If it is not explicitly required that the model weights are directly interpretable and it should also be ensured that they are actually split according to interactions, models with splines are the best choice in this case. GAMs are preferable to unpenalised bsplines in terms of their generalisation error, but the computational effort is much higher.
+
+
 
 
 \begin{table}[!htb]
@@ -632,14 +636,14 @@ xgboost & xgboost & 0.9386 & 0.0295 & 0.9199 & 0.0362 & 3.1163\\
 black box & model & n leaves & n l min & n l max & n split feat & n sf min & n sf max & \% main effect & df & sd df\\
 \hline
 standalone & basic lm & 43.06 & 36 & 48 & 5.68 & 4 & 6 & 0.5089 & 6.5804 & 0.1249\\
+standalone & penalized poly & 19.32 & 16 & 22 & 4.26 & 3 & 5 & 0.2374 & 8.8768 & 0.3681\\
 standalone & bsplines & 18.38 & 13 & 22 & 4.26 & 3 & 6 & 0.0126 & & \\
 standalone & gam & 17.60 & 12 & 22 & 3.44 & 2 & 4 & 0.0007 & & \\
-standalone & penalized poly & 19.32 & 16 & 22 & 4.26 & 3 & 5 & 0.2374 & 8.8768 & 0.3681\\
 \hline
 xgboost & basic lm & 30.38 & 2 & 47 & 4.56 & 1 & 6 & 0.6732 & 6.8519 & 0.1558\\
+xgboost & penalized poly & 20.66 & 16 & 24 & 4.70 & 3 & 6 & 0.2327 & 9.2909 & 0.4347\\
 xgboost & bsplines & 17.38 & 2 & 25 & 4.70 & 1 & 6 & 0.0597 & &\\
 xgboost & gam & 15.28 & 2 & 24 & 4.00 & 1 & 6 & 0.0191 & &\\
-xgboost & penalized poly & 20.66 & 16 & 24 & 4.70 & 3 & 6 & 0.2327 & 9.2909 & 0.4347\\
 \hline
 \end{tabular}
 \end{table}
