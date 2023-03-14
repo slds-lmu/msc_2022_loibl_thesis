@@ -22,7 +22,7 @@ In addition to selection bias, the mean squared error is measured on the test an
 
 \subsection{Simulation results}
 \subsubsection{Basic scenarios}
-\begin{table}
+\begin{table}[!htb]
 
 \caption{Mean simulation results on 100 simulation runs as surrogate models on scenario \textbf{linear smooth} with sample size $n = 1500$ for different values of impr and alpha}
 \centering \tiny
@@ -66,20 +66,20 @@ xgboost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 \end{table}
 
 
-\begin{figure}
+\begin{figure}[!htb]
 \caption{Maximum leaf size of standalone MBTs vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_symmetrie.png}
     \label{fig:app_ls_1000_standalone_symmetrie}
 \end{figure} 
 
 
-\begin{figure}
+\begin{figure}[!htb]
 \caption{Test fidelity $R^2$ as surrogate on lm predictions vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_lm_r2_test.png}
     \label{fig:app_ls_1000_lm_r2_test}
 \end{figure} 
 
-\begin{figure}
+\begin{figure}[!htb]
 \caption{Test fidelity $R^2$ as surrogate on xgboost predictions vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_xgboost_r2_test.png}
     \label{fig:app_ls_1000_xgboost_r2_test}
@@ -87,7 +87,7 @@ xgboost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 
 
 
-\begin{table}
+\begin{table}[!htb]
 
 \caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario \textbf{linear smooth} with sample size n = 5000 for different values of $impr$ and $alpha$}
 \centering \tiny
@@ -154,7 +154,7 @@ xgboost & & & & & & & 0.9877 & 0.0003 & 0.9852 & 0.0006\\
 
 
 
-\begin{table}
+\begin{table}[!htb]
 
 \caption{Mean simulation results on 100 simulation runs as surrogate models  on scenario \textbf{linear categorical} with sample size n=1500 for different values of impr and alpha}
 \centering \tiny
@@ -200,7 +200,7 @@ xgboost & & & & & & & 0.9876 & 0.0015 & 0.9778 & 0.0031\\
 
 
 
-\begin{table}
+\begin{table}[!htb]
 
 \caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario \textbf{linear categorical} with sample size n = 5000 for different values of impr and alpha}
 \centering \tiny
@@ -263,7 +263,7 @@ xgboost & & & & & & & 0.9880 & 0.0009 & 0.9852 & 0.0009\\
 
 
 
-\begin{table}
+\begin{table}[!htb]
 
 \caption{Mean simulation results on 100 simulation runs as surrogate models on scenario \textbf{linear mixed} with sample size $n=1500$ for different values of impr and alpha}
 \centering \tiny
@@ -313,7 +313,7 @@ xgboost & & & & & & & 0.9859 & 0.0014 & 0.9682 & 0.0042\\
 
 
 
-\begin{table}
+\begin{table}[!htb]
 
 \caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario \textbf{linear mixed} with sample size n = 5000 for different values of impr and alpha}
 \centering \tiny
@@ -375,18 +375,18 @@ xgboost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
 \end{table}
 
 
-
+\clearpage
 \subsubsection{Correlated features}
 
 \subsubsection{Linear smooth with noise features}
 
-\begin{figure} 
+\begin{figure}[!htb]
 \caption{Test accuracy $R^2$ of MBTs on scenario Linear smooth with noise features with $n=2000, alpha = 0.001, impr = 0.1$ with $n leaves \geq 11$}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/lasso/lasso_standalone_r2_test.png}
     \label{fig:app_lasso_standalone_r2_test}
 \end{figure} 
 
-\begin{figure}
+\begin{figure}[!htb]
 \caption{Test accuracy $R^2$ of SLIM and GUIDE MBTs on scenario Linear smooth with noise features with $n=2000, alpha = 0.001, impr = 0.1$ with $n leaves \leq 11$}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/lasso/lasso_standalone_r2_test_slim.png}
     \label{fig:app_lasso_standalone_r2_test_slim}
@@ -395,7 +395,14 @@ xgboost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
 \subsubsection{Nonlinear mixed}
 
 
-\subsubsection{Selection Bias}
 
-
+\clearpage
 \subsection{Insurance use case}
+\subsubsection{K2204}
+
+ \begin{figure}[!htb]
+     \centering     
+     \includegraphics[width = 14cm]{Figures/insurance_use_case/k2204_BPV/slim_lm_tree.png}
+     \caption{SLIM tree with linear models as standalone model for BPV in data set K2204}
+     \label{fig:app_ins_slim_lm_standalone_tree}
+ \end{figure}
