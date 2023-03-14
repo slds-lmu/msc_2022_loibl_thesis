@@ -2,6 +2,13 @@ In the following, SLIM is used in different configurations as a surrogate for mo
 
 \subsection{Data}
 The data set K2204 contains data for a (fictitious) endowment insurance tariff and includes the features sex, age and duration and the two targets benefit present value (BPV) and premium present value (PPV). The targets were modelled using two different black box models.  
-In the following, only the BPV is considered. The results for the PBV are very similar (interpreted the other way round) and can be found in the appendix. A special characteristic of this data set is a correlation between the Age and Duration features, as can be seen in Figure \ref{}. When interpreting the MBT, it must therefore be taken into account that the split with regard to one of the features always has an influence on the value range of the other feature.
+In the following, only the BPV is considered. The results for the PBV are very similar (interpreted the other way round) and can be found in the appendix. A special characteristic of this data set is a correlation between the Age and Duration features, as can be seen in Figure \ref{fig:ins_corr_age_duration}. When interpreting the MBT, it must therefore be taken into account that the split with regard to one of the features always has an influence on the value range of the other feature.
+
+\begin{figure}[!htb]
+    \centering    
+    \includegraphics[width=7cm]{Figures/insurance_use_case/k2204_BPV/corr_age_duration.png}
+    \caption{Features Age and Duration in the K2204 data set}
+    \label{fig:ins_corr_age_duration}
+\end{figure}
  
 \subsection{Results}
