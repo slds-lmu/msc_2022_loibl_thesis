@@ -228,7 +228,7 @@ extract_results_slim = function(tree, x_train, x_test, y_train, y_test, data_sta
 
 
 # fit models to ctree leaves
-fit_ctree_leaves = function(ctree, x, y){
+fit_ctree_leaves = function(ctree, x, y, fit.bsplines = FALSE){
   node_model = cbind(x, y = y, node = predict(ctree, type = "node"))
   node_model_list = split(node_model, node_model$node, drop = TRUE)
   node_model_list = lapply(node_model_list, function(node){

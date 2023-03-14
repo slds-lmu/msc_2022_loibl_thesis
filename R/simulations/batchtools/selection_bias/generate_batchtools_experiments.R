@@ -12,6 +12,9 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_b
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
+reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools",
+                   conf.file = "Data/simulations/batchtools/.batchtools.conf.R", writeable = TRUE)
+
 source("R/simulations/batchtools/simulation_setting_definition.R")
 
 # add problems and setting definitions
@@ -59,12 +62,15 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 id1 = head(findExperiments(algo.name = "selection_bias"), 1)
 print(id1)
 
-testJob(id = 300)
+testJob(id = 101)
 
-
+pars[type == "selection_bias_interaction_numerical_vs_numrical",job.id]
 
 # submit jobs
+pars = unwrap(getJobPars(reg = reg))
+
 submitJobs(reg = reg)
+submitJobs(pars[type == "selection_bias_interaction_numerical_vs_numrical",job.id])
 
 # reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools",
 #                    conf.file = "Data/simulations/batchtools/.batchtools.conf.R", writeable = TRUE)

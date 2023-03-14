@@ -1,3 +1,10 @@
+library(dplyr)
+library(REdaS)
+library(kableExtra)
+library(batchtools)
+library(data.table)
+library(GGally)
+library(ggpubr)
 # load results
 
 list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
@@ -17,43 +24,68 @@ colors_mbt =c("SLIM" = 'purple', "SLIM low symmetry" = "purple3", "GUIDE" ='oliv
               "MOB" ='skyblue', "CTree" = 'salmon')
 
 
+# ----- 1. Selection Bias Independence -----
 
-for (t in unique(tab$type)){
-  for (n_data in unique(tab[type == t , n])){
-    tab_t_n = tab[type == t & n == n_data, ]
-    # result = list(slim = table(tab_t_n$split_slim_exact),
-    #               slim_100 = table(tab_t_n$split_slim_100),
-    #               slim_10 = table(tab_t_n$split_slim_10),
-    #               mob = table(tab_t_n$split_mob),
-    #               ctree = table(tab_t_n$split_ctree),
-    #               guide_inclcat = table(tab_t_n$impr_guideincl_cat_corr),
-    #               guide_excllcat = table(tab_t_n$impr_guide_excl_cat_corr)
-    #               # ,
-    #               # guide_biased_inclcat = table(tab_t_n$impr_guideincl_cat_biased),
-    #               # guide_biased_excllcat = table(tab_t_n$impr_guide_excl_cat_biased)
-    #               
-    #               )
-    # saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), ".rds"))
+
+# Independence numerical
+res_independence_numerical = tab[type == "selection_bias_independence_small", ]
+
+setnames(res_independence_numerical, "split_guide_incl_cat_corr","GUIDE")
+
+p_independence_numerical = ggplot(stack(res_independence_numerical[,c(cols_split, "GUIDE"), with = FALSE]),
+           aes(x = values, fill = ind)) +
+  stat_count(position = position_dodge2(preserve = "single")) +
+  scale_fill_manual(values = colors_mbt) +
+  labs(x="splitting variable", y="frequency", fill = "MBT")
+
+ggexport(p_independence_numerical, filename = paste0(figuredir, "independence_numerical.png"), width = 800, height = 300)
+
+
+# Independence mixed
+
+res_independence_mixed = tab[type == "selection_bias_independence", ]
+
+setnames(res_independence_mixed, c("split_guide_excl_cat_corr", "split_guide_incl_cat_corr"),c("GUIDE excl cat", "GUIDE incl cat"))
+
+p_independence_mixed = ggplot(stack(res_independence_mixed[,c(cols_split, "GUIDE excl cat", "GUIDE incl cat"), with = FALSE]),
+                                  aes(x = values, fill = ind)) +
+  stat_count(position = position_dodge2(preserve = "single")) +
+  scale_fill_manual(values = colors_mbt) +
+  labs(x="splitting variable", y="frequency", fill = "MBT")
+
+ggexport(p_independence_mixed, filename = paste0(figuredir, "independence_mixed.png"), width = 800, height = 300)
+
+
+
+# ---- 2. Selection Bias / Splitting behaviour Interactions ----
+
+
+
+
+plot_list = list()
+interaction_types = c("selection_bias_interaction_numerical_vs_numrical",
+                      "selection_bias_interaction_binary_vs_categorical",
+                      "selection_bias_interaction_numerical_vs_binary",
+                      "selection_bias_interaction_numerical_vs_categorical")
+type_names = c("numerical vs numerical", "binary vs categorical", "numerical vs binary", "numerical vs categorical")
+for (t in seq_along(interaction_types)){
+    res_t = tab[type == interaction_types[t], ]
+
+      setnames(res_t, c("split_guide_incl_cat_corr"),c("GUIDE"))
     
-    
-    # if(t == "selection_bias_independence"){
-      setnames(tab_t_n, c("split_guide_excl_cat_corr", "split_guide_incl_cat_corr"),c("GUIDE excl cat", "GUIDE incl cat"))
-      
-      cols_split_new = c(cols_split, "GUIDE excl cat", "GUIDE incl cat")
-    # } else{
-    #   setnames(tab_t_n, "split_guide_excl_cat_corr","GUIDE")
-    #   cols_split_new =  c(cols_split, "GUIDE")
-    # }
-    p = ggplot(stack(tab_t_n[,cols_split_new, with = FALSE]),
-               aes(x = values, fill = ind)) +
-      stat_count(position = "dodge") +
+    plot_list[[t]] = ggplot(stack(res_t[,c(cols_split, "GUIDE"), with = FALSE]),
+                            aes(x = values, fill = ind)) +
+      stat_count(position = position_dodge2(preserve = "single")) +
       scale_fill_manual(values = colors_mbt) +
+      ggtitle(type_names[t]) + 
+      scale_y_continuous(limits = c(0, 1000)) +
       labs(x="splitting variable", y="frequency", fill = "MBT")
-    
-    ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ".png"), width = 800, height = 300)
-    
-  }
 }
+
+p_interactions = ggarrange(plotlist = plot_list, ncol = 2, nrow = 2, common.legend = TRUE, legend = "bottom")
+ggexport(p_interactions, filename = paste0(figuredir, "interactions.png"), width = 800, height = 400)
+
+
 
 
 
@@ -101,41 +133,6 @@ savedir ="Data/simulations/batchtools/selection_bias_guide/results/"
 
 if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
 
-table(split_data[impr_guideexcl_cat_biased < 0.01, split_guide_excl_cat_biased])
-table(split_data[impr_guideexcl_cat_corr < 0.01, split_guide_excl_cat_corr])
-table(split_data[impr_guideincl_cat_corr < 0.02, split_guide_incl_cat_corr])
-
-
-ggplot(split_data,
-       aes(x = split_guide_excl_cat_biased, y = impr_guideexcl_cat_biased)) +
-  stat_boxplot(geom = "errorbar", width = 0.5) +
-  geom_boxplot()
-
-ggplot(split_data,
-       aes(x = split_guide_excl_cat_biased)) +
-  stat_count(position = "dodge") +
-  ggtitle("Frequency of selection") +
-  labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-
-ggplot(split_data,
-       aes(x = split_guide_excl_cat_corr, y = impr_guideexcl_cat_corr)) +
-  stat_boxplot(geom = "errorbar", width = 0.5) +
-  geom_boxplot()
-
-ggplot(split_data,
-       aes(x = split_guide_incl_cat_corr, y = impr_guideincl_cat_corr)) +
-  stat_boxplot(geom = "errorbar", width = 0.5) +
-  geom_boxplot()
-
-ggplot(split_data,
-       aes(x = split_guide_incl_cat_biased, y = impr_guideincl_cat_biased)) +
-  stat_boxplot(geom = "errorbar", width = 0.5) +
-  geom_boxplot()
-
-
-library(ggplot2)
-library(ggpubr)
-library(stringr)
 
 
 for (t in unique(split_data$type)){
@@ -156,66 +153,13 @@ for (t in unique(split_data$type)){
   }
 }
 
-# for (split in col_split){
-#   split_small = split_data[, split, with = FALSE]
-#   
-#   saveRDS(split_small, file = paste0(savedir, split, ".rds"))
-#   
-#   p = ggplot(stack(split_data[, split, with = FALSE]),
-#              aes(x = values)) +
-#     stat_count(position = "dodge") +
-#     ggtitle("Frequency of selection", subtitle = split) +
-#     labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-#   
-#   ggexport(p, filename = paste0(figuredir, split, ".pdf"), width = 8, height = 3.8)
-# 
-# }
-
-# for(n.data in unique(split_data$n)){
-#   for (exclude in c(TRUE, FALSE)){
-#     for (correct in c(TRUE, FALSE)){
-#       tab_small = split_data[n == n.data, exclude.categoricals == exclude & correct.bias == correct, ]
-# 
-#       saveRDS(tab_small, file = paste0(savedir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"), ".rds"))
-# 
-#       p = ggplot(stack(tab_small[,.(split_guide)]),
-#                  aes(x = values, color=ind, fill = ind)) +
-#         stat_count(position = "dodge") +
-#         ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "),
-#                                                            ifelse(exclude, "categoricals excl", "categoricals incl"),
-#                                                            ifelse(correct, "_bias_corrected", "_biased"))) +
-#         labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-# 
-#       ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ifelse(exclude, "_categoricals_excl", "_categoricals_incl"),
-#                                     ifelse(correct, "_bias_corrected", "_biased"), ".pdf"), width = 8, height = 3.8)
-# 
-#       for(test in c("curvature", "interaction")){
-# 
-#         p = ggplot(stack(tab_small[test_guide == test,.(split_guide)]),
-#                    aes(x = values, color=ind, fill = ind)) +
-#           stat_count(position = "dodge") +
-#           ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "),
-#                                                              ifelse(exclude, "categoricals excl", "categoricals incl"),
-#                                                              ifelse(correct, "_bias_corrected", "_biased"), test)) +
-#           labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-# 
-#         ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"),
-#                                       ifelse(exclude, "_categoricals_excl", "_categoricals_incl"),
-#                                       ifelse(correct, "_bias_corrected", "_biased"), "_", test,".pdf"), width = 8, height = 3.8)
-# 
-#       }
-#     }
-#   }
-# }
 
 
 
 #####################
 # slim selection bias different values of n.quantiles
 list.files("Data/simulations/batchtools/selection_bias_slim/results/", full.names = TRUE)
-selection_bias_slim = rbind(readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds"))
-
-table(selection_bias_slim[type == ])
+selection_bias_slim = readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds")
 
 figuredir_slim = "Figures/simulations/batchtools/selection_bias_slim/"
 savedir_slim = "Data/simulations/batchtools/selection_bias_slim/results/"
@@ -224,13 +168,21 @@ if (!dir.exists(figuredir_slim)) dir.create(figuredir_slim, recursive = TRUE)
 
 for(t in unique(selection_bias_slim$type)){
   data = selection_bias_slim[type == t]
-  cols_sse = str_detect(names(data), "sse")
-  data_long_sse = stack(data[, cols_sse, with = FALSE])
-  data_long_sse$ind = str_remove_all(data_long_sse$ind, "sse_slim_")
-  p_sse = ggplot(data_long_sse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "6", "2")), y=values)) + 
+  cols_mse = str_detect(names(data), "mse_slim")
+  data_long_mse = stack(data[, cols_mse, with = FALSE])
+  data_long_mse$ind = str_remove_all(data_long_mse$ind, "mse_slim_")
+  p_mse = ggplot(data_long_mse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "6", "2")), y=values)) + 
     geom_point(stat='summary', fun='mean') +
-    ggtitle("mean SSE for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
-    labs(x="number of quantiles", y = "SSE")
+    ggtitle("Training mse for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
+    labs(x="number of quantiles", y = "mse")
+  
+  cols_mse_test = str_detect(names(data), "mse_test_slim")
+  data_long_mse_test = stack(data[, cols_mse_test, with = FALSE])
+  data_long_mse_test$ind = str_remove_all(data_long_mse_test$ind, "mse_test_slim_")
+  p_mse_test = ggplot(data_long_mse_test, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "6", "2")), y=values)) + 
+    geom_point(stat='summary', fun='mean') +
+    ggtitle("Test mse for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
+    labs(x="number of quantiles", y = "mse")
   
   
   cols_freq = str_detect(names(data), "split_slim")
@@ -241,15 +193,25 @@ for(t in unique(selection_bias_slim$type)){
   
   table_list = sapply(data_freq, function(el){
     res = tapply(c(table_empty, table(el)), names(c(table_empty, table(el))), sum)
-  })
-  saveRDS(table_list, paste0(savedir_slim, str_remove(t, "selection_bias_"),".rds"))
+  }, simplify = TRUE)
   options = length(unique(unlist(data_freq)))
   
-  if(t %in% c("selection_bias_interaction_binary_numeric", "selection_bias_interaction_categorical_numeric") ){
-    prob = c(0.45,0.45,0.1)
+  
+  
+  if(t %in% c("selection_bias_interaction_numerical_vs_numrical", 
+              "selection_bias_interaction_numerical_vs_binary", 
+              "selection_bias_interaction_numerical_vs_categorical", 
+              "selection_bias_interaction_binary_vs_categorical")){
+    prob = c(0.5,0.5)
+    if(is.vector(table_list)){
+      table_list = rbind(table_list, 0)
+    }
   } else{
     prob = rep(1/options, options)
   }
+  
+  saveRDS(table_list, paste0(savedir_slim, str_remove(t, "selection_bias_"),".rds"))
+  
     
   chi2 = apply(table_list, 2, function(table){
     chisq.test(table, p = prob)[["p.value"]]
@@ -264,15 +226,15 @@ for(t in unique(selection_bias_slim$type)){
     ggtitle("Selection bias for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
     labs(x="number of quantiles", y = "p value")
   
-  ggarrange(p_chi2, p_sse, nrow = 2) %>%
-    ggexport(filename = paste0(figuredir_slim, str_remove(t, "selection_bias_"),".pdf"),
-           width = 8, height = 3.8)
+  ggarrange(p_chi2, p_mse, p_mse_test, nrow = 3) %>%
+    ggexport(filename = paste0(figuredir_slim, str_remove(t, "selection_bias_"),".png"),
+           width = 800, height = 500)
   
   
 }
 
-cols_sse = str_detect(names(selection_bias_slim[type == "selection_bias_independence_small"]), "sse")
-data = stack(selection_bias_slim[type == "selection_bias_independence_small", cols_sse, with = FALSE])
+cols_mse = str_detect(names(selection_bias_slim[type == "selection_bias_independence_small"]), "mse")
+data = stack(selection_bias_slim[type == "selection_bias_independence_small", cols_mse, with = FALSE])
 ggplot(data, mapping=aes(x = ind, y=values))+geom_boxplot()
 
 slim_full_interaction = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction.rds")

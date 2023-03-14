@@ -62,6 +62,8 @@ testJob(4)
 submitJobs(ids = ids, list(walltime = 2000, memory = 512))
 
 
+reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
+
 
 # reduce jobs/ summarise results
 reduce = function(res) res
@@ -71,7 +73,6 @@ head(results)
 pars = unwrap(getJobPars(reg = reg))
 tab = ijoin(pars, results)
 head(tab)
-
 
 
 
