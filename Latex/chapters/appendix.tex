@@ -1,5 +1,23 @@
 \subsection{GUIDE implementation results}
 
+\subsection{Selection Bias correction approach SLIM}
+
+By means of a simulation, I investigated how the number of quantiles (n.quantiles) used as potential splitpoints in SLIM affects the selection bias for numerical features. 
+The data were defined as follows:
+\begin{itemize}
+    \item $\textbf{x}_1, \textbf{x}_2 \sim U(0,1)$
+    \item $\textbf{x}_3$ uniformly distributed on equidistant grids of length 10, 25, 50 and 100 on the interval [0,1] (i.e. four different settings)
+    \item $y \sim N(0,1)$
+\end{itemize}
+
+For each of the four simulation scenarios, SLIM trees are fitted  with n.quantiles $\in \{100, 75, 50, 25, 10, 2\}$ and one exact tree (each unique value as potetntial splitpoint) in each simulation run. The experiment is repeated 1000 times.
+
+To measure whether and how the selection bias improves, a $\chi^2$ goodness of fit test is used. The null hypothesis is that the probability of all three features is equal. To compare the results, the p-value of the tests are used.
+
+In addition to selection bias, the mean squared error is measured on the test and on the training data.
+
+
+
 
 
 \subsection{Simulation results}

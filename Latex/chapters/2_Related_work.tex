@@ -1,6 +1,6 @@
-Surrogate models are one possibility to explain complex black box models. According to \citet{Molnar.2019} the purpose of (interpretable) surrogate models is to approximate the predictions of the underlying model as accurately as possible and to be interpretable at the same time.
-Depending on whether the goal is to achieve a global interpretation of a black box model (model explanation) or only to explain the results of individual input instances (outcome explanation), global or local surrogate models can be used \citep{.2021b}
-An advantage of using surrogate models as iml-method is, that it is a model-agnostic approach, i.e., it does not require any information about the inner workings of the black box model \citep{Molnar.2019}.
+Surrogate models are one possibility to explain complex black box models post-hoc. According to \citet{Molnar.2019} the purpose of (interpretable) surrogate models is to approximate the predictions of the underlying model as accurately as possible and to be interpretable at the same time.
+Depending on whether the goal is to achieve a global interpretation of a black box model (model explanation) or only to explain the results of individual input instances (outcome explanation), global or local surrogate models can be used \citep{Maratea.2021}
+An advantage of using surrogate models as IML-method is, that it is a model-agnostic approach, i.e., it does not require any information about the inner workings of the black box model \citep{Molnar.2019}.
 
 %\subsection{Global surrogate models}
 
@@ -16,7 +16,7 @@ One aspect that must be remembered when using global surrogate models is that on
 %\subsection{Local surrogate model}
 
 If only a single prediction is to be explained instead of the entire model, local interpretable model-agnostic explanations (LIME) can be used \citep{Ribeiro.2016}. Instead of having to find a (possibly highly complex) interpretable model on the entire feature space, only a surrogate model for a small neighborhood around the instance of interest is trained. This is realized by observing how the predictions of the black-box model behave when small variations of the instance of interest are introduced into the model. For this purpose, LIME first generates perturbed samples and calculates the predictions of the black box model for them. A weighted interpretable surrogate model is then trained on these data. The weights are computed from the proximity measures of the perturbed data with respect to the instance of interest. 
-Like globale surrogates, Lime is very flexible in the choice of an appropriate surrogate model. The advantage over global replacement models is that it is easier to find a good compromise between model complexity and interpretability, since the model only needs to fit a very small range of the feature space. Even sparse main effect models could imitate the black box model well in the small area of the feature space, for example. One difficulty, however, is choosing an appropriate neighborhood for the instance of interest to which the model is to be fitted.
+Like global surrogates, LIME is very flexible in the choice of an appropriate surrogate model. The advantage over global replacement models is that it is easier to find a good compromise between model complexity and interpretability, since the model only needs to fit a very small range of the feature space. Even sparse main effect models could imitate the black box model well in the small area of the feature space, for example. One difficulty, however, is choosing an appropriate neighborhood for the instance of interest to which the model is to be fitted.
 \citep{Molnar.2019}
 
 
@@ -24,5 +24,5 @@ Like globale surrogates, Lime is very flexible in the choice of an appropriate s
 A approach that tries to combine the advantages of global and local surrogate methods, i.e., to obtain models that are easy to understand on the one hand, but at the same time cover the entire feature space without sacrificing performance, is summarized here under the term subregional surrogate model.
 The idea is to subdivide the feature space into appropriate subregions where fitting easy-to-interpret models is sufficient.
 With K-LIME (K local interpretable model-agnostic explanations), \citet{Hall.2017}  pursue the approach of unsupervised partitioning of the feature space into K subregions using a K-means clustering algorithm. 
-SLIM \citep{Hu.2020}, on the other hand, uses a supervised approach (trees) to subdivides the feature space according to a given objective. According to \citep{Hu.2018}, SLIM is superior to K-LIME, which is mainly because K-LIME does not include the objective in the clustering.
+SLIM \citep{Hu.2020}, on the other hand, uses a supervised approach (trees) to subdivides the feature space according to a given objective. According to \citep{Hu.2018}, SLIM is superior to K-LIME, which is mainly because K-LIME does not include the objective in the clustering. 
 

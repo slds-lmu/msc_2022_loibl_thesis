@@ -59,7 +59,7 @@ However, as a possible correction approach for the selection bias in SLIM, I inv
 \end{itemize}
 
 The addition of categorical features in this scenario results in a different picture for the frequencies, as shown in Figure \ref{fig:selection_bias_independence_mixed}. Although the numerical variables are chosen with approximately equal frequency in the so-called "unbiased" methods, there are large deviations in the binary and categorical variables especially for MOB and CTree, which calls the designation "unbiased" into question. 
-A possible explanation for this selection bias could be that due to the larger number of parameters that have to be estimated for the categorical features in the modelling step, random dependencies to the target variable are already caught in the model and therefore these variables are used less frequently as splitting variables.
+A possible explanation for this selection bias could be that due to the large number of parameters that have to be estimated for the categorical features in the modelling step, random dependencies to the target variable are already caught well in the model  and therefore these variables are used less frequently as splitting variables.
 
 
 In \citep{Hothorn.2006} the unbiasedness of CTree is empirically investigated for cases, in which a strict separation between regressor variables and partitioning variables is kept. Therefore, I do not want to principally question the label, but it does not seem appropriate when there is an overlap or, as in our case, even congruence between the two roles.
