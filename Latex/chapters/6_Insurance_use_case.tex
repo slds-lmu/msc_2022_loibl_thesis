@@ -133,7 +133,7 @@ CTree & 0.23 & 0.71 & 0.07\\
 \label{tab:ins_k2204_bsplines_small_surrogates_share}
 \end{table}
 
-For SLIM, GUIDE and MOB these results are similar to the MBTs with linear models. CTree, on the other hand, now also selects $23\%$ of Age as a splitting variable, whereas it was not used at all for splitting in CTree with linear models. Ctree performs the worst in terms of fidelity in this case as well, but not as considerable as in the previous setting.
+For SLIM, GUIDE and MOB these results are similar to the MBTs with linear models. CTree, on the other hand, now also selects Age in $23\%$ of split observations as splitting variable, whereas it was not used at all for splitting in CTree with linear models. CTree performs the worst in terms of fidelity in this case as well, but not as considerable as in the previous setting.
 For the interpretation, we will again take a closer look at the SLIM tree
 
 \begin{figure}[!htb]
@@ -143,8 +143,28 @@ For the interpretation, we will again take a closer look at the SLIM tree
      \label{fig:ins_slim_bsplines_tree}
 \end{figure}
 
+In order to investigate the effects of the splits on the feature effects more closely, the splits with regard to duration and age are analysed separately.
+The nodes 1,5,13 and 14 together comprise the entire feature space, whereby the sub-regions are determined by splits with regard to the feature duration.
+Figure \ref{fig:ins_k2204_effects_duration} shows the input-output relation (feature effects) of the features estimated in the B-spline models in the different nodes. Note that the effects are centred.
 
-\subsection{Data set R108}
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width = 16cm]{Figures/insurance_use_case/k2204_BPV/effects_duration.png}
+    \caption{Input-output relation of features in nodes split by duration for SLIM tree with B-splines and depth 3}
+    \label{fig:ins_k2204_effects_duration}
+\end{figure}
+
+As with SLIM with linear models, it can be seen that the positive effect of male gender increases with increasing duration. The same applies to Age. The seemingly negative effect of age at low maturity and high age is probably due to extrapolation. There are only a few observations in this area, as can be seen in Figure \ref{fig:ins_k2204_hist_age}.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width = 14cm]{Figures/insurance_use_case/k2204_BPV/hist_age.png}
+    \caption{Frequency of observations with respect to feature Age}
+    \label{fig:ins_k2204_hist_age}
+\end{figure}
+
+
+\subsection{Data set R1\_08}
 
 
 
