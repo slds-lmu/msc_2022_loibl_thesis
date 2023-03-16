@@ -243,11 +243,11 @@ Blackbox model & 0.9998316 & 2.3e-06 & 0.0009441 & 0.0047668\\
 
 The data set R1\_08 contains the data of an annuity insurance tariff. Instead of a single benefit in the endowment case, a lifelong annuity is paid out.
 R1\_08 includes, in addition to sex, age and duration, the features birth\_year, payment\_period, in\_year\_payments\_exkasso (categorical with 4 levels), guarantee\_period and increment\_factor.
-The value range of the features age and duration is limited to a range in which no correlation exists ($25 \leg$ age $\leq 35$ and $30 \leq$ Duration $\leq 40$).
+The value range of the features age and duration is limited to a range in which no correlation exists ($25 \leq$ age $\leq 35$ and $30 \leq$ Duration $\leq 40$).
 Here, as well, the BPV or BPV\_pred is analysed as target variable. Here, as well, the BPV and BPV\_pred predicted by a black box model are analysed as target variables.
 For the application of the MBTs, subsets of the training and test datasets including BPV and BPV\_pred are drawn, each with 100000 observations.
 
-In order to model non-linearities in the nodes, MBTs with B-spline models are used. As with K2204, trees with two different depths are evaluated, shallow trees with a maximum depth of 3 and deep trees with a maximum depth of 6. $impr$ and $alpha$ are set to 0.05 and a minimum nodesize of 500 observations is required.
+In order to model non-linearities in the nodes, MBTs with B-spline models are used. As with K2204, trees with two different depths are evaluated, shallow trees with a maximum depth of 3 and deep trees with a maximum depth of 7. $impr$ and $alpha$ are set to 0.05 and a minimum nodesize of 500 observations is required.
 
 For the interpretation of the splits and models, the shallow SLIM tree is examined in more detail. Its structure is shown in Figure \ref{fig:ins_k108_slim_bsplines_small_tree}.
 
@@ -258,7 +258,8 @@ For the interpretation of the splits and models, the shallow SLIM tree is examin
     \label{fig:ins_k108_slim_bsplines_small_tree}
 \end{figure}
 
-It is noticeable that the featurespace in the first splits is only divided in terms of increment factor. The effects of the splits in regard to increment factor on the other features are shown in Figure \ref{fig:ins_k108_effects_increment}
+If the tree is fitted on the test data instead of the training data, exactly the same splits result. The same applies if the tree is used as a standalone model for BPV instead of a surrogate model. This indicates that the black box model replicates the true data and relationships well.
+It is noticeable that the featurespace in the first splits is only divided iwith regard to increment\_factor. The effects of these splits on the other features are shown in Figure \ref{fig:ins_k108_effects_increment}.
 
 \begin{figure}[!htb]
     \centering    
@@ -267,8 +268,19 @@ It is noticeable that the featurespace in the first splits is only divided in te
     \label{fig:ins_k108_effects_increment}
 \end{figure}
 
-The effects of the features payment\_period and guarantee period are not shown because they are very small and therefore not visible on the scale at all.
+The effects of the features payment\_period and guarantee\_period are not shown because they are very small and therefore not visible on the scale at all.
 The interaction with increment\_factor is clearly visible in all the features shown. For all features, an increasing increment\_factor increases the feature effects. Since increment factor interacts with so many features, the splits are very effective here and bring a great improvement in performance, as can be seen in table \ref{}.
+
+The consequences of the splits with respect to duration are shown in Figure \ref{fig:ins_k108_effects_duration}. It shows that across all shown features a higher duration weakens the feature main effects.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=16cm]{Figures/insurance_use_case/k1_08_BPV/effects_duration.png}
+    \caption{Input-output relation of features in nodes split by Duration for SLIM tree with B-splines and depth 3 (nodes 11-14)}
+    \label{fig:ins_k108_effects_duration}
+\end{figure}
+
+
 
 
 
