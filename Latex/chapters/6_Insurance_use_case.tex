@@ -50,7 +50,7 @@ The results are listed in table \ref{tab:ins_k2204_lm_surrogates_perf}. It shows
 \begin{table}[!htb]
 
 \caption{Fidelity of K2204 linear baseline model and linear MBTs}
-\centering
+\centering \small
 \begin{tabular}[t]{l|r|r|r|r|r}
 \hline
   & r2 & MSE & MAE & max AE & n leaves\\
@@ -73,7 +73,7 @@ Table \ref{tab:ins_k2204_lm_surrogates_share} lists the share of observations th
 \begin{table}[!htb]
 
 \caption{Share of observations split by the different features K2204 linear MBTs}
-\centering
+\centering \small
 \begin{tabular}[t]{l|r|r|r}
 \hline
 & Age & Duration & Sex\\
@@ -108,7 +108,7 @@ The fidelity results for all B-spline surrogates are listed in table \ref{tab:in
 \begin{table}
 
 \caption{Fidelity of K2204 B-spline baseline model and  B-spline MBTs}
-\centering
+\centering \small
 \begin{tabular}[t]{l|r|r|r|r|r}
 \hline
   & $R^2$ & MSE & MAE & max AE & n leaves\\
@@ -139,7 +139,7 @@ Table \ref{tab:ins_k2204_bsplines_surrogates_share}  shows the proportions of ob
 
 \begin{table}[!htb]
 \caption{Share of observations split by the different features K2204 B-spline MBTs}
-\centering
+\centering \small
 \begin{tabular}[t]{l|r|r|r}
 \hline
   & Age & Duration & Sex\\
@@ -220,7 +220,7 @@ The accuracy of SLIM is worse than that of the black box model for all evaluatio
 \begin{table}[!htb]
 
 \caption{Performance of baseline model and MBTs with bspline linear models}
-\centering
+\centering \small
 \begin{tabular}[t]{l|r|r|r|r}
 \hline
   & $R^2$ & MSE & MAE & max AE \\
@@ -259,7 +259,7 @@ For the interpretation of the splits and models, the shallow SLIM tree is examin
 \end{figure}
 
 If the tree is fitted on the test data instead of the training data, exactly the same splits result. The same applies if the tree is used as a standalone model for BPV instead of a surrogate model. This indicates that the black box model replicates the true data and relationships well.
-It is noticeable that the featurespace in the first splits is only divided iwith regard to increment\_factor. The effects of these splits on the other features are shown in Figure \ref{fig:ins_k108_effects_increment}.
+It is noticeable that the featurespace in the first splits is only divided with regard to increment\_factor. The effects of these splits on the other features are shown in Figure \ref{fig:ins_k108_effects_increment}.
 
 \begin{figure}[!htb]
     \centering    
@@ -269,19 +269,98 @@ It is noticeable that the featurespace in the first splits is only divided iwith
 \end{figure}
 
 The effects of the features payment\_period and guarantee\_period are not shown because they are very small and therefore not visible on the scale at all.
-The interaction with increment\_factor is clearly visible in all the features shown. For all features, an increasing increment\_factor increases the feature effects. Since increment factor interacts with so many features, the splits are very effective here and bring a great improvement in performance, as can be seen in table \ref{}.
-
+The interaction with increment\_factor is clearly visible in all the features shown. For all features, an increasing increment\_factor increases the feature effects.
 The consequences of the splits with respect to duration are shown in Figure \ref{fig:ins_k108_effects_duration}. It shows that across all shown features a higher duration weakens the feature main effects.
 
 \begin{figure}[!htb]
-    \centering
+    \centering 
     \includegraphics[width=16cm]{Figures/insurance_use_case/k1_08_BPV/effects_duration.png}
     \caption{Input-output relation of features in nodes split by Duration for SLIM tree with B-splines and depth 3 (nodes 11-14)}
     \label{fig:ins_k108_effects_duration}
 \end{figure}
 
 
+Since increment\_factor interacts with so many features, the splits are very effective here and bring a great improvement in performance. Table \ref{tab:ins_k108_share} shows the share of the splits by the different features. From this it can be seen that MOB and CTree split shallow MBTs considerably less by increment\_factor than SLIM and GUIDE. At the same time, their performance is behind that of SLIM and GUIDE, as can be seen in the Tables \ref{tab:ins_k108_bsplines_surrogates_perf_train} and \ref{tab:ins_k108_bsplines_surrogates_perf_test}. SLIM achieves the best performance.
 
 
 
 
+\clearpage
+
+By using deep trees, the fidelity increases and the results of the different algorithms move closer together. The values for share also get closer. Overall, the differences between the different algorithms are therefore less pronounced with the deep trees than with the shallow trees. Although the deep trees achieve a high training performance, an interpretation is hardly possible with this high number of leaf nodes. In addition, the test performance differs more strongly from the training performance than with the shallow trees, which is a sign of overfitting.
+
+
+
+\begin{table}[!htb]
+
+\caption{Train fidelity of K1\_08 B-spline baseline model and  B-spline MBTs}
+\centering \small
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+  & $R^2$ & MSE & MAE & max AE & n leaves\\
+\hline
+lm shallow & 0.927748 & 3.534102 & 1.291762 & 16.412655 & 1\\
+\hline
+SLIM shallow & 0.997432 & 0.125606 & 0.235344 & 4.296943 & 8\\
+GUIDE shallow & 0.996540 & 0.169233 & 0.262321 & 5.006522 & 8\\
+MOB shallow & 0.994944 & 0.247289 & 0.324474 & 5.236252 & 8\\
+CTree shallow & 0.993049 & 0.340023 & 0.401982 & 5.236252 & 8\\
+\hline
+SLIM deep & 0.999882 & 0.005794 & 0.043939 & 1.079069 & 105\\
+GUIDE deep & 0.999844 & 0.007652 & 0.052102 & 1.079069 & 95\\
+MOB deep & 0.999861 & 0.006823 & 0.047428 & 1.079069 & 108\\
+CTree deep & 0.999839 & 0.007851 & 0.058806 & 1.079069 & 106\\
+\hline
+\end{tabular}
+\label{tab:ins_k108_bsplines_surrogates_perf_train}
+\end{table}
+
+
+
+\begin{table}[!htb]
+\caption{Test fidelity of K1\_08 B-spline baseline model and  B-spline MBTs}
+\centering \small
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+  & $R^2$ & MSE & MAE & max AE & n leaves\\
+\hline
+bsplines shallow & 0.927267 & 3.558816 & 1.295778 & 16.413200 & 1\\
+\hline
+SLIM shallow & 0.997397 & 0.127386 & 0.236761 & 4.299219 & 8\\
+GUIDE shallow & 0.996496 & 0.171433 & 0.263770 & 5.003334 & 8\\
+MOB shallow & 0.994942 & 0.247489 & 0.324895 & 5.336406 & 8\\
+CTree shallow & 0.993055 & 0.339838 & 0.401632 & 5.336406 & 8\\
+\hline
+SLIM deep & 0.999870 & 0.006350 & 0.045885 & 1.126732 & 105\\
+GUIDE deep & 0.999832 & 0.008219 & 0.054046 & 1.126732 & 95\\
+MOB deep & 0.999848 & 0.007460 & 0.049459 & 1.126732 & 108\\
+CTree deep & 0.999825 & 0.008539 & 0.061363 & 1.126732 & 106\\
+\hline
+\end{tabular}
+\label{tab:ins_k108_bsplines_surrogates_perf_test}
+
+\end{table}
+
+
+\begin{table}[!htb]
+\caption{Share of observations split by the different features K1\_08 B-spline MBTs}
+\centering \small
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+  & sex & age & duration & birth\_year & increment\\
+\hline
+SLIM shallow & 0.00 & 0.00 & 0.12 & 0.00  & 0.88\\
+GUIDE shallow & 0.00 & 0.12 & 0.00 & 0.00  & 0.88\\
+MOB shallow & 0.00 & 0.12 & 0.33 & 0.00  & 0.54\\
+CTree shallow & 0.00 & 0.33 & 0.33 & 0.00  & 0.33\\
+\hline
+SLIM deep & 0.10 & 0.08 & 0.24 & 0.05 & 0.54\\
+GUIDE deep & 0.06 & 0.10 & 0.22 & 0.05 & 0.56\\
+MOB deep & 0.11 & 0.15 & 0.20 & 0.03 & 0.52\\
+CTree deep & 0.00 & 0.17 & 0.29 & 0.05 & 0.49\\
+\hline
+\end{tabular}
+\label{tab:ins_k108_share}
+\end{table}
+
+The feature payment\_period, in\_year\_payments\_exkasso and guarantee\_period are never chosen as splitting variables and are therfore not listed in the table.
