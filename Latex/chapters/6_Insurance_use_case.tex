@@ -117,17 +117,18 @@ CTree deep & 0.9997091 & 3.90e-06 & 0.0012936 & 0.0123686 & 20\\
 \label{tab:ins_k2204_bsplines_surrogates_perf}
 \end{table}
 
+Figure \ref{fig:ins_k2204_fit} plots the prediction of the baseline B-spline model and the two B-spline SLIM surrogates against BPV\_pred to visualise performance improvement.
+
+\begin{figure}[!htb]
+    \centering    
+    \includegraphics[width = 14cm]{Figures/insurance_use_case/k2204_BPV/fit.png}
+    \caption{B-spline surrogate predictions vs. BPV\_pred for K2204}
+    \label{fig:ins_k2204_fit}
+\end{figure}
 
 
 The improvement of the shallow MBTs over the baseline model is large, but not as substantial as in the trees with linear models without B-spline transformations. This is probably due to the fact that the splits in the MBTs with linear models also handled non-linearities that could not be adjusted in the linear baseline model. In the baseline model with B-spline transformations, on the other hand, the non-linearities are already taken into account and the splits then actually capture primarily the interactions, which is what is desired. 
 
-\begin{figure}
-    \centering
-    \includegraphics{}
-    \caption{Caption}
-    \label{fig:my_label}
-\end{figure}
-Figure \ref{fig:ins_k2204_fit} plots the prediction of the baseline B-spline model and the two B-spline SLIM surrogates against BPV\_pred to visualise performance improvement.
 
 
 Table \ref{tab:ins_k2204_bsplines_surrogates_share}  shows the proportions of observations that were split according to the different features. 
@@ -184,7 +185,7 @@ As with SLIM with linear models, it can be seen that the positive effect of Sex 
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width = 14cm]{Figures/insurance_use_case/k2204_BPV/hist_age.png}
+    \includegraphics[width = 12cm]{Figures/insurance_use_case/k2204_BPV/hist_age.png}
     \caption{Frequency of observations with respect to feature Age}
     \label{fig:ins_k2204_hist_age}
 \end{figure}
