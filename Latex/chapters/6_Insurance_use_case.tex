@@ -1,6 +1,7 @@
 In the following, SLIM is used in various configurations as a surrogate for modelling the benefit present values of two fictitious insurance tariffs from the TRAIL.X (TRustworthy Artificial Intelligence in Life Insurance) research project \citep{msginsurit.16.03.2023}. The results are interpreted and the fidelity is compared with the MBT algorithms GUIDE, MOB and CTree.
 
-\subsection{Data set K2204}
+\subsection{Data set K2204} \label{K2204_BPV}
+
 The data set K2204 contains data for a (fictitious) endowment insurance tariff. With this tariff, a single benefit is paid both in the event of survival and death of the policyholder. The data set includes the features sex (1 = male, 0 = female), age and duration and the two targets benefit present value (BPV) and premium present value (PPV). The targets were modelled using two different black box models.  
 In the following, only the BPV is considered. The results for the PBV are very similar (interpreted the other way round) and can be found in the appendix.
 Since the data set with 5994 observations is rather small, all observations were used for training. For this data set therefore only training performance of the surrogate models is considered.
