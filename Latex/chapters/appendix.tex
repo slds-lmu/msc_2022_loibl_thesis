@@ -398,7 +398,7 @@ xgboost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
 
 \clearpage
 \subsection{Insurance use case}
-\subsubsection{K2204}
+\subsubsection{K2204 BPV}
 
  \begin{figure}[!htb]
      \centering     
@@ -406,3 +406,167 @@ xgboost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
      \caption{SLIM tree with linear models as standalone model for BPV in data set K2204}
      \label{fig:app_ins_slim_lm_standalone_tree}
  \end{figure}
+
+
+
+
+\subsubsection{K2204 PPV}
+All plots and tables shown in the chapter \ref{K2204_BPV} for the data set k2204 with target BPV are shown here for the target PPV (or PPV\_pred). The interpretation can be done analogously to chapter \ref{K2204_BPV}. The effects found here are merely all larger (since PPV is also larger than BPV) and their direction is exactly reversed. 
+
+\begin{table}[!htb]
+\caption{Fidelity of K2204 PPV linear baseline model and linear MBTs}
+\centering \scriptsize
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+  & $R^2$ & MSE & MAE & max AE & n leaves\\
+\hline
+linear baseline model & 0.985092 & 2.523500 & 1.277544 & 7.271319 & 1\\
+\hline
+SLIM & 0.999232 & 0.130069 & 0.255018 & 2.300768 & 8\\
+GUIDE & 0.999275 & 0.122765 & 0.240393 & 2.300768 & 8\\
+MOB & 0.998524 & 0.249776 & 0.353372 & 2.758192 & 8\\
+CTree & 0.995088 & 0.831537 & 0.643819 & 4.808448 & 8\\
+\hline
+\end{tabular}
+\label{tab:ins_k2204_ppv_lm_surrogates_perf}
+\end{table}
+
+
+\begin{table}[!htb]
+\caption{Share of observations split by the different features K2204 PPV linear MBTs}
+\centering \scriptsize
+\begin{tabular}[t]{l|r|r|r}
+\hline
+& age & duration & sex\\
+\hline
+SLIM & 0.28 & 0.67 & 0.05\\
+GUIDE & 0.28 & 0.72 & 0.00\\
+MOB & 0.10 & 0.77 & 0.13\\
+CTree & 0.00 & 0.96 & 0.04\\
+\hline
+\end{tabular}
+\label{tab:ins_k2204_ppv_lm_surrogates_share}
+\end{table}
+
+
+
+Figure \ref{fig:ins_k2204_ppv_fit} plots the prediction of the baseline B-spline model and the two B-spline SLIM surrogates against PPV\_pred to visualise performance improvement. 
+
+\begin{figure}[!htb]
+    \centering    
+    \includegraphics[width = 14cm]{Figures/insurance_use_case/k2204_PPV/fit.png}
+    \caption{B-spline surrogate predictions vs. PPV\_pred for K2204}
+    \label{fig:ins_k2204_ppv_fit}
+\end{figure}
+
+The fidelity results for all B-spline surrogates are listed in table \ref{tab:ins_k2204_ppv_bsplines_surrogates_perf} .
+
+\begin{table}
+
+\caption{Fidelity of K2204 PPV B-spline baseline model and  B-spline MBTs}
+\centering \scriptsize
+\begin{tabular}[t]{l|r|r|r|r|r}
+\hline
+  & $R^2$ & MSE & MAE & max AE & n leaves\\
+\hline
+B-spline baseline model & 0.9943260 & 0.9604583 & 0.7605289 & 4.249894 & 1\\
+\hline
+SLIM shallow & 0.9994172 & 0.0986492 & 0.2046541 & 1.880490 & 8\\
+GUIDE shallow & 0.9993896 & 0.1033306 & 0.2132615 & 1.849715 & 8\\
+MOB shallow & 0.9992104 & 0.1336634 & 0.2494695 & 2.063691 & 8\\
+CTree shallow & 0.9990906 & 0.1539409 & 0.2713325 & 2.069590 & 8\\
+\hline
+SLIM deep & 0.9997505 & 0.0422310 & 0.1208647 & 1.421309 & 21\\
+GUIDE deep & 0.9997299 & 0.0457276 & 0.1315567 & 1.307047 & 20\\
+MOB deep & 0.9996846 & 0.0533855 & 0.1510094 & 1.342777 & 21\\
+CTree deep & 0.9997083 & 0.0493729 & 0.1451053 & 1.385141 & 20\\
+\hline
+\end{tabular}
+\label{tab:ins_k2204_ppv_bsplines_surrogates_perf}
+\end{table}
+
+
+
+
+
+Table \ref{tab:ins_k2204_ppv_bsplines_surrogates_share}  shows the proportions of observations that were split according to the different features. 
+
+
+\begin{table}[!htb]
+\caption{Share of observations split by the different features K2204 PPV B-spline MBTs}
+\centering \scriptsize
+\begin{tabular}[t]{l|r|r|r}
+\hline
+  & age & duration & sex\\
+\hline
+SLIM shallow & 0.38 & 0.62 & 0.00\\
+GUIDE shallow & 0.30 & 0.70 & 0.00\\
+MOB shallow & 0.08 & 0.84 & 0.08\\
+CTree shallow & 0.23 & 0.71 & 0.07\\
+\hline
+SLIM deep & 0.35 & 0.60 & 0.04\\
+GUIDE deep & 0.20 & 0.78 & 0.02\\
+MOB deep & 0.08 & 0.76 & 0.16\\
+CTree deep & 0.20 & 0.67 & 0.13\\
+\hline
+\end{tabular}
+\label{tab:ins_k2204_ppv_bsplines_surrogates_share}
+\end{table}
+
+
+
+\begin{figure}[!htb]
+    \centering   
+    \includegraphics[width = 16cm]{Figures/insurance_use_case/k2204_PPV/slim_bsplines_small_tree.png}
+         \caption{SLIM tree for K2204 PPV with B-spline models}
+     \label{fig:ins_k2204_ppv_slim_bsplines_tree}
+\end{figure}
+
+
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width = 16cm]{Figures/insurance_use_case/k2204_PPV/effects_duration.png}
+    \caption{Input-output relation of features in nodes split by duration for SLIM tree with B-splines and depth 3}
+    \label{fig:ins_k2204_ppv_effects_duration}
+\end{figure}
+
+
+
+
+\begin{figure}[!htb]
+    \centering    
+    \includegraphics[width = 16cm]{Figures/insurance_use_case/k2204_PPV/effects_age_low_duration.png}
+    \caption{Input-output relation of features in nodes with duration $\leq 25$ split by age for SLIM tree with B-splines and depth 3}
+    \label{fig:ins_k2204_ppv_effects_age_low_duration}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering    
+    \includegraphics[width = 16cm]{Figures/insurance_use_case/k2204_PPV/effects_age_medium_duration.png}
+    \caption{Input-output relation of features in nodes with $25 > $duration $<= 40$ split by age for SLIM tree with B-splines and depth 3}
+    \label{fig:ins_k2204_ppv_effects_age_medium_duration}
+\end{figure}
+
+
+\begin{table}[!htb]
+
+\caption{Accuracy of standalone B-spline SLIM MBTs and of the black box model K2204 PPV}
+\centering \scriptsize
+\begin{tabular}[t]{l|r|r|r|r}
+\hline
+  & $R^2$ & MSE & MAE & max AE \\
+\hline
+SLIM & 0.9997757 & 0.0383432 & 0.1140380 & 1.3335727\\
+Blackbox model & 0.9998305 & 0.0289638 & 0.1060365 & 0.5345493\\
+\hline
+\end{tabular}
+\label{tab:ins_k2204_ppv_standalone_slim}
+\end{table}
+
+
+
+
+
+
+
