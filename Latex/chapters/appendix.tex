@@ -12,9 +12,11 @@ The data is defined as follows:
 
 For each of the four simulation scenarios, SLIM trees are fitted  with  \\ n.quantiles $\in \{100, 75, 50, 25, 10, 2\}$ and one exact tree (each unique value as potential splitpoint) in each simulation run. The experiment is repeated 1000 times.
 
-To measure whether and how the selection bias improves, a $\chi^2$ goodness of fit test is used. The null hypothesis is that the probability of all three features being selected as splitting variable is equal. To compare the results, the p-value of the tests are used.
+To measure whether and how the selection bias improves, a $\chi^2$ goodness of fit test is used. The null hypothesis is that the probability of all three features being selected as splitting variable is equal. To compare the results, the p-value of the tests are used. The p-value gives the probability that the null hypothesis of unbiasedness of the split variables in the first split is falsely rejected. I.e. a small p-value is a sign of selection bias, while a high p-value means that the null hypothesis of unbiasedness is not rejected.
 
-In addition to selection bias, the mean squared error is measured on the test and on the training data.
+In addition to p-value, the mean squared error is measured on the test and on the training data.
+
+Figure \ref{fig:app_selection_bias_slim} shows the results of the four variants
 
 \begin{figure}[!htb]
     \centering
@@ -22,13 +24,13 @@ In addition to selection bias, the mean squared error is measured on the test an
     \includegraphics[width = 12cm]{Figures/simulations/batchtools/selection_bias_slim/independence_25.png}\\
     \includegraphics[width = 12cm]{Figures/simulations/batchtools/selection_bias_slim/independence_50.png}\\
     \includegraphics[width = 12cm]{Figures/simulations/batchtools/selection_bias_slim/independence_100.png}\\
-    \caption{Caption}
-    \label{fig:my_label}
+    \caption{impact of the value of n.quantiles on selection bias and performance}
+    \label{fig:app_selection_bias_slim}
 \end{figure}
 
 
 
-
+\clearpage
 \subsection{Simulation results}
 \subsubsection{Basic scenarios}
 \begin{table}[!htb]
