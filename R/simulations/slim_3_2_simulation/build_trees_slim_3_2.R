@@ -10,10 +10,30 @@ data_slim_pred = cbind(y_pred_slim, X_slim)
 
 #### Splines #####
 # Vergleiche MOB, CTree und SLIM für LM mit Basissplines 
-tree_slim_bspline = compute_tree_slim(y_pred_slim, X_slim, n.split = 3, fit.bsplines = TRUE, impr.par = 0.05, min.split = n/100, pruning = "forward",
+tree_slim_bspline = compute_tree_slim(y_pred_slim, X_slim, n.split = 1, fit.bsplines = TRUE, impr.par = 0.05, min.split = n/100, pruning = "forward",
                                approximate = FALSE, df.spline = 15)
+
 splitting = extract_split_criteria(tree_slim_bspline)
 models = extract_models(tree_slim_bspline)
+
+test = glmnet(X_slim, y_pred_slim)
+p = plotmo(test, pmethod="partdep")
+
+lapply(models[1:3],function(m){
+  m_node = m$model
+  p = plotmo(m_node, pmethod="partdep")
+})
+
+library(plotmo)
+plotmo(models[[1]]$model, pmethod="partdep", 
+       degree1=c("x3", "x4"))
+
+plotmo(models[[2]]$model, pmethod="partdep", 
+       degree1=c("x3", "x4"))
+
+plotmo(models[[3]]$model, pmethod="partdep", 
+       degree1=c("x3", "x4"))
+
 x_slim_pred = predict_slim(tree_slim_bspline, newdata = X_slim)
 View(cbind(x_slim_pred$y_hat,y_pred_slim))
 rss = sum((x_slim_pred$y_hat - y_pred_slim)^2)
