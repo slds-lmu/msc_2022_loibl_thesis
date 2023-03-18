@@ -1,9 +1,10 @@
+Since it was shown in the previous chapter that selection bias is a problem for all MBTs and therefore the so-called unbiased methods should not be generally preferred to SLIM, the algorithms are compared on the basis of other properties.
 Desirable properties of an MBT are high performance, good interpretability and stability.
-In this chapter, simulation scenarios are described with which an empirical comparison of these properties for the different MBT algorithms is carried out.
+In this chapter, simulation scenarios and their results are described with which an empirical comparison of these properties for the different MBT algorithms can be made.
 In addition, a comparison of the performance and interpretability of SLIM MBTs is made when objectives of different complexity are used for modelling.
 
 \subsection{Evaluation measures}
-To evaluate the desired properties we use the following definitions and measurements.
+To evaluate the desired properties the following definitions and measurements are used.
 
 \subsubsection{Performance}
 A central aspect in the comparison of the different MBT algorithms is their performance. 
@@ -23,10 +24,10 @@ Accuracy and fidelity are measured on both training and test data in order to ma
 
 \vspace{0.5cm}
 \subsubsection{Interpretability}
-When evaluating the suitability of an MBT algorithm as a surrogate model, the trade-off between performance and interpretability is the central aspect. While performance is easy to measure, the concept of interpretability is much more abstract.
-According to \citet{DoshiVelez.2017} interpretability is defined as the ability to explain or present something to a person in understandable terms. If, for different MBT algorithms to be compared, the models in the leaf nodes are defined as equally complex (e.g. linear regression models), these do not have to be taken into account when comparing interpretability, but only the structure of the tree is relevant. We then use the number of leafnodes as the most important criterion for interpretability.  The underlying assumption is: the fewer leafnodes a tree has, the easier its structure is to understand.
+When evaluating the suitability of an MBT algorithm as a surrogate model, the trade-off between performance and interpretability is a key concern. While performance is easy to measure, the concept of interpretability is much more abstract.
+According to \citet{DoshiVelez.2017} interpretability is defined as the ability to explain or present something to a person in understandable terms. If, for different MBT algorithms to be compared, the models in the leaf nodes are defined as equally complex (e.g. linear regression models), these do not have to be taken into account when comparing interpretability, but only the structure of the tree is relevant. The number of leafnodes is used as the most important criterion for interpretability here.  The underlying assumption is: the fewer leafnodes a tree has, the easier its structure is to understand and to explain to another person.
 
-As an additional measure, we include the number of different features used for splitting. The idea here is that the splitting of the feature space is easier to understand if it is done in few dimensions.
+As an additional measure, the number of different features used for splitting is included. The idea here is that the splitting of the feature space is easier to understand if it is done in few dimensions.
 
 
 
@@ -53,7 +54,7 @@ According to \citep{Hu.2020}, the stability problem with SLIM is less if it is u
 
 
 \subsection{Basic scenarios}
-We use three simple scenarios that differ mainly in the type of interaction(s) they contain (smooth interaction vs subgroup depending effects). Based on these scenarios the different MBT algorithms are compared with respect to performance, interpretability and stability.
+Three simple scenarios that differ mainly in the type of interaction(s) they contain (smooth interaction vs subgroup depending effects) are used for the evaluation. Based on these scenarios the different MBT algorithms are compared with respect to performance, interpretability and stability.
 
 
 \subsubsection{Scenarios}
@@ -142,14 +143,14 @@ The most important findings from the simulations of the basic scenarios are:
 \begin{itemize}
     \item SLIM and GUIDE perform better on subgroup detection tasks (Scenario linear categorical and linear mixed) in terms of better performance and interpretability than MOB and CTree. CTree is the weakest in this task.
     \item MOB and CTree produce more stable trees in scenarios with smooth interactions (Linear smooth and linear mixed). This is probably mainly due to the different pruning techniques. There is room for improvement here with SLIM and GUIDE.
-    \item The statement that stability increases when MBTs are used as surrogate models is confirmed in most results. An exception is the scenario linear categorical with a GAM as a black box model, which does not model the subgroups well enough. As a result, SLIM and GUIDE can no longer recognise them so well and the stability decreases considerably.
-    \item A fundamental problem is that smooth interactions can often only be modelled well by a large number of binary splits, which makes MBTs difficult to interpret on such data. In such cases, MBTs are probably not the best choice for a surrogate model and other models such as GA2M should be considered.
+    \item The statement that stability increases when MBTs are used as surrogate models is confirmed in most results. An exception is the scenario linear categorical with a GAM as black box model, which does not model the subgroups well enough. As a result, SLIM and GUIDE can no longer recognise them so well and the stability decreases considerably.
+    \item A fundamental problem is that smooth interactions can often only be modelled well by a large number of binary splits, which makes MBTs difficult to interpret on such data. In such cases, MBTs are probably not the best choice for a surrogate model and other models such as GA2M \citep{Lou.2013} should be considered.
 
 \end{itemize}
 
 
 \subsubsection{Detailed Results}
-In the following, parts of the detailed simulation results are presented and discussed. Additional results can be found in the appendix
+In the following, parts of the detailed simulation results are presented and discussed. Additional results can be found in the appendix.
 
 \paragraph{Linear Smooth}
 For a comparison of the different MBT algorithms as standalone model on the scenario linear smooth the aggregated results are listed in table \ref{tab:linear_smooth_summary} for sample size $n = 1500$. 
@@ -185,8 +186,8 @@ xgboost & & & & & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 \end{table}
 The results of SLIM and GUIDE are very close to each other. Noticeable is the large variation in the number of leaf nodes and thus also in the performance of SLIM and GUIDE for different values of $impr$. The variation of $alpha$ has a much smaller impact on the results for MOB and CTree.
 
-Since the trade off between interpretability and performance must be taken into account when comparing the models, we compare the performance of the different MBTs depending on the number of leaf nodes. 
-At impr = 0.1 and alpha = 0.001, all four models have a similar mean number of leaf nodes, which is why we use this setting for a more detailed comparison.
+Since the trade off between interpretability and performance must be taken into account when comparing the models, the performance of the different MBTs is compared depending on the number of leaf nodes. 
+At $impr = 0.1$ and $alpha = 0.001$, all four models have a similar mean number of leaf nodes, which is why this setting is used for a more detailed comparison.
 
 \begin{figure}[!htb] 
 \caption{Pairwise plot of the number of leaf nodes vs the accuracy measures $R^2$ train and $R^2$ test scenario \textbf{linear smooth} with $n=1500, alpha = 0.001, impr = 0.1$}
@@ -237,7 +238,7 @@ Figure \ref{fig:ls_1000_int} shows that this is also the case when the MBTs are 
     \label{fig:ls_1000_standalone_sta}
 \end{figure}
 
-This observation is already a sign of lower stability of SLIM and GUIDE compared to MOB and CTree. Moreover, in figure \ref{fig:ls_1000_standalone_sta} the rand indices of the different algorithms are plotted for tree pairs with identical number of leafnodes. There you can see that even with identical numbers of leafnodes, MOB and CTree generate more stable trees.
+This observation is already a sign of lower stability of SLIM and GUIDE compared to MOB and CTree. Moreover, in figure \ref{fig:ls_1000_standalone_sta} the rand indices of the different algorithms are plotted for tree pairs with identical number of leafnodes. There one can see that even with identical numbers of leafnodes, MOB and CTree generate more stable trees.
 
 
 
@@ -247,10 +248,10 @@ This observation is already a sign of lower stability of SLIM and GUIDE compared
 
 \paragraph{Linear Categorical} 
 In the linear categorical scenario, the data-generating process is not determined by a smooth interaction, but can be fully described by main effect models in four subgroups.
-This would require a split at mean of the feature $x_1$ and a split with respect to the binary variable $x_3$. 
+This would require a split at the empirical mean of  feature $x_1$ and a split with respect to the binary variable $x_3$. 
 SLIM and GUIDE differ greatly from MOB and CTree in their ability to find these splits, which can be seen in Table \ref{tab:linear_abrupt_summary}. 
 The column share $x_2$ indicates what proportion of all split observations were split on average with respect to the variable $x_2$.
-For SLIM and GUIDE this value is $0$ for all values of $impr$ , which indicates, that the splits where performed regarding the variables $x_1$ and $x_3$.
+For SLIM and GUIDE this value is $0$ for all values of $impr$ , which indicates, that all splits where performed regarding the variables $x_1$ and $x_3$.
 MOB and CTree, on the other hand, split almost only with respect to the variable $x_2$ and therefore achieve a worse mean performance than SLIM and GUIDE (except for $impr = 0.15$) despite a considerable higher number of leafnodes.
 
 \begin{table}[!htb]
@@ -307,7 +308,9 @@ This could be because, according to \citep{Schlosser.2019}, the M-fluctuation te
 
 
 
-
+\color{red}
+Abbildung oder Tabelle einfügen!
+\color{black}
 If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases. This indicates that the interactions with the GAM were not fitted well enough (despite $R^2_{test} = 0.97$ see table \ref{tab:linear_abrupt_summary}). The statement that SLIM is more stable when used as a surrogate model than when used as a standalone model \citep{Hu.2020} is therefore not true in this case.
 Nevertheless, the mean performance of SLIM and GUIDE is better than that of the other MBTs, as can be seen in Table \ref{tab:app_linear_abrupt_1000} in the appendix.
 
@@ -357,11 +360,9 @@ lm & & & & & 0.9902 & 0.0006 & 0.9898 & 0.0008 &\\
 
 The scenario linear mixed contains both smooth interactions that can only be handled by splits with respect to the numerical variables $\textbf{x}_1$ and $\textbf{x}_2$, and subgroups defined by the binary variables $\textbf{x}_3$ and $\textbf{x}_4$. 
 The average proportion of splits carried out with respect to the two numerical variables is shown in table \ref{tab:linear_mixed_summary}.
-For $alpha = 0.001$ and $impr = 0.05$ the mean number of leaf nodes is similar for all four MBT algorithms. The table shows that the average performance of SLIM and GUIDE for this setting is on average higher than that of the other two MBTs and at the same time the mean proportion of splits with respect to the numerical variable is lower.  This means that SLIM and GUIDE use the binary variables more often to reveal the subgroups defined by them, while MOB and even more pronounced CTree split almost exclusively along the numerical features and thus perform worse despite having the same mean number of leafnodes. 
+For $alpha = 0.001$ and $impr = 0.05$ the mean number of leaf nodes is similar for all four MBT algorithms. The table shows that the average performance of SLIM and GUIDE for this setting is higher than that of the other two MBTs and at the same time the mean proportion of splits with respect to the numerical variable is lower.  This means that SLIM and GUIDE use the binary variables more often to reveal the subgroups defined by them, while MOB and even more pronounced CTree split almost exclusively along the numerical features and thus perform worse despite having the same mean number of leafnodes. 
 
-In this example, SLIM and GUIDE achieve a better tradeoff between performance and interpretability than MOB and CTree.
-
-
+In this example, SLIM and GUIDE achieve a better trade-off between performance and interpretability than MOB and CTree.
 In the figures \ref{fig:lm_1000_standalone_r2_test}  and \ref{fig:lm_1000_standalone_share_x3x4} this is broken down in more detail.
 
 
@@ -387,7 +388,7 @@ In the figures \ref{fig:lm_1000_standalone_r2_test}  and \ref{fig:lm_1000_standa
     \label{fig:lm_1000_standalone_lm_sta}
 \end{figure}
 
-For the comparison of stability we look at figure \ref{fig:lm_1000_standalone_lm_sta}. On the one hand, it can be seen that MOB and CTree seem to be somewhat more stable than SLIM and GUIDE with the same number of leafnodes, but the difference is not great. Furthermore, it can be seen that in most cases the stability of trees with the same number of leafnodes is higher when they are used as surrogates than when they are used as standalone models. Here, the assertion of \citep{Hu.2020} that SLIM is more stable when used as a surrogate is true and also applies to the other algorithms.
+For the comparison of stability one can look at figure \ref{fig:lm_1000_standalone_lm_sta}. On the one hand, it can be seen that MOB and CTree seem to be somewhat more stable than SLIM and GUIDE with the same number of leafnodes, but the difference is not great. Furthermore, it can be seen that in most cases the stability of trees with the same number of leafnodes is higher when they are used as surrogates than when they are used as standalone models. Here, the assertion of \citep{Hu.2020} that SLIM is more stable when used as a surrogate is true and also applies to the other algorithms.
 
 
 \newpage
@@ -455,8 +456,8 @@ lm & CTree & 0.9 & 0.000 & 15.144 & 14 & 17 & 0.9995 & 0.0001 & 0.9994 & 0.0001\
 \end{table} 
 
 
-Table \ref{tab:linear_smooth_correlated_summary} shows the average performance and the number of leaf nodes of MBTs  as well as the proportion of trees "freq $\textbf{x}_1$" where $\textbf{x}_1$ is wrongly chosen as the splitting variable.
-If the MBTs are used as standalone, SLIM and GUIDE choose feature $\textbf{x}_1$ as splitting variable already at a very low correlation of 0.1 in some cases. As the correlation increases, this frequeny increases. MOB and CTree, on the other hand, only use the variables actually involved in the interaction for the splits at $\rho \in \{0.1, 0.5\}$, but at a very high correlation $rho = 0.9$ they also include $x_1$ for the split in a small number of cases. 
+Table \ref{tab:linear_smooth_correlated_summary} shows the average performance and the number of leaf nodes of MBTs  as well as the frequency of trees freq where $\textbf{x}_1$ is wrongly chosen as the splitting variable.
+If the MBTs are used as standalone, SLIM and GUIDE choose feature $\textbf{x}_1$ as splitting variable already at a very low correlation of 0.1 in some cases. As the correlation increases, this frequency increases. MOB and CTree, on the other hand, only use the variables actually involved in the interaction for the splits at $\rho \in \{0.1, 0.5\}$, but at a very high correlation $rho = 0.9$ they also include $x_1$ for the split in a small number of cases. 
 Since the use of ridge regression for correlated features is becoming more common, SLIM was also fitted with ridge regression models in the nodes. The choice of the penalization parameter is made in each recursion step by minimising the BIC. Instead of the SSE, the penalised SSE is used as objective function. However, this does not result in any systematic improvement. 
 If the MBTs are used as surrogates for the lm predictions instead of standalone models, there are hardly any false splits in this scenario. So it seems that the problem of correlated features is reduced when the models are used as surrogates.
 

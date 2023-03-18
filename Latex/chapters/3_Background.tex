@@ -81,7 +81,7 @@ gradient of the objective function regarding the parameter vector $\theta_b$ - p
 \citep{Zeileis.2008}
 
 
-In contrast to the definition in \citet{Zeileis.2008}, $z = x$ was set in (\ref{align:W_j}) as no distinction is made between regressor and partitiong variables.
+In contrast to the definition in \citet{Zeileis.2008}, $\textbf{z} = \textbf{x}$ was set in (\ref{align:W_j}) as no distinction is made between regressor and partitiong variables.
 If the scores - ordered by the potential split variable - do not fluctuate randomly around zero, this indicates that there is parameter instability which could potentially be captured by splitting the data using this variable as partitioning variable \citep{Schlosser.2019}.
 To test the null hypothesis of parameter stability with the so called M-fluctuation test, MOB captures systematic deviations from zero through the empirical fluctuation process
 
@@ -109,8 +109,8 @@ A limitation of MOB is that only objective functions can be selected for which t
 
 \subsubsection{CTree}
 CTree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
-CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $h()$ of the response $\textbf{y}$.
-A common transformation used in MBTs is the score function, i.e. $h(y) = \psi$, but another transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
+CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $h()$ of the response $y$.
+A common transformation used in MBTs is the score function, i.e. $h(y) = \psi$, but other transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
 
 To test the independence between the scores and the potential partition variables, CTree uses a linear association test.
 
@@ -118,17 +118,17 @@ To measure the association between the scores $y$ and a potential splitting vari
 \begin{align}
     T_{j}(y,\textbf{x}) = vec\left(\sum_{i=1}^n \textbf{x}_j^{(i)}\hat{\psi}^{(i)T}\right) \in \mathbf{R}^{p_{j} q}
 \end{align}
-is used which is derived from the more general definition in \citep{Hothorn.2006}
+is used which is derived from the more general definition in \citep{Hothorn.2006}.
 
 To standardize the teststatistic $T_{j}$, the conditional expectation and covariance of $T_{j}$ under the null hypothesis of independence between $y$ and $\textbf{x}_j$ given all permutations of $\{y,\textbf{x}\}$ are calculated.
-Different transformations can be used to to map the multivariate test statistic $T_{j}$ to a standardized univariate test statistic. The default setting in the R package \citep{Hothorn.2015b} is a quadratic transformation. According to  \citep{Hothorn.2006} the transformed teststatistic follows an asymptotic $\chi^2$ distribution under the nullhypothesis.
+Different transformations can be used to to map the multivariate test statistic $T_{j}$ to a standardized univariate test statistic. The default setting in the R package $\mathtt{partykit}$  \citep{Hothorn.2015b} is a quadratic transformation for numerical features. According to  \citep{Hothorn.2006} the transformed teststatistic follows an asymptotic $\chi^2$ distribution under the nullhypothesis.
 As in MOB, the splitting variable, for which the p-value of the test is the smallest is selected as splitting variable. A Bonferroni-adjusted p-value is again used as prepruning criterion.
 
 
 
 Unlike the other methods, the split point is not selected by an exhaustive search, but with the help of a linear test statistic. The discrepancy between two subsets is measured with a two-sample linear test statistic for each possible binary split. The split that maximises the discrepancy is chosen as the split point. \citep{Hothorn.2006}
 
-\citep{Schlosser.2019} state that the linear test used in CTree has higher power in detecting smooth relationships between the scores and the splitting variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
+\citet{Schlosser.2019} state that the linear test used in CTree has higher power in detecting smooth relationships between the scores and the splitting variables compared to the M-fluctuation test in MOB. MOB, on the other hand, has a higher ability in detecting abrupt changes.
 
 
 \subsubsection{GUIDE}
@@ -144,12 +144,10 @@ One advantage of GUIDE is that the score function does not have to exist. This m
 
 \subsection{Software implementation}
 
-No implementation of SLIM was found, which is why an implementation in R  \citep{RCoreTeam.2022} was carried out as part of this work. The source code for this can be found at \url{https://github.com/slds-lmu/msc_2022_loibl_thesis}. 
+No implementation of SLIM was found, which is why an implementation in R  \citep{RCoreTeam.2022} was carried out as part of this work. The code from the package $\mathtt{customtrees}$ from \citet{Casalicchio.2020} and from \citet{Herbinger.2022} was used as basis. The source code for the SLIM implementation and the applications in this thesis can be found at \url{https://github.com/slds-lmu/msc_2022_loibl_thesis}. 
 
-The software implementation of GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}. The binary executable is available under \url{https://pages.stat.wisc.edu/~loh/guide.html}.  Unfortunately, the source code is not accessible and the method cannot be easily adapted to other objectives, although this would be theoretically possible.
-
-For this reason, I have incorporated the residual based $\chi^2$- independence tests for finding the best split variable as an option of the SLIM implementation in R  in this work. Bootstrap bias correction was also adopted. To the best of my knowledge, I followed the original paper \citep{Loh.2002}. However, the results differ somewhat from the results in the paper, as can be seen in the appendix in figure \ref{}. 
-Whenever GUIDE is discussed in the following, it always refers to my implementation. 
+The software implementation of GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}. The binary executable is available under \url{https://pages.stat.wisc.edu/~loh/guide.html}.  Unfortunately, the source code is not accessible and the method cannot be easily adapted to other objectives, although this would be theoretically possible. For this reason, I have incorporated the residual based $\chi^2$- independence tests for finding the best split variable as an option of the SLIM implementation in R  in this work. Bootstrap bias correction was also adopted. To the best of my knowledge, I followed the original paper \citep{Loh.2002}. However, the results differ somewhat from the results in the paper, as can be seen in the appendix in figure \ref{}. 
+Whenever GUIDE is discussed in the following, it refers to my implementation. 
 
 MOB and CTree are implemented in the R package $\mathtt{partykit}$ \citep{Hothorn.2015} in the functions $\mathtt{mob()}$ \citep{Zeileis.2008} and $\mathtt{ctree()}$ \citep{Hothorn.2006}
 
@@ -157,18 +155,21 @@ MOB and CTree are implemented in the R package $\mathtt{partykit}$ \citep{Hothor
 
 
 \subsection{Comparison}
+
+In Table \ref{tab:mbt_comparison} a comparison of the different MBT algorithms is given. SLIM and GUIDE are particularly interesting because of their flexibility in choosing different loss functions. In the case of SLIM, one open question is whether the exhaustive search, in contrast to the two-step methods, leads to a selection bias. This will be examined in the following chapter \ref{selection}.
 \begin{table}[ht]
 \centering
-\begin{tabular}{llll}
+\begin{tabular}{lllll}
   \hline
- & Split point selection & Test & Flexibility  \\ 
+ & Split point selection & Test & Flexibility & Implementation  \\ 
   \hline
-    SLIM & exhaustive search & - & high  \\ 
-    MOB & two-step & score-based fluctuation & low \\ 
-    CTree & two-step & score-based Permutation & low \\ 
-    GUIDE & two-step & residual-based $\chi^2$  & high \\ 
+    SLIM & exhaustive search & - & high & - \\ 
+    MOB & two-step & score-based fluctuation & low & R package \\ 
+    CTree & two-step & score-based Permutation & low & R package\\ 
+    GUIDE & two-step & residual-based $\chi^2$  & high & binary executable\\ 
    \hline
 \end{tabular}
+\label{tab:mbt_comparison}
 \end{table}
 %\citep{Schlosser.2019}
 
