@@ -59,7 +59,7 @@ testJob(4)
 submitJobs(ids = ids, list(walltime = 2000, memory = 512))
 
 
-# reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
+reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
 
 
 # reduce jobs/ summarise results
@@ -74,10 +74,6 @@ head(tab)
 
 
 
-
-library(ggplot2)
-library(ggpubr)
-library(stringr)
 
 savedir = "Data/simulations/batchtools/selection_bias_slim/results/"
 

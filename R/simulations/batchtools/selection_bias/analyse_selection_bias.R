@@ -5,6 +5,7 @@ library(batchtools)
 library(data.table)
 library(GGally)
 library(ggpubr)
+library(stringr)
 # load results
 
 list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
@@ -36,6 +37,7 @@ p_independence_numerical = ggplot(stack(res_independence_numerical[,c(cols_split
            aes(x = values, fill = ind)) +
   stat_count(position = position_dodge2(preserve = "single")) +
   scale_fill_manual(values = colors_mbt) +
+  theme_bw() +
   labs(x="splitting variable", y="frequency", fill = "MBT")
 
 ggexport(p_independence_numerical, filename = paste0(figuredir, "independence_numerical.png"), width = 800, height = 300)
@@ -51,6 +53,7 @@ p_independence_mixed = ggplot(stack(res_independence_mixed[,c(cols_split, "GUIDE
                                   aes(x = values, fill = ind)) +
   stat_count(position = position_dodge2(preserve = "single")) +
   scale_fill_manual(values = colors_mbt) +
+  theme_bw() +
   labs(x="splitting variable", y="frequency", fill = "MBT")
 
 ggexport(p_independence_mixed, filename = paste0(figuredir, "independence_mixed.png"), width = 800, height = 300)
@@ -79,6 +82,7 @@ for (t in seq_along(interaction_types)){
       scale_fill_manual(values = colors_mbt) +
       ggtitle(type_names[t]) + 
       scale_y_continuous(limits = c(0, 1000)) +
+      theme_bw() +
       labs(x="splitting variable", y="frequency", fill = "MBT")
 }
 
@@ -146,6 +150,7 @@ for (t in unique(split_data$type)){
                aes(x = values, color=ind, fill = ind)) +
       stat_count(position = "dodge") +
       ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "))) +
+      theme_bw() +
       labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
     
     ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), ".pdf"), width = 8, height = 3.8)
@@ -156,8 +161,8 @@ for (t in unique(split_data$type)){
 
 
 
-#####################
-# slim selection bias different values of n.quantiles
+
+# ---- 4. Slim selection bias correction approach - different values of n.quantiles ----
 list.files("Data/simulations/batchtools/selection_bias_slim/results/", full.names = TRUE)
 selection_bias_slim = readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds")
 
@@ -166,24 +171,34 @@ savedir_slim = "Data/simulations/batchtools/selection_bias_slim/results/"
 
 if (!dir.exists(figuredir_slim)) dir.create(figuredir_slim, recursive = TRUE)
 
-for(t in unique(selection_bias_slim$type)){
+type_independence = c("selection_bias_independence_10", "selection_bias_independence_25", 
+                      "selection_bias_independence_50", "selection_bias_independence_100")
+p_list_independence = list()
+for(t in type_independence){
   data = selection_bias_slim[type == t]
   cols_mse = str_detect(names(data), "mse_slim")
-  data_long_mse = stack(data[, cols_mse, with = FALSE])
-  data_long_mse$ind = str_remove_all(data_long_mse$ind, "mse_slim_")
-  p_mse = ggplot(data_long_mse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "6", "2")), y=values)) + 
-    geom_point(stat='summary', fun='mean') +
-    ggtitle("Training mse for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
-    labs(x="number of quantiles", y = "mse")
-  
+  data_long_mse_train = stack(data[, cols_mse, with = FALSE])
+  data_long_mse_train$ind = str_remove_all(data_long_mse_train$ind, "mse_slim_")
+
   cols_mse_test = str_detect(names(data), "mse_test_slim")
   data_long_mse_test = stack(data[, cols_mse_test, with = FALSE])
   data_long_mse_test$ind = str_remove_all(data_long_mse_test$ind, "mse_test_slim_")
-  p_mse_test = ggplot(data_long_mse_test, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "6", "2")), y=values)) + 
-    geom_point(stat='summary', fun='mean') +
-    ggtitle("Test mse for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
-    labs(x="number of quantiles", y = "mse")
   
+  data_long_mse = rbind(cbind(data_long_mse_train, type = "train"), cbind(data_long_mse_test, type = "test"))
+  p_mse = ggplot(data_long_mse, mapping = aes(x = factor(ind, level=c("exact", "100", "75", "50", "25", "10", "6", "2")), 
+                                              y=values, color = type)) + 
+    geom_point(stat='summary', fun='mean') +
+    theme_bw() +
+    labs(x=NULL, y = "MSE") 
+    
+  
+  if(t == "selection_bias_independence_100"){
+    p_mse = p_mse + labs(x="number of quantiles", y = "mean MSE", color = "data set") +
+      theme(legend.position="bottom")
+  } else{
+    p_mse = p_mse + theme(axis.title.x=element_blank(),
+                            legend.position="none")
+  }
   
   cols_freq = str_detect(names(data), "split_slim")
   data_freq = data[, cols_freq, with = FALSE]
@@ -194,43 +209,40 @@ for(t in unique(selection_bias_slim$type)){
   table_list = sapply(data_freq, function(el){
     res = tapply(c(table_empty, table(el)), names(c(table_empty, table(el))), sum)
   }, simplify = TRUE)
-  options = length(unique(unlist(data_freq)))
-  
-  
-  
-  if(t %in% c("selection_bias_interaction_numerical_vs_numrical", 
-              "selection_bias_interaction_numerical_vs_binary", 
-              "selection_bias_interaction_numerical_vs_categorical", 
-              "selection_bias_interaction_binary_vs_categorical")){
-    prob = c(0.5,0.5)
-    if(is.vector(table_list)){
-      table_list = rbind(table_list, 0)
-    }
-  } else{
-    prob = rep(1/options, options)
-  }
-  
   saveRDS(table_list, paste0(savedir_slim, str_remove(t, "selection_bias_"),".rds"))
-  
+
+  options = length(unique(unlist(data_freq)))
+  prob = rep(1/options, options)
+
     
   chi2 = apply(table_list, 2, function(table){
     chisq.test(table, p = prob)[["p.value"]]
   }) 
   
   names(chi2) = str_remove_all(names(chi2), "split_slim_")
-
   data_chi2 = data.frame(p_value = chi2, n.quantile = names(chi2))
   
   p_chi2 = ggplot(data_chi2) +
     geom_point(aes(x = factor(n.quantile, level = c("exact", "100", "75", "50", "25", "10", "8", "6", "4", "2")), y = chi2)) +
-    ggtitle("Selection bias for different values of n.quantiles", subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
-    labs(x="number of quantiles", y = "p value")
+    ggtitle(label = NULL, subtitle = str_replace_all(str_remove(t, "selection_bias_"), "_", " ")) +
+    theme_bw() +
+    ylim(0,1) +
+    # geom_hline(yintercept = 0.05, color="green") +
+    labs(x=NULL, y = "p value") +
+    theme(axis.title.x=element_blank())
+    
+
+  p_list_independence[[t]] =  list(p_chi2,p_mse)
+
   
-  ggarrange(p_chi2, p_mse, p_mse_test, nrow = 3) %>%
-    ggexport(filename = paste0(figuredir_slim, str_remove(t, "selection_bias_"),".png"),
-           width = 800, height = 500)
   
-  
+  if(t == "selection_bias_independence_100"){
+    ggexport(ggarrange(p_chi2, p_mse, nrow = 2, heights = c(1,1.3)), filename = paste0(figuredir_slim, str_remove(t, "selection_bias_"),".png"),
+             width = 700, height = 300)
+  } else{
+    ggexport(ggarrange(p_chi2, p_mse, nrow = 2), filename = paste0(figuredir_slim, str_remove(t, "selection_bias_"),".png"),
+             width = 700, height = 250)
+  }
 }
 
 cols_mse = str_detect(names(selection_bias_slim[type == "selection_bias_independence_small"]), "mse")
@@ -239,8 +251,8 @@ ggplot(data, mapping=aes(x = ind, y=values))+geom_boxplot()
 
 slim_full_interaction = readRDS("Data/simulations/batchtools/selection_bias_slim/results/full_interaction.rds")
 slim_independence_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small.rds")
-slim_independence_small_25 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small_25.rds")
-slim_independence_small_50 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_small_50.rds")
+slim_independence_100 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_100.rds")
+slim_independence_50 = readRDS("Data/simulations/batchtools/selection_bias_slim/results/independence_50.rds")
 
 slim_independence_guide = readRDS("Data/simulations/batchtools/selection_bias_slim/results/guide.rds")
 slim_interaction_small = readRDS("Data/simulations/batchtools/selection_bias_slim/results/interaction.rds")
