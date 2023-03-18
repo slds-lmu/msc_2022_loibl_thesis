@@ -22,7 +22,7 @@ pdes = expand.grid(n = 1500, type = rep(c(
   "selection_bias_independence_25",
   "selection_bias_independence_50",
   "selection_bias_independence_100",
-  "selection_bias_interaction_numerical_vs_numrical", 
+  "selection_bias_interaction_numerical_vs_numrical"
   ), each = 1))
 pdes = list("selection_bias" = pdes)
 
