@@ -403,7 +403,7 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
 
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = round(runif(n, 0, 1), 1)
+    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)  
     y =  rnorm(n, 0, 1)
     data = data.frame(x1, x2, x3, y)
     fm = NULL
@@ -436,7 +436,7 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
 
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
-    x3 = round(runif(n, 0, 1), 2)
+    x3 = sample(seq(0, 1, 0.01), size = n, replace = TRUE) 
     y =  rnorm(n, 0, 1)
     data = data.frame(x1, x2, x3, y)
     fm = NULL

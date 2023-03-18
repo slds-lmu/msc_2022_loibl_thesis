@@ -23,9 +23,6 @@ pdes = expand.grid(n = 1500, type = rep(c(
   "selection_bias_independence_50",
   "selection_bias_independence_100",
   "selection_bias_interaction_numerical_vs_numrical", 
-  "selection_bias_interaction_numerical_vs_binary", 
-  "selection_bias_interaction_numerical_vs_categorical", 
-  "selection_bias_interaction_binary_vs_categorical"
   ), each = 1))
 pdes = list("selection_bias" = pdes)
 
@@ -62,7 +59,7 @@ testJob(4)
 submitJobs(ids = ids, list(walltime = 2000, memory = 512))
 
 
-reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
+# reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
 
 
 # reduce jobs/ summarise results
