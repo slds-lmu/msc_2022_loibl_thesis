@@ -36,9 +36,6 @@ list.files("Data/simulations/batchtools/basic_scenarios/results/")
 
 
 
-View(result_basic$mean[n == 1500 & type == "linear_smooth" & surrogate == "standalone",
-                  .(mbt, alpha , impr, n_leaves, r2_train, r2_test, ri)])
-
 
 result_basic_mean[n == 7500 & type == "linear_smooth" &  ((surrogate %in% c("standalone", "lm", "xgboost") & mbt %in% c("SLIM", "GUIDE", "MOB", "CTree")) |
                                                             (mbt == "lm" & surrogate =="lm") |
@@ -74,7 +71,8 @@ overview_ls = rbind(unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE"),
 p_ls_1000_standalone_overview =  ggpairs(overview_ls[!is.na(ri) & surrogate == "standalone" ,.(n_leaves, ri, r2_train, mbt)],
                                          columns = 1:3,        # Columns
                                          aes(color = mbt,  # Color by group (cat. variable)
-                                             alpha = 0.1)) 
+                                             alpha = 0.1)) +
+  theme_bw()
 ggexport(p_ls_1000_standalone_overview, filename = paste0(save_dir, "ls_1000_standalone_overview.png"), width = 600, height = 300)
 
 
@@ -85,7 +83,9 @@ ggexport(p_ls_1000_standalone_overview, filename = paste0(save_dir, "ls_1000_sta
 p_ls_1000_lm_overview =  ggpairs(overview_ls[!is.na(ri)  & surrogate == "lm" ,.(n_leaves, ri, r2_train, mbt)],
                                          columns = 1:3,        # Columns
                                          aes(color = mbt,  # Color by group (cat. variable)
-                                             alpha = 0.1)) 
+                                             alpha = 0.1))  +
+  theme_bw()
+
 ggexport(p_ls_1000_lm_overview, filename = paste0(save_dir, "ls_1000_lm_overview.png"), width = 600, height = 300)
 
 
@@ -102,6 +102,7 @@ p_ls_1000_standalone_int = ggplot(interpretabiliy_ls[surrogate == "standalone",]
   stat_summary(fun="mean", color = "grey") +
   scale_color_manual(values = colors_mbt) +
   labs(x="MBT", y="Number of leafnodes") +
+  theme_bw() +
   theme(legend.position = "none")
 
 ggexport(p_ls_1000_standalone_int, filename = paste0(save_dir, "ls_1000_standalone_lm_int.png"), width = 600, height = 300)
@@ -114,6 +115,7 @@ p_ls_1000_int = ggplot(interpretabiliy_ls[surrogate %in% c("standalone", "lm", "
   stat_boxplot(geom = "boxplot") +
   scale_color_manual(values = colors_mbt, guide = "none") +
   scale_fill_manual(values = colors_surrogate)+
+  theme_bw() +
   labs(x="MBT", y="Number of leafnodes",
        fill = "black box")
 ggexport(p_ls_1000_int, filename = paste0(save_dir, "ls_1000_int.png"), width = 800, height = 300)
@@ -144,6 +146,7 @@ p_ls_1000_standalone_sta = ggplot(stability_ls[surrogate == "standalone" & stabi
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="RI", fill = "MBT")
 
 ggexport(p_ls_1000_standalone_sta, filename = paste0(save_dir, "ls_1000_standalone_sta.png"), width = 800, height = 300)
@@ -168,6 +171,7 @@ p_ls_1000_lm_sta = ggplot(stability_ls[surrogate == "lm" & stability_same_size =
     position = position_dodge(width = 0.75)
   ) +
   scale_fill_manual(values = colors_mbt) +
+  theme_bw() +
   labs(x="number of leafnodes", y="RI", fill = "MBT")
 
 ggexport(p_ls_1000_lm_sta, filename = paste0(save_dir, "ls_1000_lm_sta.png"), width = 800, height = 300)
@@ -192,6 +196,7 @@ p_ls_1000_standalone_lm_sta = ggplot(stability_ls[surrogate %in% c("standalone",
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = colors_surrogate)+
+  theme_bw() +
   labs(x="MBT", y="RI", fill = "black box", color = "MBT")
 ggexport(p_ls_1000_standalone_lm_sta, filename = paste0(save_dir, "ls_1000_standalone_lm_sta.png"), width = 1200, height = 450)
 
@@ -214,6 +219,7 @@ p_ls_1000_xgboost_sta = ggplot(stability_ls[surrogate %in% c("standalone", "xgbo
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = c("standalone" = "white", "xgboost" = "lightgrey"))+
+  theme_bw() +
   labs(x="MBT", y="RI", fill = "black box", color = "MBT")
 ggexport(p_ls_1000_xgboost_sta, filename = paste0(save_dir, "ls_1000_standalone_xgboost_sta.png"), width = 1200, height = 450)
 
@@ -225,7 +231,9 @@ p_ls_1000_standalone = ggpairs(unique(overview_ls[ surrogate == "standalone",.(n
                                columns = 1:3,        # Columns
                                aes(color = mbt,  # Color by group (cat. variable)
                                    alpha = 0.9),
-                               columnLabels = c("n leaves", "R2 train", "R2 test"))
+                               columnLabels = c("n leaves", "R2 train", "R2 test")) +
+  theme_bw()
+  
 ggexport(p_ls_1000_standalone, filename = paste0(save_dir, "ls_1000_standalone_r2_nleaves.png"), width = 600, height = 300)
 
 
@@ -264,6 +272,7 @@ p_ls_1000_standalone_r2_train = ggplot(performance_ls[surrogate == "standalone" 
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_ls_1000_standalone_r2_train, filename = paste0(save_dir, "ls_1000_standalone_r2_train.png"), width = 800, height = 300)
@@ -288,6 +297,7 @@ p_ls_1000_standalone_r2_test = ggplot(performance_ls[surrogate == "standalone" &
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_ls_1000_standalone_r2_test, filename = paste0(save_dir, "ls_1000_standalone_r2_test.png"), width = 800, height = 300)
@@ -312,6 +322,7 @@ p_ls_1000_standalone_symmetrie = ggplot(performance_ls[surrogate == "standalone"
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="maximum leafsize", fill = "MBT")
 
 ggexport(p_ls_1000_standalone_symmetrie, filename = paste0(save_dir, "ls_1000_standalone_symmetrie.png"), width = 800, height = 300)
@@ -337,6 +348,7 @@ p_ls_1000_lm_r2_train = ggplot(performance_ls[surrogate == "lm" & n_leaves > 12 
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_ls_1000_lm_r2_train, filename = paste0(save_dir, "ls_1000_lm_r2_train.png"), width = 800, height = 300)
@@ -358,6 +370,7 @@ p_ls_1000_lm_r2_test = ggplot(performance_ls[surrogate == "lm" & n_leaves > 11 &
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_ls_1000_lm_r2_test, filename = paste0(save_dir, "ls_1000_lm_r2_test.png"), width = 800, height = 300)
@@ -382,6 +395,7 @@ p_ls_1000_xgboost_r2_test = ggplot(performance_ls[surrogate == "xgboost" & n_lea
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_ls_1000_xgboost_r2_test, filename = paste0(save_dir, "ls_1000_xgboost_r2_test.png"), width = 800, height = 300)
@@ -428,7 +442,9 @@ overview_la = rbind(unique(res_la_n1500_alpha05[mbt %in% c("SLIM", "GUIDE") ,
 p_la_1000_standalone_overview =  ggpairs(overview_la[!is.na(ri) & stability_same_size == TRUE & surrogate == "standalone" ,.(n_leaves, ri, r2_train, mbt)],
                                          columns = 1:3,        # Columns
                                          aes(color = mbt,  # Color by group (cat. variable)
-                                             alpha = 0.1)) 
+                                             alpha = 0.1)) +
+  theme_bw()
+  
 ggexport(p_la_1000_standalone_overview, filename = paste0(save_dir, "la_1000_standalone_overview.png"), width = 600, height = 300)
 
 
@@ -447,6 +463,7 @@ p_la_1000_int = ggplot(interpretabiliy_la[surrogate %in% c("standalone", "lm", "
   stat_boxplot(geom = "boxplot") +
   scale_color_manual(values = colors_mbt, guide = "none") +
   scale_fill_manual(values = colors_surrogate)+
+  theme_bw() +
   labs(x="MBT", y="Number of leafnodes", fill = "black box")
 ggexport(p_la_1000_int, filename = paste0(save_dir, "la_1000_int.png"), width = 800, height = 300)
 
@@ -477,6 +494,7 @@ p_la_1000_standalone_sta = ggplot(stability_la[surrogate == "standalone" & stabi
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="RI", fill = "MBT")
 
 ggexport(p_la_1000_standalone_sta, filename = paste0(save_dir, "la_1000_standalone_sta.png"), width = 800, height = 300)
@@ -501,6 +519,7 @@ p_la_1000_standalone_lm_sta = ggplot(stability_la[surrogate %in% c("standalone",
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = colors_surrogate)+
+  theme_bw() +
   labs(x="MBT", y="RI", fill = "black box", color = "MBT")
 ggexport(p_la_1000_standalone_lm_sta, filename = paste0(save_dir, "la_1000_standalone_lm_sta.png"), width = 2000, height = 450)
 
@@ -514,7 +533,9 @@ performance_la = rbind(unique(res_la_n1500_alpha001[mbt %in% c("MOB", "CTree"),.
 p_la_1000_standalone = ggpairs(unique(overview_la[ surrogate == "standalone",.(n_leaves, r2_train, r2_test, mbt, job.id, config_id)]),
                                columns = 1:3,        # Columns
                                aes(color = mbt,  # Color by group (cat. variable)
-                                   alpha = 0.9))
+                                   alpha = 0.9)) +
+  theme_bw() 
+  
 ggexport(p_la_1000_standalone, filename = paste0(save_dir, "la_1000_standalone_r2_nleaves.png"), width = 600, height = 300)
 
 
@@ -536,6 +557,7 @@ p_la_1000_standalone_r2_train = ggplot(performance_la[surrogate == "standalone"]
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_la_1000_standalone_r2_train, filename = paste0(save_dir, "la_1000_standalone_r2_train.png"), width = 800, height = 300)
@@ -557,6 +579,7 @@ p_la_1000_standalone_r2_test = ggplot(performance_la[surrogate == "standalone"],
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "Model")
 
 ggexport(p_la_1000_standalone_r2_test, filename = paste0(save_dir, "la_1000_standalone_r2_test.png"), width = 800, height = 300)
@@ -581,6 +604,7 @@ p_la_1000_lm_r2_train = ggplot(performance_la[surrogate == "lm" & mbt %in% c("SL
     position = position_dodge(width = 0.75)
   ) +
   ggtitle("Fidelity of MBTs on lm predictions Linear Abrupt Train", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_la_1000_lm_r2_train, filename = paste0(save_dir, "la_1000_lm_r2_train.png"), width = 1500, height = 450)
@@ -603,6 +627,7 @@ p_la_1000_lm_r2_test = ggplot(performance_la[surrogate == "lm" & mbt %in% c("SLI
     position = position_dodge(width = 0.75)
   ) +
   ggtitle("Fidelity of MBTs on lm predictions Linear Abrupt test", subtitle = "n = 1000, alpha = 0.001, impr = 0.1") +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_la_1000_lm_r2_test, filename = paste0(save_dir, "la_1000_lm_r2_test.png"), width = 1500, height = 450)
@@ -654,7 +679,8 @@ overview_lm = rbind(unique(res_lm_n1500_alpha05[mbt %in% c("SLIM", "GUIDE") ,
 p_lm_1000_standalone_overview =  ggpairs(overview_lm[!is.na(ri) & stability_same_size == TRUE & surrogate == "standalone" ,.(n_leaves, ri, r2_train, mbt)],
                                          columns = 1:3,        # Columns
                                          aes(color = mbt,  # Color by group (cat. variable)
-                                             alpha = 0.1)) 
+                                             alpha = 0.1)) +
+  theme_bw() 
 
 
 ggexport(p_lm_1000_standalone_overview, filename = paste0(save_dir, "lm_1000_standalone_overview.png"), width = 600, height = 300)
@@ -674,6 +700,7 @@ p_lm_1000_int = ggplot(interpretabiliy_lm[surrogate %in% c("standalone", "lm", "
   stat_boxplot(geom = "boxplot") +
   scale_color_manual(values = colors_mbt, guide = "none") +
   scale_fill_manual(values = colors_surrogate)+
+  theme_bw() +
   labs(x="MBT", y="Number of leafnodes", fill = "black box")
 ggexport(p_lm_1000_int, filename = paste0(save_dir, "lm_1000_int.png"), width = 800, height = 300)
 
@@ -706,6 +733,7 @@ p_lm_1000_standalone_sta = ggplot(stability_lm[surrogate == "standalone" & stabi
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="RI", fill = "MBT")
 
 ggexport(p_lm_1000_standalone_sta, filename = paste0(save_dir, "lm_1000_standalone_sta.png"), width = 800, height = 300)
@@ -733,6 +761,7 @@ p_lm_1000_standalone_lm_sta = ggplot(stability_lm[surrogate %in% c("standalone",
     position = position_dodge(width = 0.75))+
   scale_color_manual(values = colors_mbt) +
   scale_fill_manual(values = colors_surrogate)+
+  theme_bw() +
   labs(x="MBT", y="RI", fill = "black box", color = "MBT")+
   theme(legend.position = "bottom")
 ggexport(p_lm_1000_standalone_lm_sta, filename = paste0(save_dir, "lm_1000_standalone_lm_sta.png"), width = 1100, height = 450)
@@ -746,13 +775,15 @@ performance_lm = rbind(unique(res_lm_n1500_alpha001[mbt %in% c("MOB", "CTree"),.
 p_lm_1000_standalone = ggpairs(unique(overview_lm[ surrogate == "standalone",.(n_leaves, r2_test, share_x3_x4, mbt, job.id, config_id)]),
                                columns = 1:3,        # Columns
                                aes(color = mbt,  # Color by group (cat. variable)
-                                   alpha = 0.9))
+                                   alpha = 0.9)) +
+  theme_bw() 
+
 ggexport(p_lm_1000_standalone, filename = paste0(save_dir, "lm_1000_standalone_r2_nleaves.png"), width = 600, height = 300)
 
 # Standalone
 p_lm_1000_standalone_r2_train = ggplot(performance_lm[surrogate == "standalone"],
                                        aes(x = as.factor(n_leaves), 
-                                           y = share_x2,
+                                           y = r2_train,
                                            fill = factor(mbt, levels = c("SLIM", "GUIDE", "MOB", "CTree"))
                                        )) +
   stat_boxplot(geom = "boxplot") +
@@ -767,6 +798,7 @@ p_lm_1000_standalone_r2_train = ggplot(performance_lm[surrogate == "standalone"]
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="share", fill = "MBT")
 
 ggexport(p_lm_1000_standalone_r2_train, filename = paste0(save_dir, "lm_1000_standalone_r2_train.png"), width = 800, height = 300)
@@ -788,6 +820,7 @@ p_lm_1000_standalone_r2_test = ggplot(performance_lm[surrogate == "standalone" &
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lm_1000_standalone_r2_test, filename = paste0(save_dir, "lm_1000_standalone_r2_test.png"), width = 800, height = 300)
@@ -810,6 +843,7 @@ p_lm_1000_standalone_share_x3_x4 = ggplot(performance_lm[surrogate == "standalon
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="share x3 x4", fill = "MBT")
 
 ggexport(p_lm_1000_standalone_share_x3_x4, filename = paste0(save_dir, "lm_1000_standalone_share_x3x4.png"), width = 800, height = 300)
@@ -834,6 +868,7 @@ p_lm_1000_lm_r2_train = ggplot(performance_lm[surrogate == "lm" & mbt %in% c("SL
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leaf nodes", y="R2", fill = "MBT")
 
 ggexport(p_lm_1000_lm_r2_train, filename = paste0(save_dir, "lm_1000_lm_r2_train.png"), width = 800, height = 300)
@@ -855,6 +890,7 @@ p_lm_1000_lm_r2_test = ggplot(performance_lm[surrogate == "lm"& mbt %in% c("SLIM
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lm_1000_lm_r2_test, filename = paste0(save_dir, "lm_1000_lm_r2_test.png"), width = 800, height = 300)
@@ -878,6 +914,7 @@ p_lm_1000_xgboost_r2_test = ggplot(performance_lm[surrogate == "xgboost"& mbt %i
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lm_1000_xgboost_r2_test, filename = paste0(save_dir, "lm_1000_xgboost_r2_test.png"), width = 800, height = 300)

@@ -12,6 +12,7 @@ library(ggpubr)
 colors_mbt =c("SLIM" = 'purple', "SLIM LASSO" = "plum", "SLIM Lasso max df 2" = "pink3", "SLIM Lasso max df 3" = "plum4", "GUIDE" = 'olivedrab3', 
               "MOB" ='skyblue', "CTree" = 'salmon')
 colors_symmetry = c("high" = "darkgrey", "low" = "black")
+colors_surrogate = c("standalone" = "white", "lm" = "lightgrey", xgboost = "cornsilk")
 
 
 # analyse scenario noise features results
@@ -58,6 +59,7 @@ p_lasso_standalone_r2_train = ggplot(res_lasso[surrogate == "standalone" & str_d
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lasso_standalone_r2_train, filename = paste0(save_dir, "lasso_standalone_r2_train.png"), width = 800, height = 300)
@@ -70,6 +72,7 @@ p_lasso_standalone_r2_train_points = ggplot(res_lasso[surrogate == "standalone" 
                                      )) +
   geom_point() +
   scale_color_manual(values = c(colors_mbt, colors_surrogate)) +
+  theme_bw() +
   labs(x="max leaf size", y="R2", color = "MBT")
 
 # Symmetry
@@ -103,6 +106,7 @@ p_lasso_standalone_r2_test_slim = ggplot(res_lasso[surrogate == "standalone"  & 
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lasso_standalone_r2_test_slim, filename = paste0(save_dir, "lasso_standalone_r2_test_slim.png"), width = 800, height = 300)
@@ -127,6 +131,7 @@ p_lasso_standalone_r2_test = ggplot(res_lasso[surrogate == "standalone"  & n_lea
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lasso_standalone_r2_test, filename = paste0(save_dir, "lasso_standalone_r2_test.png"), width = 900, height = 300)
@@ -157,6 +162,7 @@ p_lasso_lm_r2_train = ggplot(res_lasso[surrogate == "lm" & str_detect(mbt, "SLIM
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lasso_lm_r2_train, filename = paste0(save_dir, "lasso_lm_r2_train.png"), width = 800, height = 300)
@@ -179,6 +185,7 @@ p_lasso_lm_r2_test = ggplot(res_lasso[surrogate == "lm" & str_detect(mbt, "SLIM"
     vjust = 0.9,
     position = position_dodge(width = 0.75)
   ) +
+  theme_bw() +
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lasso_lm_r2_test, filename = paste0(save_dir, "lasso_lm_r2_test.png"), width = 800, height = 300)
