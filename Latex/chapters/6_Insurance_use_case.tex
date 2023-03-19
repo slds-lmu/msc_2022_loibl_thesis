@@ -88,7 +88,10 @@ CTree & 0.00 & 0.96 & 0.04\\
 \label{tab:ins_k2204_lm_surrogates_share}
 \end{table}
 
+
 It is noticeable that SLIM and GUIDE split by age more often than the other two algorithms.
+Furthermore, it should be considered that the SLIM tree could be influenced by selection bias and therefore sex with only one possible splitpoint could be disadvantaged as a splitting variable. SLIM actually chooses sex less often as splitting variable than MOB and CTree, but sex is also rarely chosen by GUIDE and no selection bias between numerical variables with different numbers of splitting variables could be found in GUIDE in chapter \ref{selection}. 
+Moreover, the effect of selection bias would not be so dramatic here, since the two variables with which sex could interact - and probably does to a small extent, as the varying parameter estimates indicate - are chosen as splitting variables. The small interaction of sex with age and duration is thus reflected in the model, even if sex is not chosen as a splitting variable.
 
 \subsubsection{MBTs with B-spline models}
 
