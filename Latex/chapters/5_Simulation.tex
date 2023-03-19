@@ -103,8 +103,6 @@ Settings that are fixed in all variants are maximum tree depth of $6$ and a mini
 The experiment is repeated $N = 100$ times.
 
 \begin{table}[!htb] 
-
-\caption{Simulation setting basic scenarios}
 \centering \small
 \begin{tabular}[t]{lll}
 \hline
@@ -116,6 +114,7 @@ Prepruning parameters   & $alpha \in \{0.05,0.01,0.001\}, impr \in \{0.05,0.1,0.
 Usage of MBT  & standalone, surrogate for lm, surrogate for xgboost \\ 
 \hline
 \end{tabular}
+\caption{Simulation setting basic scenarios}
 \label{tab:simulation_setting}
 \end{table}
 
@@ -156,7 +155,6 @@ In the following, parts of the detailed simulation results are presented and dis
 For a comparison of the different MBT algorithms as standalone model on the scenario linear smooth the aggregated results are listed in table \ref{tab:linear_smooth_summary} for sample size $n = 1500$. 
 
 \begin{table}[!htb] 
-\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear smooth} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r}
 \hline
@@ -182,16 +180,20 @@ lm & & & & & 0.9902 & 0.0006 & 0.9901 & 0.0008\\
 xgboost & & & & & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 \hline
 \end{tabular}
+\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear smooth} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \label{tab:linear_smooth_summary}
 \end{table}
+
+
 The results of SLIM and GUIDE are very close to each other. Noticeable is the large variation in the number of leaf nodes and thus also in the performance of SLIM and GUIDE for different values of $impr$. The variation of $alpha$ has a much smaller impact on the results for MOB and CTree.
 
 Since the trade off between interpretability and performance must be taken into account when comparing the models, the performance of the different MBTs is compared depending on the number of leaf nodes. 
 At $impr = 0.1$ and $alpha = 0.001$, all four models have a similar mean number of leaf nodes, which is why this setting is used for a more detailed comparison.
 
 \begin{figure}[!htb] 
-\caption{Pairwise plot of the number of leaf nodes vs the accuracy measures $R^2$ train and $R^2$ test scenario \textbf{linear smooth} with $n=1500, alpha = 0.001, impr = 0.1$}
+\centering
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_nleaves.png}
+    \caption{Pairwise plot of the number of leaf nodes vs the accuracy measures $R^2$ train and $R^2$ test scenario \textbf{linear smooth} with $n=1500, alpha = 0.001, impr = 0.1$}
     \label{fig:ls_1000_standalone_r2_nleaves}
 \end{figure} 
 
@@ -203,8 +205,9 @@ In figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that, as expect
 
 
 \begin{figure}[!htb] 
-\caption{Test accuracy $R^2$ vs number of leaf nodes scenario \textbf{linear smooth} with $n=1500, alpha = 0.001, impr = 0.1$}
+\centering
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_test.png}
+    \caption{Test accuracy $R^2$ vs number of leaf nodes scenario \textbf{linear smooth} with $n=1500, alpha = 0.001, impr = 0.1$}
     \label{fig:ls_1000_standalone_r2_test}
 \end{figure} 
 
@@ -221,9 +224,10 @@ Overall, it should  be noted that the number of leafnodes required to achieve a 
 
 
 \begin{figure}[!htb] 
-\caption{Number of leafnodes linear smooth}
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_int.png}
+\centering
+    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_int.png}
     \label{fig:ls_1000_int}
+    \caption{Number of leafnodes linear smooth}
 \end{figure} 
 
 
@@ -232,10 +236,12 @@ Figure \ref{fig:ls_1000_int} shows that this is also the case when the MBTs are 
 
 
 \begin{figure}[!htb]
-\caption{Rand Indices for scenario \textbf{linear smooth}}
+\centering
     \centering
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_sta.png}
+    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_sta.png}
     \label{fig:ls_1000_standalone_sta}
+    \caption{Rand Indices for scenario \textbf{linear smooth}}
+
 \end{figure}
 
 This observation is already a sign of lower stability of SLIM and GUIDE compared to MOB and CTree. Moreover, in figure \ref{fig:ls_1000_standalone_sta} the rand indices of the different algorithms are plotted for tree pairs with identical number of leafnodes. There one can see that even with identical numbers of leafnodes, MOB and CTree generate more stable trees.
@@ -256,7 +262,6 @@ MOB and CTree, on the other hand, split almost only with respect to the variable
 
 \begin{table}[!htb]
 
-\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear categorical} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
@@ -286,6 +291,7 @@ xgboost & & & & & 0.9876 & 0.0015 & 0.9778 & 0.0031 & \\
 \hline
 
 \end{tabular}
+\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear categorical} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \label{tab:linear_abrupt_summary} 
 \end{table}
 
@@ -296,9 +302,11 @@ In contrast to the scenario linear smooth, the variation in the number of leafno
 
 
 \begin{figure}[!htb]
-\caption{Test accuracy $R^2$ vs number of leaf nodes scenario \textbf{linear categorical} with $n=1500, alpha = 0.001, impr = 0.05$}
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_abrupt/la_1000_standalone_r2_test.png}
+\centering
+    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_abrupt/la_1000_standalone_r2_test.png}
     \label{fig:la_1000_standalone_r2_test}
+    \caption{Test accuracy $R^2$ vs number of leaf nodes scenario     
+\textbf{linear categorical} with $n=1500, alpha = 0.001, impr = 0.05$}
 \end{figure} 
 
 Figure \ref{fig:la_1000_standalone_r2_test} shows the performance by number of leafnodes for impr = 0.05 and alpha = 0.001. There one can see again that SLIM and GUIDE achieve a very high $R^2$ despite the low number of leafnodes. 
@@ -319,11 +327,9 @@ Nevertheless, the mean performance of SLIM and GUIDE is better than that of the 
 
 \paragraph{Linear Mixed}
 \begin{table}[!htb]
-\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear mixed} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
-
 
 MBT & impr  & n leaves & n leaves min & n leaves max & $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & share $x_1$ $x_2$\\
 \hline
@@ -353,8 +359,8 @@ xgboost & & & & & 0.9859 & 0.0014 & 0.9682 & 0.0042 &\\
 lm & & & & & 0.9902 & 0.0006 & 0.9898 & 0.0008 &\\
 \hline
 
-
 \end{tabular}
+\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear mixed} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \label{tab:linear_mixed_summary}
 \end{table}
 
@@ -367,25 +373,28 @@ In the figures \ref{fig:lm_1000_standalone_r2_test}  and \ref{fig:lm_1000_standa
 
 
 \begin{figure}[!htb]
-\caption{Test accuracy $R^2$ vs number of leaf nodes scenario \textbf{linear mixed} with $n=1500, alpha = 0.001, impr = 0.05$}
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_r2_test.png}
+\centering
+    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_r2_test.png}
     \label{fig:lm_1000_standalone_r2_test}
+    \caption{Test accuracy $R^2$ vs number of leaf nodes scenario
+\textbf{linear mixed} with $n=1500, alpha = 0.001, impr = 0.05$}
 \end{figure} 
 
 
 \begin{figure}[!htb]
-\caption{Share of splitted observations by features $\textbf{x}_3, \textbf{x}_4$ vs number of leaf nodes scenario linear mixed with $n=1500, alpha = 0.001, impr = 0.05$}
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_share_x3x4.png}
+\centering
+    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_share_x3x4.png}
     \label{fig:lm_1000_standalone_share_x3x4}
+    \caption{Share of splitted observations by features $\textbf{x}_3, \textbf{x}_4$ vs number of leaf nodes scenario linear mixed with $n=1500, alpha = 0.001, impr = 0.05$}
 \end{figure} 
 
 
 
 
 \begin{figure}[!htb]
-\caption{Rand Indices for scenario linear mixed}
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_sta.png}
     \label{fig:lm_1000_standalone_lm_sta}
+    \caption{Rand Indices for scenario linear mixed}
 \end{figure}
 
 For the comparison of stability one can look at figure \ref{fig:lm_1000_standalone_lm_sta}. On the one hand, it can be seen that MOB and CTree seem to be somewhat more stable than SLIM and GUIDE with the same number of leafnodes, but the difference is not great. Furthermore, it can be seen that in most cases the stability of trees with the same number of leafnodes is higher when they are used as surrogates than when they are used as standalone models. Here, the assertion of \citep{Hu.2020} that SLIM is more stable when used as a surrogate is true and also applies to the other algorithms.
@@ -409,7 +418,6 @@ For the simulation, the MBTs are fitted on a dataset with sample size $ n = 1500
 
 
 \begin{table}[!htb]
-\caption{mean results correlated data}
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
@@ -452,6 +460,7 @@ lm & MOB & 0.9 & 0.004 & 15.752 & 14 & 17 & 0.9996 & 0.0001 & 0.9995 & 0.0001\\
 lm & CTree & 0.9 & 0.000 & 15.144 & 14 & 17 & 0.9995 & 0.0001 & 0.9994 & 0.0001\\
 \hline
 \end{tabular}
+\caption{mean results correlated data}
 \label{tab:linear_smooth_correlated_summary}
 \end{table} 
 
@@ -477,7 +486,6 @@ This examines whether the noise variables are incorrectly used as splitting vari
 As in the previous scenario the MBTs are fitted as standalone models and surrogates on lm predictions on a dataset with sample size $ n = 3000$ ($2000$ training, $1000$ test observations) using the pruning parameter settings $alpha = 0.001$ and $impr = 0.1$. The simulation is repeated $250$ times.
 
 \begin{table}[!htb]
-\caption{Mean simulation results as stand alone model and as surrogate on lm predictions on scenario Linear smooth with noise features}
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
@@ -505,6 +513,7 @@ lm & CTree & 0.000 & 0.5003 & 15.564 & 13 & 16 & 0.9994 & 0.0001 & 0.9992 & 0.00
 \hline
 \end{tabular}
 \label{tab:linear_smooth_noisy_summary}
+\caption{Mean simulation results as stand alone model and as surrogate on lm predictions on scenario Linear smooth with noise features}
 \end{table}
 
 Table \ref{tab:linear_smooth_noisy_summary} shows the mean simulation results. freq $ \textbf{x}_{wrong}$ is the proportion of trees in which at least one of the noise variables was used as a splitting variable. 
@@ -560,15 +569,12 @@ Three different settings were simulated
 
     \end{tabular}
     \caption{simulation setting nonlinear}
-    \label{tab:}
 \end{table}
 
 For all three scenarios a sample size of 3000 is used and the simulation is repeated 50 times. The MBTs are fitted both as standalone models and as surrogate models on predictions of an xgboost model.
 
 
 \begin{table}[!htb]
-
-\caption{mean interpretability simulation results nonlinear scenario 1}
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
@@ -586,6 +592,7 @@ xgboost & gam & 1.90 & 1 & 4 & 0.88 & 0 & 2 & 0.0000 &  & \\
 
 \hline
 \end{tabular}
+\caption{mean interpretability simulation results nonlinear scenario 1}
 \label{tab:linear_mixed_1_interpretability}
 
 \end{table}
@@ -604,7 +611,6 @@ Both SLIM with linear bspline transformed variables and GAMs require on average 
 
 \begin{table}[!htb]
 
-\caption{mean performance simulation results nonlinear scenario 1}
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline
@@ -623,6 +629,8 @@ xgboost & gam & 0.9348 & 0.0118 & 0.9289 & 0.0117 & 384.7403\\
 xgboost & xgboost & 0.9386 & 0.0295 & 0.9199 & 0.0362 & 3.1163\\
 \hline
 \end{tabular}
+\caption{mean performance simulation results nonlinear scenario 1}
+
 \end{table}
 
 
@@ -630,7 +638,6 @@ xgboost & xgboost & 0.9386 & 0.0295 & 0.9199 & 0.0362 & 3.1163\\
 
 \begin{table}[!htb]
 
-\caption{mean interpretability simulation results nonlinear scenario 3}
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
@@ -647,12 +654,13 @@ xgboost & bsplines & 17.38 & 2 & 25 & 4.70 & 1 & 6 & 0.0597 & &\\
 xgboost & gam & 15.28 & 2 & 24 & 4.00 & 1 & 6 & 0.0191 & &\\
 \hline
 \end{tabular}
+\caption{mean interpretability simulation results nonlinear scenario 3}
+
 \end{table}
 
 
 \begin{table}[!htb] 
 
-\caption{mean performance simulation results nonlinear scenario 3}
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline
@@ -671,6 +679,8 @@ xgboost & gam & 0.9786 & 0.0127 & 0.9672 & 0.0115 & 1728.6021\\
 xgboost & xgboost & 0.9392 & 0.0342 & 0.9216 & 0.0405 & 3.0131\\
 \hline
 \end{tabular}
+\caption{mean performance simulation results nonlinear scenario 3}
+
 \end{table}
 
 
