@@ -43,7 +43,7 @@ addExperiments(
   reg = reg, 
   prob.designs = pdes,
   algo.designs = ades, 
-  repls = 2000L)
+  repls = 3000L)
 
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
@@ -56,10 +56,10 @@ ids[, chunk := batchtools::chunk(job.id, n.chunks = 250)]
 testJob(4)
 
 # submit jobs
-submitJobs(ids = ids, list(walltime = 4000, memory = 512))
+submitJobs(ids = ids, list(walltime = 6000, memory = 512))
 
 
-#reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
+reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
 
 
 # reduce jobs/ summarise results
