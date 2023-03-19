@@ -22,7 +22,10 @@ pdes = expand.grid(n = 1500, type = rep(c(
   "selection_bias_independence_25",
   "selection_bias_independence_50",
   "selection_bias_independence_100",
-  "selection_bias_interaction_numerical_vs_numrical"
+  "selection_bias_interaction_numerical_vs_numrical",
+  "selection_bias_interaction_numerical_vs_binary", 
+  "selection_bias_interaction_numerical_vs_categorical", 
+  "selection_bias_interaction_binary_vs_categorical"
   ), each = 1))
 pdes = list("selection_bias" = pdes)
 
@@ -56,10 +59,10 @@ ids[, chunk := batchtools::chunk(job.id, n.chunks = 250)]
 testJob(4)
 
 # submit jobs
-submitJobs(ids = ids, list(walltime = 6000, memory = 512))
+submitJobs(ids = ids, list(walltime = 10000, memory = 512))
 
 
-reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
+# reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
 
 
 # reduce jobs/ summarise results
