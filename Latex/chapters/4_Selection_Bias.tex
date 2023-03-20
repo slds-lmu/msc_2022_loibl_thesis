@@ -43,9 +43,6 @@ The resulting frequencies are shown in Figure \ref{fig:selection_bias_independen
     \label{fig:selection_bias_independence_numeric}
 \end{figure}
 
-For the simulations in this chapter, each unique value was seen as a potential split point for SLIM.
-However, as a possible correction approach for the selection bias in SLIM, I investigated how the number of quantiles considered as potential split points affects the selection bias and the performance (mean square error) of SLIM. The simulation setup and results are shown in the appendix. In summary, the selection bias can indeed be reduced by a smaller number of quantiles, but performance also suffers. In principle, it would be possible to consider the number of quantiles as a tuning parameter and to try to achieve the best possible trade off between selection bias and performance. 
-
 
 
 \paragraph{Selection bias independence mixed \newline} 
@@ -55,7 +52,7 @@ In the second scenario, the data is simulated as follows:
     \item $\textbf{x}_3$ uniformly distributed on the set $\{0, 0.1,..., 0.9, 1\}$ 
     \item $\textbf{x}_4  \sim Bern(0.5)$ 
     \item $\textbf{x}_5$ uniformly distributed on 5 factor levels (15 possible split sets) 
-    \item $\textbf{x}_5$ uniformly distributed on 8 factor levels (128 possible split sets) %stirling number of second kind    
+    \item $\textbf{x}_6$ uniformly distributed on 8 factor levels (128 possible split sets) %stirling number of second kind    
     \item $y \sim N(0,1)$
     \item sample size $n = 1000$
     \item 1000 simulation runs
@@ -77,7 +74,7 @@ In \citep{Hothorn.2006} the unbiasedness of CTree is empirically investigated fo
 
 For GUIDE two different variants were evaluated in this scenario. "GUIDE excl cat" corresponds to the original version, in which categorial variables are only used as splitting and not as regressor variables. In "GUIDE incl cat", on the other hand, the categorial variables are also used as regressors. The fact that the frequencies of the categorical variables are smaller in "GUIDE incl. cat" could be explained analogously to the selection bias of MOB and CTree.
 
-The binary variable $\textbf{x}_4$ is almost never chosen as a splitting variable with SLIM, in contrast to the other variables. However, this can be attributed to the selection bias in numerical features with different numbers of split points. What is more interesting is that the numerical variable $\textbf{x}_2$ with 10 possible split points is chosen by SLIM much more frequently as splitting variable than the variable $\textbf{x}_6$ with 128 possible splits, so that the bias cannot be determined by the number of possible splits alone.
+The binary variable $\textbf{x}_4$ is almost never chosen as a splitting variable with SLIM, in contrast to the other variables. However, this can be attributed to the selection bias in numerical features with different numbers of split points, as the binary variable can be seen as numerical variable with only one possible splitpoint. What is more interesting is that the numerical variable $\textbf{x}_2$ with 10 possible split points is chosen by SLIM much more frequently as splitting variable than the variable $\textbf{x}_6$ with 128 possible splits, so that the bias cannot be determined by the number of possible splits alone.
 
 The difference between the categorical ($\textbf{x}_5$ and $\textbf{x}_6$) and the numerical variables can probably be explained in a similar way as with the other methods, but in reverse. With SLIM, the potential split is executed first and then models in the childnodes are fitted.  If a numerical variable is split, the parameters for all factor levels are estimated in both childmodels, whereby random dependencies with $y$ can be modelled very accurately. If, on the other hand, splitting is done according to a categorical variable, only a subset of the factor levels can be used for modelling in both childnodes.
 
@@ -85,10 +82,14 @@ The difference between the categorical ($\textbf{x}_5$ and $\textbf{x}_6$) and t
 An important result is that selection bias does not only affect SLIM, but also the other methods if categorical variables are used. This fact should be kept in mind when using the methods for interpretation.
 
 
+For all simulations in this chapter, each unique value was seen as a potential split point for SLIM.
+As a possible correction approach for the selection bias in SLIM, I investigated how the number of quantiles considered as potential split points affects the selection bias and the performance (mean square error) of SLIM. The simulation setup and results are shown in the appendix. In summary, although selection bias can be reduced for numerical variables in the case of an independent target variable, this correction can lead to unpredictable biases if interactions are actually present. For this reason, the approach is not recommended. 
 
 
 
-\subsection{Simulation interactions}
+
+
+\subsection{Simulation interactions} \label{selection_bias_interactions}
 While so far only the frequencies with which different feature types are selected in the case of independence were shown, it is empirically investigated in the following which feature types the different MBT algorithms tend to select when interactions are actually present.
 Four different scenarios are examined for this. These are, in a sense, pair comparisons of the different feature types. In all scenarios, the data generating process consists of two pairs of interactions, whereby the interactions have the same strength. Each pair consists of a numerical variable that enters linearly into the interaction and another variable that splits the linear effect into two subgroups.
 In all four scenarios the numerical variables which define the linear effect are 
