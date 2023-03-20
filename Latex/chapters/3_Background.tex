@@ -1,5 +1,5 @@
 \subsection{Model and Notation}
-Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((y, \mathbf{x}), \theta)$ be a parametric model, that describes the target $y \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x} = (\mathbf{x_1}, ... \mathbf{x_p})^T \in \mathcal{X}$  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, we use the notation $y^{bb}$. Given $n$ observations $(y, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((y, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
+Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((y, \mathbf{x}), \theta)$ be a parametric model, that describes the target $y \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x} = (\mathbf{x_1}, ... \mathbf{x_p})^T \in \mathcal{X}$  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, the notation $y^{bb}$ is used. Given $n$ observations $(y, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((y, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
 \begin{align}
     \hat{\mathbf{\theta}} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta).
 \end{align}
@@ -42,14 +42,14 @@ MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of
 
 
 \subsubsection{SLIM}
-SLIM by \citep{Hu.2020} is explicitly designed to create surrogate MBTs that contain main effect models in the leafnodes and split them by interactions. 
+SLIM by \citep{Hu.2020} is explicitly designed to create surrogate MBTs that contain main effect models in the leafnodes and are split by interactions. 
 
 After fitting the model to all observations in step 2 the  objective function is calculated, e.g. the sum of squared errors (SSE).
 In step 3 SLIM performs an exhaustive search to find the optimal splitpoint.  
 The optimization problem in each recursion step includes the optimization of the objective of the left node and the right node and is given by \begin{align} \label{align:mob_opitimization}
     \min_{j \in 1,..., p} \left( \min_{s \in \mathcal{S}_j} \left(\min_{\theta_{l} \in \Theta}\sum_{i \in I_{l}(s)}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{l})  +  \min_{\theta_{r} \in \Theta}\sum_{i \in I_{r}(s)}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{r}) \right) \right),
 \end{align}
-where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $\mathbf{x}_j$. For numeric variables, this set consists either of all unique values of $\mathbf{x}_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, the left node $I_{l}$ is defined as the set of indices $i \in 1,...,n$ for which $x_j^{(i)} \leq s$ holds and the right node $I_{r}$ is its complement. For categorical variables, one subgroup of all possibilities of dividing the levels of $\mathbf{x}_j$ into two disjoint sets are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $x_j^{(i)} \in s$ applies and and $I_{r}$ is its complement.
+where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $\mathbf{x}_j$. For numeric variables, this set consists either of all unique values of $\mathbf{x}_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, the left node $I_{l}$ is defined as the set of indices $i \in 1,...,n$ for which $x_j^{(i)} \leq s$ holds and the right node $I_{r}$ is its complement. For categorical variables, all possibilities of dividing the levels of $\mathbf{x}_j$ into two disjoint sets are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $x_j^{(i)} \in s$ applies and and $I_{r}$ is its complement.
 
 The variable $\mathbf{x}_j$ and split point $s$ which minimize  (\ref{align:mob_opitimization}) are selected as splitting variable and split point, if this leads to a large enough improvement of the objective function.
 
@@ -57,7 +57,6 @@ Since the computational effort for estimating all possible child models becomes 
 
 To avoid overfitting and to obtain a small interpretable tree, the use of pruning is necessary. \citet{Hu.2020} use the approach of backpruning, i.e. a deep tree is first fitted and then leaves that do not fulfil certain criteria are pruned back. 
 In order to keep the computational effort as low as possible, prepruning is used in this thesis. Specifically, this means that a split is only performed if the improvement of the objective through the split is at least $impr \in [0,1]$ times the improvement of the objective in the parent node. In addition, it is possible to set a value for $R^2$ (defined in chapter \ref{simulation}) above which splitting in a node will not continue.
-
 
 
 
@@ -81,7 +80,7 @@ gradient of the objective function regarding the parameter vector $\theta_b$ - p
 \citep{Zeileis.2008}
 
 
-In contrast to the definition in \citet{Zeileis.2008}, $\textbf{z} = \textbf{x}$ was set in (\ref{align:W_j}) as no distinction is made between regressor and partitiong variables.
+In contrast to the definition in \citet{Zeileis.2008}, $\textbf{z} = \textbf{x}$ was set in (\ref{align:W_j}) as no distinction is made between regressor and partitioning variables.
 If the scores - ordered by the potential split variable - do not fluctuate randomly around zero, this indicates that there is parameter instability which could potentially be captured by splitting the data using this variable as partitioning variable \citep{Schlosser.2019}.
 To test the null hypothesis of parameter stability with the so called M-fluctuation test, MOB captures systematic deviations from zero through the empirical fluctuation process
 
@@ -109,7 +108,7 @@ A limitation of MOB is that only objective functions can be selected for which t
 
 \subsubsection{CTree}
 CTree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
-CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependecy between potential splitting variables and a transformation $h()$ of the response $y$.
+CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependency between potential splitting variables and a transformation $h()$ of the response $y$.
 A common transformation used in MBTs is the score function, i.e. $h(y) = \psi$, but other transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
 
 To test the independence between the scores and the potential partition variables, CTree uses a linear association test.

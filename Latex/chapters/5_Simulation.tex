@@ -93,11 +93,13 @@ Numerical and binary features with linear effects, subgroup dependent and smooth
     \item $y = f_{lm}(\textbf{x}) + \epsilon$
 \end{itemize}
 
+Note that the number of possible split points for all characteristics in the scenario is linearly smooth identically. Selection bias is therefore not a problem here.
+In the other two scenarios, however, a discrimination of the binary features could occur in SLIM. Whether such a disadvantage actually occurs or would only be present in the independence case is discussed on basis of the results.
 
 
 \subsubsection{Simulation Setting}
 Since the number of leafnodes and the performance strongly depend on the prepruning value for $impr$ for SLIM and GUIDE and $alpha$ for MOB and CTree, the simulations are carried out for different values of these parameters. In addition, two different sample sizes $n$ are chosen. 
-All MBT algorithms are fitted as standalone models on the original data and as surrogate models on a correctly specified linear model or GAM and on an xgboost model with correctly specified interactions. The configurations of the xgboost models are listed in the appendix.
+All MBT algorithms are fitted as standalone models on the original data and as surrogate models on a correctly specified linear model or GAM and on an xgboost model with correctly specified interactions. The configurations of the xgboost models are listed in the appendix in table \ref{tab:app_xgboost_config}.
 Table \ref{tab:simulation_setting} lists all varied factors and their levels. In total, there are $3 \times 2 \times 3 \times 3 = 54$ variants for each of the 4 MBT algorithms.
 Settings that are fixed in all variants are maximum tree depth of $6$ and a minimum node size of $50$.
 The experiment is repeated $N = 100$ times.
@@ -254,10 +256,10 @@ This observation is already a sign of lower stability of SLIM and GUIDE compared
 
 \paragraph{Linear Categorical} 
 In the linear categorical scenario, the data-generating process is not determined by a smooth interaction, but can be fully described by main effect models in four subgroups.
-This would require a split at the empirical mean of  feature $x_1$ and a split with respect to the binary variable $x_3$. 
+This would require a split at the empirical mean of  feature $\textbf{x}_1$ and a split with respect to the binary variable $\textbf{x}_3$. 
 SLIM and GUIDE differ greatly from MOB and CTree in their ability to find these splits, which can be seen in Table \ref{tab:linear_abrupt_summary}. 
-The column share $x_2$ indicates what proportion of all split observations were split on average with respect to the variable $x_2$.
-For SLIM and GUIDE this value is $0$ for all values of $impr$ , which indicates, that all splits where performed regarding the variables $x_1$ and $x_3$.
+The column share $\textbf{x}_2$ indicates what proportion of all split observations were split on average with respect to the variable $\textbf{x}_2$.
+For SLIM and GUIDE this value is $0$ for all values of $impr$ , which indicates, that all splits where performed regarding the variables $\textbf{x}_1$ and $\textbf{x}_3$.  Consequently, the selection bias of SLIM does not lead to the binary variable $\textbf{x}_3$ not being selected as a splitting variable here. This corresponds to the results from chapter \ref{selection_bias_interactions} in which is shown that SLIM prefers the variable that defines a subgroup in a two-way interaction as  splitting variable.
 MOB and CTree, on the other hand, split almost only with respect to the variable $x_2$ and therefore achieve a worse mean performance than SLIM and GUIDE (except for $impr = 0.15$) despite a considerable higher number of leafnodes.
 
 \begin{table}[!htb]
@@ -312,14 +314,11 @@ In contrast to the scenario linear smooth, the variation in the number of leafno
 Figure \ref{fig:la_1000_standalone_r2_test} shows the performance by number of leafnodes for impr = 0.05 and alpha = 0.001. There one can see again that SLIM and GUIDE achieve a very high $R^2$ despite the low number of leafnodes. 
 
 It is also noticeable that MOB performs better than CTree with the same number of leafnodes.
-This could be because, according to \citep{Schlosser.2019}, the M-fluctuation test used in MOB has a higher ability in detecting abrupt changes than the linear test statistic used in CTree.
+This could be because, according to \citep{Schlosser.2019}, the M-fluctuation test used in MOB has a higher ability in detecting abrupt changes than the linear test statistic used in CTree, which was also seen in chapter \ref{selection_bias_interactions}.
 
 
 
-\color{red}
-Abbildung oder Tabelle einfügen!
-\color{black}
-If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases. This indicates that the interactions with the GAM were not fitted well enough (despite $R^2_{test} = 0.97$ see table \ref{tab:linear_abrupt_summary}). The statement that SLIM is more stable when used as a surrogate model than when used as a standalone model \citep{Hu.2020} is therefore not true in this case.
+If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases, as can be seen in table \ref{tab:app_linear_abrupt_1000} in the appendix. This indicates that the interactions with the GAM were not fitted well enough, despite a  $R^2_{test} = 0.97$ see table \ref{tab:linear_abrupt_summary}). The statement that SLIM is more stable when used as a surrogate model than when used as a standalone model \citep{Hu.2020} is therefore not true in this case.
 Nevertheless, the mean performance of SLIM and GUIDE is better than that of the other MBTs, as can be seen in Table \ref{tab:app_linear_abrupt_1000} in the appendix.
 
 
@@ -460,7 +459,7 @@ lm & MOB & 0.9 & 0.004 & 15.752 & 14 & 17 & 0.9996 & 0.0001 & 0.9995 & 0.0001\\
 lm & CTree & 0.9 & 0.000 & 15.144 & 14 & 17 & 0.9995 & 0.0001 & 0.9994 & 0.0001\\
 \hline
 \end{tabular}
-\caption{mean results correlated data}
+\caption{Mean results correlated data}
 \label{tab:linear_smooth_correlated_summary}
 \end{table} 
 
@@ -473,7 +472,7 @@ If the MBTs are used as surrogates for the lm predictions instead of standalone 
 
 \subsection{Linear smooth with noise features}
 This scenario examines how noise features that have no influence on $y$ affect the MBTs. Here, again, the scenario linear smooth was used as a basis, to which six noise variables were added.
-In addition to the usual models, SLIM models were fitted with LASSO regression models. LASSO models allow the fitting of sparse models, i.e. a feature selection in the nodes takes place automatically.The strength of the feature selection depends strongly on the penalisation parameter. Three different variants were used to choose this parameter. In all SLIM LASSO MBTs, the penalisation parameter was selected using the BIC criterion. However, in the case of $df = 3$ or $df = 2$, the additional restriction was defined that the effective degrees of freedom must not exceed this value. This enforces especially sparse models.
+In addition to the usual models, SLIM models were fitted with lasso regression models (\citealp{Tibshirani.1996};  \citealp{Friedman.2010}). Lasso models allow the fitting of sparse models, i.e. a feature selection in the nodes takes place automatically. The strength of the feature selection depends strongly on the penalisation parameter. Three different variants were used to choose this parameter. In all SLIM lasso MBTs, the penalisation parameter was selected using the BIC criterion \citep{Sabourin.2015}. However, in the case of $df = 3$ or $df = 2$, the additional restriction was defined that the effective degrees of freedom must not exceed this value. This enforces especially sparse models.
 
 \begin{itemize}
     \item $\textbf{x}_1,..., \textbf{x}_{10} \sim U(-1,1)$
@@ -492,9 +491,9 @@ As in the previous scenario the MBTs are fitted as standalone models and surroga
 black box & MBT & freq $ \textbf{x}_{noise}$  & share $\textbf{x}_3$ & n leaves & n leaves min & n leaves max & $R^2_{train}$  & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
 \hline
 standalone & SLIM & 0.072 & 0.4654 & 11.988 & 5 & 17 & 0.9880 & 0.0048 & 0.9854 & 0.0049\\
-standalone & SLIM LASSO & 0.092 & 0.4655 & 11.048 & 5 & 16 & 0.9871 & 0.0049 & 0.9852 & 0.0051\\
-standalone & SLIM LASSO df 3 & 0.028 & 0.5182 & 9.732 & 4 & 14 & 0.9863 & 0.0046 & 0.9848 & 0.0050\\
-standalone & SLIM LASSO df 2 & 0.028 & 0.9990 & 9.648 & 4 & 15 & 0.9864 & 0.0044 & 0.9852 & 0.0047\\
+standalone & SLIM lasso & 0.092 & 0.4655 & 11.048 & 5 & 16 & 0.9871 & 0.0049 & 0.9852 & 0.0051\\
+standalone & SLIM lasso df 3 & 0.028 & 0.5182 & 9.732 & 4 & 14 & 0.9863 & 0.0046 & 0.9848 & 0.0050\\
+standalone & SLIM lasso df 2 & 0.028 & 0.9990 & 9.648 & 4 & 15 & 0.9864 & 0.0044 & 0.9852 & 0.0047\\
 standalone & GUIDE & 0.104 & 0.4780 & 11.788 & 5 & 16 & 0.9880 & 0.0047 & 0.9854 & 0.0048\\
 standalone & MOB & 0.000 & 0.5038 & 11.096 & 8 & 14 & 0.9901 & 0.0005 & 0.9878 & 0.0007\\
 standalone & CTree & 0.000 & 0.5087 & 13.140 & 10 & 16 & 0.9904 & 0.0004 & 0.9882 & 0.0007\\
@@ -504,9 +503,9 @@ standalone & lm & & & & & & 0.9901 & 0.0004 & 0.9901 & 0.0006\\
 
 \hline
 lm & SLIM & 0.000 & 0.4900 & 14.036 & 8 & 16 & 0.9987 & 0.0018 & 0.9984 & 0.0019\\
-lm & SLIM LASSO & 0.000 & 0.4574 & 13.736 & 8 & 16 & 0.9985 & 0.0023 & 0.9982 & 0.0027\\
-lm & SLIM LASSO df 3 & 0.000 & 0.5076 & 14.008 & 8 & 16 & 0.9985 & 0.0023 & 0.9983 & 0.0026\\
-lm & SLIM LASSO df 2 & 0.000 & 1.0000 & 11.160 & 5 & 14 & 0.9979 & 0.0018 & 0.9977 & 0.0020\\
+lm & SLIM lasso & 0.000 & 0.4574 & 13.736 & 8 & 16 & 0.9985 & 0.0023 & 0.9982 & 0.0027\\
+lm & SLIM lasso df 3 & 0.000 & 0.5076 & 14.008 & 8 & 16 & 0.9985 & 0.0023 & 0.9983 & 0.0026\\
+lm & SLIM lasso df 2 & 0.000 & 1.0000 & 11.160 & 5 & 14 & 0.9979 & 0.0018 & 0.9977 & 0.0020\\
 lm & GUIDE & 0.000 & 0.4909 & 14.096 & 8 & 16 & 0.9988 & 0.0018 & 0.9984 & 0.0019\\
 lm & MOB & 0.000 & 0.5073 & 15.960 & 15 & 16 & 0.9995 & 0.0000 & 0.9993 & 0.0001\\
 lm & CTree & 0.000 & 0.5003 & 15.564 & 13 & 16 & 0.9994 & 0.0001 & 0.9992 & 0.0001\\
@@ -518,9 +517,9 @@ lm & CTree & 0.000 & 0.5003 & 15.564 & 13 & 16 & 0.9994 & 0.0001 & 0.9992 & 0.00
 
 Table \ref{tab:linear_smooth_noisy_summary} shows the mean simulation results. freq $ \textbf{x}_{wrong}$ is the proportion of trees in which at least one of the noise variables was used as a splitting variable. 
 As in the correlated data scenario, wrong variables are only used as splitting variables for the specified settings if the MBTs are used as standalone models. However, MOB and CTree do not select false variables even then. For the SLIM MBTs it can be seen that freq $\textbf{x}_{wrong}$ decreases with a strong penalty (df = 2 and df = 3). GUIDE, on the other hand, has the most problems with the noise variables and the highest value for freq $x_{wrong}$.
-An interesting effect of using a LASSO model with a maximum of 2 effective degrees of freedom is that for the splitting almost exclusively variable $\textbf{x}_3$ is used, although otherwise $\textbf{x}_2$ and $\textbf{x}_3$ are mostly chosen similarly often. This could be because $\textbf{x}_3$ does not have a main effect on the response, but $\textbf{x}_2$ and $\textbf{x}_1$ do.  Due to the strong penalisation, only these two features are used for modelling in the leafs. Since $\textbf{x}_3$ is not included in the modelling, it is instead more often used as a splitting variable.
+An interesting effect of using a lasso model with a maximum of 2 effective degrees of freedom is that for the splitting almost exclusively variable $\textbf{x}_3$ is used, although otherwise $\textbf{x}_2$ and $\textbf{x}_3$ are mostly chosen similarly often. This could be because $\textbf{x}_3$ does not have a main effect on the response, but $\textbf{x}_2$ and $\textbf{x}_1$ do.  Due to the strong penalisation, only these two features are used for modelling in the leafs. Since $\textbf{x}_3$ is not included in the modelling, it is instead more often used as a splitting variable.
 The interpretability of this MBT is thus increased on the one hand by the very sparse models in the leaf nodes and on the other hand by the fact that the splits are almost only carried out with respect to $\textbf{x}_3$, which is easier to keep track of than if the feature space is split with respect to several different variables.
-The average number of leafnodes for SLIM with LASSO df 2 is smaller than for the standard SLIM MBT, which is why the performance cannot be directly compared.  However, it can be seen that the training performance of SLIM with LASSO df 2 is further below that of the standard SLIM than the test performance. This means that with the strong penalisation, the overfitting can also be reduced.
+The average number of leafnodes for SLIM with lasso df 2 is smaller than for the standard SLIM MBT, which is why the performance cannot be directly compared.  However, it can be seen that the training performance of SLIM with lasso df 2 is further below that of the standard SLIM than the test performance. This means that with the strong penalisation, the overfitting can also be reduced.
 In the appendix in the figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone_r2_test_slim} there is a more detailed presentation of the individual results. It is particularly noticeable that, as with the basic scenario linear smooth, all SLIM MBTs and GUIDE generate some strongly asymmetrical trees, which then have a considerable poorer performance.
 
 
@@ -540,7 +539,7 @@ As it is very flexible in the selection of the objective, only the SLIM algorith
 SLIM is fitted here with four different objectives.
 \begin{enumerate}
     \item linear regression model (lm)
-    \item polynomial regression of degree $2$ with LASSO penalization (penalized poly)
+    \item polynomial regression of degree $2$ with lasso penalization (penalized poly)
     \item linear regression with linear bspline transformations of the features (bsplines)
     \item Generalized additive models with integrated smoothness estimation \citep{Wood.2011} (GAM)
 \end{enumerate}
