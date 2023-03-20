@@ -76,9 +76,10 @@ p_ls_1000_standalone_overview =  ggpairs(overview_ls[!is.na(ri) & surrogate == "
 ggexport(p_ls_1000_standalone_overview, filename = paste0(save_dir, "ls_1000_standalone_overview.png"), width = 600, height = 300)
 
 
+
+
+
 # lm
-
-
 
 p_ls_1000_lm_overview =  ggpairs(overview_ls[!is.na(ri)  & surrogate == "lm" ,.(n_leaves, ri, r2_train, mbt)],
                                          columns = 1:3,        # Columns
@@ -327,6 +328,41 @@ p_ls_1000_standalone_symmetrie = ggplot(performance_ls[surrogate == "standalone"
 
 ggexport(p_ls_1000_standalone_symmetrie, filename = paste0(save_dir, "ls_1000_standalone_symmetrie.png"), width = 800, height = 300)
 
+
+# create and plot two trees with different symmetry properties
+source("R/tree_splitting_slim.R")
+source("R/helper_general.R")
+source("R/load_packages.R")
+source("R/simulations/batchtools/simulation_setting_definition.R")
+
+# asymmetric tree
+set.seed(162)
+data_asym = create_sim_data(job = NULL, n = 1000, type = "linear_smooth")$data
+x_asym = data_asym[, colnames(data) != "y"]
+y_asym = data_asym$y
+
+slim_asym = compute_tree_slim(y_asym, x_asym, n.split = 6, min.split = 50)
+split_slim_asym = as.data.table(extract_split_criteria(slim_asym))
+impr_first_leafnodes_asym = split_slim_asym[3,.(impr.relative)]
+
+png(paste0(save_dir, "/tree_low_symmetry.png"), 1000, 600)
+plot_slim(slim_asym, vertex.size = 20, vertex.size2 = 20, asp = 0.7, 
+          include_coefficiants = "none", include_improvement = TRUE) 
+dev.off()
+
+
+# tree with higher symmetry
+set.seed(3)
+data_sym = create_sim_data(job = NULL, n = 1000, type = "linear_smooth")$data
+x_sym = data_sym[, colnames(data) != "y"]
+y_sym = data_sym$y
+
+slim_sym = compute_tree_slim(y_sym, x_sym, n.split = 6, min.split = 50)
+split_slim_sym = as.data.table(extract_split_criteria(slim_sym))
+png(paste0(save_dir, "/tree_high_symmetry.png"), 1000, 600)
+plot_slim(slim_sym, vertex.size = 20, vertex.size2 = 20, asp = 0.7, 
+          include_coefficiants = "none", include_improvement = TRUE) 
+dev.off()
 
 
 

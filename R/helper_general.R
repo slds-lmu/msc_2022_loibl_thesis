@@ -114,7 +114,7 @@ data_to_nodes = function(tree, newdata, nodes = "leafnode", degree.poly = 1){
 # Function to plot tree structure of a SLIM Tree
 # include_coefficiants options: "leafnodes", "all", "none"
 
-plot_slim = function(tree, include_coefficiants = "leafnodes", digits = 3,
+plot_slim = function(tree, include_coefficiants = "leafnodes", digits = 3, include_improvement = FALSE,
                      vertex.size = 40, vertex.size2 = 50, vertex.label.cex = 0.8,
                      edge.label.cex = 0.8,...){
   split = as.data.table(extract_split_criteria(tree))
@@ -125,7 +125,9 @@ plot_slim = function(tree, include_coefficiants = "leafnodes", digits = 3,
                          text = apply(str_split_fixed(str_trim(str_extract(split$child.type, "[^&]+$")), " ", 2), 
                                       1,
                                       function(rule){
-                                        paste0(rule, collapse = "\n")
+                                        splitpoint = str_split_fixed(rule[2], " ", 2)
+                                        splitpoint[2] = round(as.numeric(splitpoint[2]),4)
+                                        paste0(c(rule[1], splitpoint), collapse = "\n")
                                       })
                          )[-1,]
                            
@@ -161,13 +163,17 @@ plot_slim = function(tree, include_coefficiants = "leafnodes", digits = 3,
         }
         vertex.label[n] = paste0(vertex.label[n], coeffs_output)
       }
+    } 
+    if(include_improvement){
+      if(n > 1 & !is.na(split[n,impr.relative])){
+        vertex.label[n] = paste0(vertex.label[n],  "\n", "impr: ", round(split[n,impr.relative],3) )
+      }
     }
   }
 
   # match vertex ids with new labels
   names(vertex.label) = as.character(0:(length(vertex.label)-1))
   V(g)$label = vertex.label[V(g)$name]
-  
   
   
   plot(g, layout = layout_as_tree, 
