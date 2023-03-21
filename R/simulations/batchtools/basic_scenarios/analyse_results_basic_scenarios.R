@@ -1,3 +1,21 @@
+# reduce results basic scenarios
+# source("R/simulations/batchtools/reduce_results.R")
+# reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
+#                          ,conf.file = NA
+#                          )
+# 
+# ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
+# pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
+# 
+# # savedir_basic = "Data/simulations/batchtools/basic_scenarios/results/"
+# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_new/"
+# 
+# 
+# reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
+
+
+
+
 library(dplyr)
 library(REdaS)
 library(kableExtra)
@@ -226,16 +244,20 @@ ggexport(p_ls_1000_xgboost_sta, filename = paste0(save_dir, "ls_1000_standalone_
 
 
 
-
 # ---- Performance ----
 p_ls_1000_standalone = ggpairs(unique(overview_ls[ surrogate == "standalone",.(n_leaves, r2_train, r2_test, mbt, job.id, config_id)]),
-                               columns = 1:3,        # Columns
-                               aes(color = mbt,  # Color by group (cat. variable)
-                                   alpha = 0.9),
-                               columnLabels = c("n leaves", "R2 train", "R2 test")) +
-  theme_bw()
-  
-ggexport(p_ls_1000_standalone, filename = paste0(save_dir, "ls_1000_standalone_r2_nleaves.png"), width = 600, height = 300)
+                               columns = 1:2,        # Columns
+                               aes(color = mbt),
+                               upper = "blank",
+                               legend = c(1,1),
+                               columnLabels = c("n leaves", "R2 train")) +
+  theme_bw() +
+  theme(legend.position = "right")
+
+
+ 
+
+ggexport(p_ls_1000_standalone, filename = paste0(save_dir, "ls_1000_standalone_r2_nleaves.png"), width = 500, height = 250)
 
 
 

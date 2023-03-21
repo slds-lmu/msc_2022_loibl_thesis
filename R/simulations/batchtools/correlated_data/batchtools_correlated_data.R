@@ -41,9 +41,4 @@ addExperiments(
 
 summarizeExperiments()
 testJob(5)
-submitJobs(1:750,reg = reg)
-
-
-# pars = unwrap(getJobPars(reg = reg))
-
-# test = readRDS("Data/simulations/batchtools/correlated_data/batchtools/results/100.rds")
+submitJobs()

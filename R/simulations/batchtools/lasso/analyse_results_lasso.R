@@ -7,6 +7,22 @@ library(GGally)
 library(ggpubr)
 
 
+# Reduce results
+# source("R/simulations/batchtools/reduce_results.R")
+# reg_lasso = loadRegistry("Data/simulations/batchtools/lasso/batchtools/"
+#                          ,conf.file = NA)
+# 
+# ades_lasso = NULL
+# pdes_lasso = data.frame(n = c(3000), type = c("linear_smooth_lasso"))
+# 
+# savedir_lasso = "Data/simulations/batchtools/lasso/results/"
+# 
+# reduce_trees(ades_lasso, pdes_lasso, savedir_lasso, reg_lasso)
+# 
+
+
+
+# analyse results
 
 
 colors_mbt =c("SLIM" = 'purple', "SLIM LASSO" = "plum", "SLIM Lasso max df 2" = "pink3", "SLIM Lasso max df 3" = "plum4", "GUIDE" = 'olivedrab3', 
@@ -21,7 +37,7 @@ result_lasso_sd = result_lasso$sd
 setnames(result_lasso_sd, c("r2_train", "r2_test"), c("r2_train_sd", "r2_test_sd"))
 result_lasso_mean = cbind(result_lasso$mean, result_lasso_sd[,.(r2_train_sd, r2_test_sd)])
 
-
+result_lasso_mean[, share_x_wrong := 1- share_x1-share_x2-share_x3]
 
 
 result_lasso_mean[,.(surrogate, mbt, x_wrong, share_x3, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>%
@@ -189,4 +205,6 @@ p_lasso_lm_r2_test = ggplot(res_lasso[surrogate == "lm" & str_detect(mbt, "SLIM"
   labs(x="number of leafnodes", y="R2", fill = "MBT")
 
 ggexport(p_lasso_lm_r2_test, filename = paste0(save_dir, "lasso_lm_r2_test.png"), width = 800, height = 300)
+
+
 
