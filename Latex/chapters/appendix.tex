@@ -1,5 +1,5 @@
 \subsection{GUIDE replication}
-To validate the R implementation of GUIDE, the selection bias simulation example from \citep{Loh.2002} was replicated for independent features. For this, GUIDE was simulated both without bootstrap bias correction and with correction in 1000 repetitions. All settings were chosen to the best of my knowledge as described in the paper. In table \ref{tab:app_guide_selection_bias} the results from the paper are listed in the first two columns and in the following two columns the results from the replication. In the replication the features $x_1, x_2, x_2$ are also selected in the uncorrected version to a certain extent as splitting variables. However, the bias is notable. The effect of the bias correction can also be seen, although not as considerable as in the results from the paper. 
+To validate the R implementation of GUIDE, the selection bias simulation example from \citep{Loh.2002} was replicated for independent features. For this, GUIDE was simulated both without bootstrap bias correction and with correction in 1000 repetitions. All settings were chosen to the best of my knowledge as described in the paper. In Table \ref{tab:app_guide_selection_bias} the results from the paper are listed in the first two columns and in the following two columns the results from the replication. In the replication the features $x_1, x_2, x_2$ are also selected in the uncorrected version to a certain extent as splitting variables. However, the bias is notable. The effect of the bias correction can also be seen, although not as considerable as in the results from the paper. 
 
 \begin{table}[!htb]
 \centering
@@ -18,7 +18,7 @@ $\textbf{x}_5$ & 531 & 209 & 354 & 274\\
 \label{tab:app_guide_selection_bias}
 \end{table}
 
-\subsection{Selection Bias correction approach SLIM}
+\subsection{Selection Bias correction approach SLIM} \label{app:selection_bias_correction}
 
 By means of a simulation, I investigated how the number of quantiles (n.quantiles) used as potential splitpoints in SLIM affects the selection bias for numerical features. 
 The data is defined as follows:
@@ -30,7 +30,7 @@ The data is defined as follows:
 
 For each of the four simulation scenarios, SLIM trees are fitted  with  \\ n.quantiles $\in \{100, 75, 50, 25, 10, 2\}$ and one exact tree (each unique value as potential splitpoint) in each simulation run. The experiment is repeated 3000 times.
 
-In table \ref{tab:app_selection_bias_independence_grid} the frequency of the selected features and the resulting train and test mean MSE for the four different grid sizes and seven different values of n.quantiles is listed. There one can see that the selection bias in all the variations shown decreases with decreasing values of n.quantiles. However, if n.quantiles is chosen equal to the number of unique values of $\textbf{x}_3$ the selection bias does not seem to be completely eliminated. Only when n.quantiles is chosen smaller is selection bias no longer visible.
+In Table \ref{tab:app_selection_bias_independence_grid} the frequency of the selected features and the resulting train and test mean MSE for the four different grid sizes and seven different values of n.quantiles is listed. There one can see that the selection bias in all the variations shown decreases with decreasing values of n.quantiles. However, if n.quantiles is chosen equal to the number of unique values of $\textbf{x}_3$ the selection bias does not seem to be completely eliminated. Only when n.quantiles is chosen smaller is selection bias no longer visible.
 
 For the MSE, it can be observed that as the number of n.quantiles decreases, the $MSE_{train}$ increases and the $MSE_{test}$ decreases. 
 That $MSE_{train}$ increases with decreasing n.quantiles was to be expected and is due to the fact that if fewer quantiles are used as potential splitpoint set, the optimal splitpoint may not fall into this set. 
@@ -72,7 +72,7 @@ The values of $MSE_{test}$ are not very meaningful here, as there is no dependen
 \label{tab:app_selection_bias_independence_grid}
 \end{table}
 
-The scenarios independence numeric and independence mixed from chapter \ref{selection} were also simulated with varying values of n.quantiles. The results are listed in table \ref{tab:app_selection_bias_independence}. 
+The scenarios independence numeric and independence mixed from chapter \ref{selection} were also simulated with varying values of n.quantiles. The results are listed in Table \ref{tab:app_selection_bias_independence}. 
 In the case of scenario independence numeric, the approach seems to be successful. However, here again, only with n.quantiles = 2 selection bias is no longer visible. In the independence mixed scenario, the frequencies also change, but with no value of n.quantiles  an approximately unbiased result is found. If n.quantiles is chosen too small, the bias turns in the other direction (i.e. categorical variables are preferably used for the first split). Within the numerical variables ($\textbf{x}_1 ,... \textbf{x}_3$) the balance seems to succeed. The binary variety $\textbf{x}_4$ is not chosen sufficiently often in any variant. For the MSE, the results correspond to those of the previous simulation.
 
 
@@ -105,7 +105,7 @@ mixed & $MSE_{test}$ & 1.0515 & 1.0498 & 1.0493 & 1.0486 & 1.0475 & 1.0450 & 1.0
 \end{table}
 
 
-In order to investigate whether the correction approach, which seems to work at least for numerical variables, also leads to unbiased variable selection in the presence of interactions, the numerical vs numerical scenario from chapter \ref{selection_bias_interactions} is simulated for different values of n.quantiles. The results are listed in table \ref{tab:app_selection_bias_interaction}. 
+In order to investigate whether the correction approach, which seems to work at least for numerical variables, also leads to unbiased variable selection in the presence of interactions, the numerical vs numerical scenario from chapter \ref{selection_bias_interactions} is simulated for different values of n.quantiles. The results are listed in Table \ref{tab:app_selection_bias_interaction}. 
 
 $x_3$ only takes on 11 different values in this scenario. In the independence case, it would therefore be expected that the selection bias decreases with a decreasing number of quantiles and is no longer recognisable at least for n.quantiles = 2. Here, however, a different picture emerges. If all possible splitpoints are included, the variable $\textbf{x}_1$ with more possible splitpoints is preferred, as expected. With decreasing values of n.quantiles the relationship changes, but no direct linear relationship can be seen. Rather, the selection bias reverses at n.quantiles $= 100$ and then increases sharply and decreases again somewhat at lower values. However, the bias seems to be smallest when all possible split points are used for the exhaustive search. 
 
@@ -138,10 +138,10 @@ $MSE_{test}$ & 0.0391 & 0.0393 & 0.0393 & 0.0393 & 0.0392 & 0.0392 & 0.0404\\
 
 \clearpage
 \subsection{Simulation results}
-\subsubsection{Basic scenarios}
+\subsubsection{Basic scenarios}\label{app:basic_scenarios}
 
 \paragraph{xgboost configurations}
-In table \ref{tab:app_xgboost_config} the xgboost hyperparameter settings, which were used for the simulation of the basic scenarios are listed.
+In Table \ref{tab:app_xgboost_config} the xgboost hyperparameter settings, which were used for the simulation of the basic scenarios are listed.
 \begin{table}[!htb]
     \centering
     \begin{tabular}{l|r|r|r}
@@ -161,7 +161,26 @@ In table \ref{tab:app_xgboost_config} the xgboost hyperparameter settings, which
 
 
 \paragraph{Simulation Results}
-In the following tables and figures the mean simulation results of the basic scenarios, which are not included in chapte \ref{simulation} are shown.
+The Figures \ref{fig:app_tree_low_symmetry} and \ref{fig:app_tree_high_symmetry} each show an example of a SLIM tree with high and low symmetry on the scenario linear smooth with each 8 leafnodes. The value impr is the potential relative improvement of the objective through the best split for this node in relation to the improvement in the parent node. In the tree \ref{fig:app_tree_high_symmetry}, the required improvement of $10 \%$ in node 2 is just missed, which is why this node is not split further.
+\begin{figure}[!htb]
+    \centering    
+    \includegraphics[width = 16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/tree_high_symmetry.png}  
+    \caption{SLIM tree with (relativly) high symmetry on scenario linear smooth}
+    \label{fig:app_tree_high_symmetry}
+\end{figure}
+
+\begin{figure}[!htb]
+    \includegraphics[width = 16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/tree_low_symmetry.png}
+    \caption{SLIM tree with low symmetry on scenario linear smooth}
+    \label{fig:app_tree_low_symmetry}
+\end{figure}
+
+
+
+
+\clearpage
+
+In the following tables and figures the mean simulation results of the basic scenarios, which are not included in chapter \ref{simulation} are shown.
 \begin{table}[!htb]
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
@@ -522,7 +541,7 @@ xgboost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
 \subsubsection{Correlated features}
 
 \subsubsection{Linear smooth with noise features}
-Figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone_r2_test_slim} show the the $R^2$ test accuracy in scenario linear smooth with noise features. Figure \ref{fig:app_lasso_standalone_r2_test_slim} shows that in this scenario assymmetric trees (i.e. trees with a maximum leafsize $> 700$) lead to poorer performance in SLIM and GUIDE.
+Figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone_r2_test_slim} show the the $R^2$ test accuracy in scenario linear smooth with noise features. Figure \ref{fig:app_lasso_standalone_r2_test_slim} shows that in this scenario asymmetric trees (i.e. trees with a maximum leafsize $> 700$) lead to poorer performance in SLIM and GUIDE.
 
 
 \begin{figure}[!htb]
@@ -540,7 +559,76 @@ Figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone
 \label{fig:app_lasso_standalone_r2_test_slim}
 \end{figure} 
 
-\subsubsection{Nonlinear mixed}
+\subsubsection{Nonlinear}
+
+\paragraph{xgboost configurations}
+In Table \ref{tab:app_xgboost_config_nonlinear} the xgboost hyperparameter setting for simulation nonlinear is shown.
+\begin{table}[!htb]
+    \centering
+    \begin{tabular}{l|r}
+    \hline
+    & nonlinear  \\
+    \hline
+    max\_depth & 4 \\
+    eta & 0.825 \\
+    alpha & 0.75 \\
+    gamma & 1 \\
+    nrounds & 700 \\
+    \hline
+    \end{tabular}
+    \caption{xgboost hyperparameters for scenario nonlinear after hyperparametertuning}
+    \label{tab:app_xgboost_config_nonlinear}
+\end{table}
+
+
+\begin{table}[!htb]
+
+\centering \tiny
+\begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
+\hline
+black box & model & n leaves & n l min & n l max & n split feat & n sf min & n sf max & \% main effect & df & sd df\\
+\hline
+standalone & basic lm & 43.06 & 36 & 48 & 5.68 & 4 & 6 & 0.5089 & 6.5804 & 0.1249\\
+standalone & penalized poly & 19.32 & 16 & 22 & 4.26 & 3 & 5 & 0.2374 & 8.8768 & 0.3681\\
+standalone & bsplines & 18.38 & 13 & 22 & 4.26 & 3 & 6 & 0.0126 & & \\
+standalone & gam & 17.60 & 12 & 22 & 3.44 & 2 & 4 & 0.0007 & & \\
+\hline
+xgboost & basic lm & 30.38 & 2 & 47 & 4.56 & 1 & 6 & 0.6732 & 6.8519 & 0.1558\\
+xgboost & penalized poly & 20.66 & 16 & 24 & 4.70 & 3 & 6 & 0.2327 & 9.2909 & 0.4347\\
+xgboost & bsplines & 17.38 & 2 & 25 & 4.70 & 1 & 6 & 0.0597 & &\\
+xgboost & gam & 15.28 & 2 & 24 & 4.00 & 1 & 6 & 0.0191 & &\\
+\hline
+\end{tabular}
+\label{tab:app_nonlinear_interpretability}
+\caption{mean interpretability simulation results nonlinear scenario 2}
+
+\end{table}
+
+
+\begin{table}[!htb] 
+
+\centering \tiny
+\begin{tabular}[t]{l|l|r|r|r|r|r}
+\hline
+black box & model & $R^2_{train}$  & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & time in sec\\
+\hline
+standalone & basic lm & 0.9633 & 0.0035 & 0.9469 & 0.0048 & 102.2842\\
+standalone & penalized poly & 0.9824 & 0.0015 & 0.9781 & 0.0020 & 195.4385\\
+standalone & bsplines & 0.9929 & 0.0013 & 0.9714 & 0.0029 & 113.2447\\
+standalone & gam & 0.9880 & 0.0016 & 0.9835 & 0.0017 & 1544.3393\\
+\hline
+xgboost & basic lm & 0.9198 & 0.0516 & 0.9030 & 0.0417 & 72.3790\\
+xgboost & penalized poly & 0.9750 & 0.0033 & 0.9634 & 0.0051 & 206.5870\\
+xgboost & bsplines & 0.9865 & 0.0141 & 0.9591 & 0.0092 & 97.9321\\
+xgboost & gam & 0.9786 & 0.0127 & 0.9672 & 0.0115 & 1728.6021\\
+\hline
+xgboost & xgboost & 0.9392 & 0.0342 & 0.9216 & 0.0405 & 3.0131\\
+\hline
+\end{tabular}
+\label{tab:app_nonlinear_performance}
+\caption{mean performance simulation results nonlinear scenario 2}
+
+\end{table}
 
 
 
@@ -554,6 +642,13 @@ Figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone
      \caption{SLIM tree with linear models as standalone model for BPV in data set K2204}
      \label{fig:app_ins_slim_lm_standalone_tree}
  \end{figure}
+
+ \begin{figure}[!htb]
+    \centering
+    \includegraphics[width = 8cm]{Figures/insurance_use_case/k2204_BPV/hist_age.png}
+    \caption{Frequency of observations with respect to feature age}
+    \label{fig:app_ins_k2204_hist_age}
+\end{figure}
 
 
 
@@ -607,7 +702,7 @@ Figure \ref{fig:ins_k2204_ppv_fit} plots the prediction of the baseline B-spline
     \label{fig:ins_k2204_ppv_fit}
 \end{figure}
 
-The fidelity results for all B-spline surrogates are listed in table \ref{tab:ins_k2204_ppv_bsplines_surrogates_perf} .
+The fidelity results for all B-spline surrogates are listed in Table \ref{tab:ins_k2204_ppv_bsplines_surrogates_perf} .
 
 \begin{table}
 
