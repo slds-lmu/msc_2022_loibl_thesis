@@ -1,5 +1,7 @@
+In the following, MBTs are introduced and the different algorithms are presented.
+
 \subsection{Model and Notation}
-Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((y, \mathbf{x}), \theta)$ be a parametric model, that describes the target $y \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x} = (\mathbf{x_1}, ... \mathbf{x_p})^T \in \mathcal{X}$  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, the notation $y^{bb}$ is used. Given $n$ observations $(y, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((y, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
+Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((y, \mathbf{x}), \theta)$ be a parametric model, that describes the target $y \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x}\in \mathcal{X}$ with $p$ features $\mathbf{x_1}, ... \mathbf{x_p} $  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, the notation $y^{bb}$ is used. Given $n$ observations $(y, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((y, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
 \begin{align}
     \hat{\mathbf{\theta}} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta).
 \end{align}
@@ -15,8 +17,8 @@ and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with correspond
 
 
 \subsection{Model-based Trees}
-In this chapter, four algorithms are described that aim to find a partition that is close to the optimal one and the associated estimators for $\theta_b$ through binary recursive partitioning. All approachs use a greedy forward search to optimize the objective function $\Psi$ locally in each step \citep{Zeileis.2008}.  
-The resulting global models are called Model-based Trees (MBT).
+In this chapter, four algorithms are described that aim to find a partition that is close to the optimal one and the associated estimators for $\theta_b$ through binary recursive partitioning. All approaches use a greedy forward search to optimize the objective function $\Psi$ locally in each step \citep{Zeileis.2008}.  
+The resulting global models are called Model-based trees .
 
 
 
@@ -29,7 +31,7 @@ A recursive partitioning algorithm for MBTs can generally be divided into the fo
 \end{enumerate}
 
 
-The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in step 3. This can lead to the phenomenon that, even if the strength of all feature effects (or in our case interaction effects) are the same, fetaures with many possible split points are more often chosen as split variables than fetaures with few possible split points. This phenomenon is called selection bias and is explained in more detail in \ref{selection} and examined for the algorithms considered here.
+The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in step 3. This can lead to the phenomenon that, even if the strength of all feature effects (or in our case interaction effects) are the same, fetaures with many possible split points are more often chosen as split variables than fetaures with few possible split points. This phenomenon is called selection bias and is explained in more detail in chapter \ref{selection} and examined for the four MBT algorithms.
 MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of comparing the objective for all possible split points and variables, step 3 of the recursive partitioning algorithm is split into 2 steps:
 
 \begin{enumerate}
@@ -42,33 +44,33 @@ MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of
 
 
 \subsubsection{SLIM}
-SLIM by \citep{Hu.2020} is explicitly designed to create surrogate MBTs that contain main effect models in the leafnodes and are split by interactions. 
+SLIM by \citet{Hu.2020} is explicitly designed to create surrogate MBTs that contain main effect models in the leafnodes and are split by interactions. 
 
 After fitting the model to all observations in step 2 the  objective function is calculated, e.g. the sum of squared errors (SSE).
 In step 3 SLIM performs an exhaustive search to find the optimal splitpoint.  
 The optimization problem in each recursion step includes the optimization of the objective of the left node and the right node and is given by \begin{align} \label{align:mob_opitimization}
-    \min_{j \in 1,..., p} \left( \min_{s \in \mathcal{S}_j} \left(\min_{\theta_{l} \in \Theta}\sum_{i \in I_{l}(s)}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{l})  +  \min_{\theta_{r} \in \Theta}\sum_{i \in I_{r}(s)}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{r}) \right) \right),
+    \min_{j \in 1,..., p} \left( \min_{s \in \mathcal{S}_j} \left(\min_{\theta_{l} \in \Theta}\sum_{i \in I_{l}^s}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{l})  +  \min_{\theta_{r} \in \Theta}\sum_{i \in I_{r}^s}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta_{r}) \right) \right),
 \end{align}
-where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $\mathbf{x}_j$. For numeric variables, this set consists either of all unique values of $\mathbf{x}_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, the left node $I_{l}$ is defined as the set of indices $i \in 1,...,n$ for which $x_j^{(i)} \leq s$ holds and the right node $I_{r}$ is its complement. For categorical variables, all possibilities of dividing the levels of $\mathbf{x}_j$ into two disjoint sets are considered as potential split sets $S_j$. $I_l$ is  the set of all indices for which $x_j^{(i)} \in s$ applies and and $I_{r}$ is its complement.
+where ${S}_j$ is the set of all possible split points $s$ (or split sets) regarding variable $\mathbf{x}_j$. For numeric variables, this set consists either of all unique values of $\mathbf{x}_j$ or, in order to reduce the calculation effort, of sample quantiles (e.g. 100 quantiles). For a specific split point $s$, the left node $I_{l}$ is defined as the set of indices $i \in 1,...,n$ for which $x_j^{(i)} \leq s$ holds and the right node $I_{r}$ is its complement. For categorical variables, all possibilities of dividing the levels of $\mathbf{x}_j$ into two disjoint sets are considered as potential split sets $S_j$. $I_l^s$ is  the set of all indices for which $x_j^{(i)} \in s$ applies and and $I_{r}^s$ is its complement.
 
-The variable $\mathbf{x}_j$ and split point $s$ which minimize  (\ref{align:mob_opitimization}) are selected as splitting variable and split point, if this leads to a large enough improvement of the objective function.
+The feature $\mathbf{x}_j$ and split point $s$ which minimize  (\ref{align:mob_opitimization}) are selected as splitting variable and split point, if this leads to a large enough improvement of the objective function.
 
-Since the computational effort for estimating all possible child models becomes very large as the number of possible partitioning variables increases, \citep{Hu.2020} have developed an efficient algorithm for estimating them for the case of linear regression, linear regression with bspline transformed features and ridge regression. A detailed description of this algorithm can be found in \citep{Hu.2020}.
+Since the computational effort for estimating all possible child models becomes very large as the number of possible partitioning variables increases, \citet{Hu.2020} have developed an efficient algorithm for estimating them for the case of linear regression, linear regression with bspline transformed features and ridge regression. A detailed description of this algorithm can be found in \citet{Hu.2020}.
 
 To avoid overfitting and to obtain a small interpretable tree, the use of pruning is necessary. \citet{Hu.2020} use the approach of backpruning, i.e. a deep tree is first fitted and then leaves that do not fulfil certain criteria are pruned back. 
-In order to keep the computational effort as low as possible, prepruning is used in this thesis. Specifically, this means that a split is only performed if the improvement of the objective through the split is at least $impr \in [0,1]$ times the improvement of the objective in the parent node. In addition, it is possible to set a value for $R^2$ (defined in chapter \ref{simulation}) above which splitting in a node will not continue.
+In order to keep the computational effort as low as possible, prepruning is used in this thesis. This means that a split is only performed if the improvement of the objective through the split is at least $impr \in [0,1]$ times the improvement of the objective in the parent node. In addition, it is possible to set a value for $R^2$ (defined in chapter \ref{simulation}) above which splitting in a node will not continue.
 
 
 
 
 \subsubsection{MOB}
-MOB generally distinguishes between regressor variables $\mathbf{x}$, which are only used to fit the models in the nodes, and pure partitioning variables $\mathbf{z}$. In \citep{Zeileis.2008}, however, an overlapping of roles is explicitly not excluded. 
+MOB generally distinguishes between regressor variables $\mathbf{x_j}$, which are only used to fit the models in the nodes, and pure partitioning variables $\mathbf{z_j}$. In \citep{Zeileis.2008}, however, an overlapping of roles is explicitly not excluded. 
 In this thesis, the roles should not be defined in advance, but all features should be able to enter the MBT both as main-effect and in the splits as interactions.
 In this way, the application of MOB in this thesis differs from other application examples as in \citet{Seibold.2016} or \citet{Thomas.2018}. 
 
 
 
-After an initial model has been fitted in step 2, MOB examines whether the corresponding parameter estimates $\hat{\theta}_b$ are stable. If there is some overall instability, the variable whose parameter estimate has the most significant instability is chosen as splitting variable.
+After an initial model has been fitted in step 2, MOB examines whether the corresponding parameter estimates $\hat{\theta}_b$ are stable. If there is some overall instability, the feature whose parameter estimate has the most significant instability is chosen as splitting variable.
 
 To investigate this, the so called score $\psi$ function is considered, which is defined as the
 gradient of the objective function regarding the parameter vector $\theta_b$ - provided that it exists:
@@ -79,8 +81,6 @@ gradient of the objective function regarding the parameter vector $\theta_b$ - p
 
 \citep{Zeileis.2008}
 
-
-In contrast to the definition in \citet{Zeileis.2008}, $\textbf{z} = \textbf{x}$ was set in (\ref{align:W_j}) as no distinction is made between regressor and partitioning variables.
 If the scores - ordered by the potential split variable - do not fluctuate randomly around zero, this indicates that there is parameter instability which could potentially be captured by splitting the data using this variable as partitioning variable \citep{Schlosser.2019}.
 To test the null hypothesis of parameter stability with the so called M-fluctuation test, MOB captures systematic deviations from zero through the empirical fluctuation process
 
@@ -88,26 +88,24 @@ To test the null hypothesis of parameter stability with the so called M-fluctuat
     W_{j}(t) = \hat{J}^{-1/2}n^{-1/2}\sum_{i = 1}^{\lfloor nt \rfloor} \hat{\psi}_{\sigma(x_{j}^{(i)})} \hspace{0.5cm} (0 \leq t \leq 1), 
 \end{align}
 
-where $\hat{\psi}_{\sigma(x_{j}^{(i)})}$ are the scores ordered by $\mathbf{x}_{j}$ and $\hat{J}$ is an estimate of the covariance matrix $cov(\psi(Y, \hat{\theta}))$. \citep{Zeileis.2008}
+where $\hat{\psi}_{\sigma(x_{j}^{(i)})}$ are the scores ordered by $\mathbf{x}_{j}$ and $\hat{J}$ is an estimate of the covariance matrix $cov(\psi(Y, \hat{\theta}))$. \citep{Zeileis.2008} In contrast to the definition in \citet{Zeileis.2008}, $\textbf{z} = \textbf{x}$ was set in (\ref{align:W_j}) as no distinction is made between regressor and partitioning variables.
 
 
 
 
 According to \citet{Zeileis.2008} and \citet{Zeileis.2007}, under the null hypothesis of parameter stability the empirical fluctuation process $W_j(t)$ converges to a Brownian Bridge $W_0$. By applying a scalar test function to the empirical fluctuation process and the Brownian Bridge, a test statistic and the theoretical limiting distribution can be derived. An overview of possible scalar functions that can be used for this purpose can be found in \citep{Zeileis.2008} and in more detail in \citep{Zeileis.2007}.
 The variable for which the M-fluctuation test detects the most significant parameter instability is used as splitting variable. 
-
 The choice of the optimal split point with respect to this variable is then made by means of an exhaustive search, analogous to SLIM.
+As prepruning criterion, MOB uses the Bonferroni-adjusted p-value of the M-flucutation test. That means a split is only performed if the instability is significant at a given significance level $alpha$.
 
-As a prepruning criterion, MOB uses the Bonferroni-adjusted p-value of the M-flucutation test. That means a split is only performed if the instability is significant at a given significance level $alpha$.
 
-
-A limitation of MOB is that only objective functions can be selected for which the gradient regarding $\theta_b$  exists. This means, for example, that it is not possible to fit LASSO models in the nodes.
+A limitation of MOB is that only objective functions can be selected for which the gradient regarding $\theta_b$  exists. This means, for example, that it is not possible to fit lasso models in the nodes.
 
 
 
 
 \subsubsection{CTree}
-CTree was originally developed as a non-parametric regression tree (i.e. constant fits in the leaf) but can also be used for MBTs.
+CTree was originally developed as a non-parametric regression tree (i.e. for constant fits in the nodes) but can also be used for MBTs.
 CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependency between potential splitting variables and a transformation $h()$ of the response $y$.
 A common transformation used in MBTs is the score function, i.e. $h(y) = \psi$, but other transformation of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
 
@@ -134,9 +132,9 @@ Unlike the other methods, the split point is not selected by an exhaustive searc
 GUIDE \citep{Loh.2002} uses residual-based categorical association tests to detect instabilities. For this purpose, $\chi^2$- independence tests between the dichotomized residuals of the fitted model and the categorized covariates are performed and the p-values of these so-called curvature tests are calculated. In addition to the curvature tests, GUIDE explicitly searches for interactions.  Again, $\chi^2$- independence tests are performed. Instead of categorizing only one variable, a new categorical variable is created by combining covariates for the interaction test. If the smallest p-value comes from a curvature test, the corresponding covariate is chosen as the partitioning variable. If the smallest p-value is from an interaction test, the categorical variable involved, if any, is preferably chosen as the splitting variable. If both potential variables are categorical, the variable for which the p-value of the curvature test is smaller is chosen. In the case of two numerical variables, the choice is made by evaluating the potential child models after splitting with respect to both variables.
 Subsequently, a bootstrap selection bias correction is performed.
 In the original GUIDE algorithm developed by \citep{Loh.2002}, numerical variables can be used both as regressor variables and as splitting variables. Categorical variables, on the other hand, can only take on the role of splitting variables. This is justified by the fact that a disproportionately large number of degrees of freedom are consumed in the parameter estimation of categorical variables.
-In the following simulations, both a GUIDE implementation in which categorical variables can only serve as splitting variables and a variant in which categorical variables can also take on both roles are considered. 
+In the following simulations, unless explicitly stated otherwise, the variant is used in which all features can fulfil both roles. 
 
-One advantage of GUIDE is that the score function does not have to exist. This makes the choice of objective very flexible and allows, for example, to fit LASSO regression models  in the nodes.
+One advantage of GUIDE is that the score function does not have to exist. This makes the choice of objective very flexible and allows, for example, to fit lasso regression models  in the nodes.
 
 
 
@@ -145,7 +143,7 @@ One advantage of GUIDE is that the score function does not have to exist. This m
 
 No implementation of SLIM was found, which is why an implementation in R  \citep{RCoreTeam.2022} was carried out as part of this work. The code from the package $\mathtt{customtrees}$ from \citet{Casalicchio.2020} and from \citet{Herbinger.2022} was used as basis. The source code for the SLIM implementation and the applications in this thesis can be found at \url{https://github.com/slds-lmu/msc_2022_loibl_thesis}. 
 
-The software implementation of GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}. The binary executable is available under \url{https://pages.stat.wisc.edu/~loh/guide.html}.  Unfortunately, the source code is not accessible and the method cannot be easily adapted to other objectives, although this would be theoretically possible. For this reason, I have incorporated the residual based $\chi^2$- independence tests for finding the best split variable as an option of the SLIM implementation in R  in this work. Bootstrap bias correction was also adopted. To the best of my knowledge, I followed the original paper \citep{Loh.2002}. However, the results differ somewhat from the results in the paper, as can be seen in the appendix in figure \ref{}. 
+The software implementation of GUIDE falls in the category "Algorithms with a closed-source, free-of-charge implementation" \citep{Loh.2014}. The binary executable is available under \url{https://pages.stat.wisc.edu/~loh/guide.html}.  Unfortunately, the source code is not accessible and the method cannot be easily adapted to other objectives, although this would be theoretically possible. For this reason, I have incorporated the residual based $\chi^2$- independence tests for finding the best split variable as an option of the SLIM implementation in R  in this work. Bootstrap bias correction was also adopted. To the best of my knowledge, I followed the original paper \citep{Loh.2002}. However, the results differ from the results in the paper, as can be seen in the appendix in Table \ref{tab:app_guide_selection_bias}. 
 Whenever GUIDE is discussed in the following, it refers to my implementation. 
 
 MOB and CTree are implemented in the R package $\mathtt{partykit}$ \citep{Hothorn.2015} in the functions $\mathtt{mob()}$ \citep{Zeileis.2008} and $\mathtt{ctree()}$ \citep{Hothorn.2006}

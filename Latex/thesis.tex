@@ -20,6 +20,7 @@ bindingoffset = 0mm]{geometry}
 \newcommand{\changefont}{%
     \fontsize{8}{11}\selectfont
 }
+\usepackage[onehalfspacing]{setspace}
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{enumitem}
@@ -96,12 +97,7 @@ Supervised by \mysupervisor
 
 \begin{abstract}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis 
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
-culpa qui officia deserunt mollit anim id est laborum.
+Surrogate models allow complex but powerful black box machine learning models to be interpreted retrospectively. In this work, the following requirements are placed on a surrogate model: It should divide the feature space in subregions where interpretable models that only include main effects can approximate the black box model. In this way, both good interpretability and high performance should be achieved. For the generation of such models, four different algorithms for the generation of model-based trees are compared: SLIM, GUIDE, MOB and CTree. Selection bias, performance, interpretability and stability of the different methods are investigated. In the presence of subgroup-specific main effects, SLIM and GUIDE convince with their results regarding interpretability and performance.
 
 \end{abstract}
 
@@ -135,12 +131,12 @@ culpa qui officia deserunt mollit anim id est laborum.
 \input{Latex/chapters/3_Background}
 \newpage
 
-\section{Selection Bias}
+\section{Selection bias and splitting strategies}
 \label{selection}
 \input{Latex/chapters/4_Selection_Bias}
 \newpage
 
-\section{Simulation study}
+\section{Comparison of performance, interpretability and stability}
 \label{simulation}
 \input{Latex/chapters/5_Simulation}
 \newpage

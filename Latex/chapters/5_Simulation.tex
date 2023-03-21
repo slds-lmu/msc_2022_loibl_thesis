@@ -1,4 +1,4 @@
-Since it was shown in the previous chapter that selection bias is a problem for all MBTs and therefore the so-called unbiased methods should not be generally preferred to SLIM, the algorithms are compared on the basis of other properties.
+Since it was shown in the previous chapter that selection bias is a problem for all MBTs and therefore the so-called unbiased methods should not be generally preferred to SLIM, the algorithms are compared on the basis of other important properties.
 Desirable properties of an MBT are high performance, good interpretability and stability.
 In this chapter, simulation scenarios and their results are described with which an empirical comparison of these properties for the different MBT algorithms can be made.
 In addition, a comparison of the performance and interpretability of SLIM MBTs is made when objectives of different complexity are used for modelling.
@@ -36,7 +36,7 @@ A well-known weakness of recursive partitioning algorithms is that the resulting
 Depending on whether differences between two decision trees mean different predictions for the same observations or different structural properties of a tree, such as the number of leaf nodes, we speak of semantic or structural instability \citep{Wang.2018}. 
 Since we are looking for MBTs that are easy to interpret, it is not enough to look at semantic stability. It would be desirable for an MBT that has been fitted twice on slightly different training data to partition the feature space in the same way. To compare two trees that have the same number of leafnodes, an additional data set (evaluation data) is used that is clustered according to the decision rules found for the training data. The subregions of an MBT are defined as the clustering of the evaluation data set according to the decision rules learned by fitting the MBT to a training data set. 
 If the clustering of the evaluation data is identical for both MBTs, the interpretation of the decision rules is also identical, even if the order of split features in the two MBTs is reversed and the rules therefore appear different at first glance.
-In order to measure the similarity of subregions found by MBTs trained on slightly different data we use the Rand index (RI) \citep{Rand.1971}. The RI defines the similarity of two clusterings $\mathcal{A}, \mathcal{B}$ of $n$ observations each by the proportion of  the number of observation pairs that were either assigned to the same partition in both clusterings ($n_{11}$) or to different partitions in both clusterings ($n_{00}$) measured against the total number of observation pairs. 
+In order to measure the similarity of subregions found by MBTs trained on slightly different data the Rand index (RI) \citep{Rand.1971} is used. The RI defines the similarity of two clusterings $\mathcal{A}, \mathcal{B}$ of $n$ observations each by the proportion of  the number of observation pairs that were either assigned to the same partition in both clusterings ($n_{11}$) or to different partitions in both clusterings ($n_{00}$) measured against the total number of observation pairs. 
 \begin{align}
     RI(\mathcal{A}, \mathcal{B}) = \frac{n_{11} + n_{00}}{\binom{n}{2}}
 \end{align}
@@ -45,7 +45,8 @@ In order to measure the similarity of subregions found by MBTs trained on slight
 The higher the RI for a pair of trees with the same number of leaf nodes, the more similar the subregions defined by these trees and the more stable the MBT algorithm is in a concrete simulation scenario. 
 
 
-Besides the similarity of subregions with the same number of leafnodes, we use the variability of the number of leafnodes as a measure of stability. The more the number of leaf nodes fluctuates in for an MBT algorithm, the more unstable we consider it to be.
+Besides the similarity of subregions with the same number of leafnodes, the variability of the number of leafnodes is used as a measure of stability. The more the number of leaf nodes fluctuates between different simulation runs for an MBT algorithm, the more unstable it is considered 
+ to be.
 
 According to \citep{Hu.2020}, the stability problem with SLIM is less if it is used as a surrogate and not as stand-alone model on the original data. However, this is not shown in the paper. Therefore, this claim is empirically investigated here for all MBT Algorithms presented by comparing the stability of MBTs on the original data with the stability of MBTs used as surrogate models.
 
@@ -57,52 +58,13 @@ According to \citep{Hu.2020}, the stability problem with SLIM is less if it is u
 Three simple scenarios that differ mainly in the type of interaction(s) they contain (smooth interaction vs subgroup depending effects) are used for the evaluation. Based on these scenarios the different MBT algorithms are compared with respect to performance, interpretability and stability.
 
 
-\subsubsection{Scenarios}
-The data generating processes of the basic scenarios are defined as follows:
-
-
-\paragraph{Linear smooth}
-Numerical features with linear effects on y and smooth interactions
-\begin{itemize}
-    \item $\textbf{x}_1,..., \textbf{x}_{3} \sim U(-1,1)$
-    \item $ f_{ls}(\textbf{x}) = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3 $
-    \item $\epsilon \sim N(0, 0.1 \cdot sd(f_{ls}(\textbf{x}))$
-    \item $y = f_{ls}(\textbf{x}) + \epsilon$
-\end{itemize}             
-
-
-\paragraph{Linear categorical}
-Numerical and binary features with linear effects and subgroup specific linear effects
-\begin{itemize}
-    \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3 \sim Bern(0.5)$,  
-    \item $ f_{la}(x) =  \textbf{x}_{1} - 8  \textbf{x}_2 + 16  \textbf{x}_2  \mathbf{I}_{\textbf{x}_3 = 0} + 8  \textbf{x}_2  \mathbf{I}_{\textbf{x}_1 > mean(\textbf{x}_1)} $
-    \item $\epsilon \sim N(0, 0.1 \cdot sd(f_{la}(\textbf{x}))$
-    \item $y = f_{la}(\textbf{x}) + \epsilon$          
-\end{itemize}
-
-
-
-The scenario is based on a simulation example in \citep{Herbinger.2022}.
-
-\paragraph{Linear mixed}
-Numerical and binary features with linear effects, subgroup dependent and smooth two- and three-way interactions
-\begin{itemize}
-    \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3, \textbf{x}_4 \sim Bern(0.5)$
-    \item $f_{lm}(\textbf{c}) = 4   \textbf{x}_2 + 2   \textbf{x}_4  + 4   \textbf{x}_2   \textbf{x}_1 + 8   \textbf{x}_2   \mathbf{I}_{\textbf{x}_3 = 0} +  8 \textbf{x}_1   \textbf{x}_2 \mathbf{I}_{\textbf{x}_4 = 1}$
-    \item $\epsilon \sim N(0, 0.1 \cdot sd(f_{lm}(x))$
-    \item $y = f_{lm}(\textbf{x}) + \epsilon$
-\end{itemize}
-
-Note that the number of possible split points for all characteristics in the scenario is linearly smooth identically. Selection bias is therefore not a problem here.
-In the other two scenarios, however, a discrimination of the binary features could occur in SLIM. Whether such a disadvantage actually occurs or would only be present in the independence case is discussed on basis of the results.
-
 
 \subsubsection{Simulation Setting}
-Since the number of leafnodes and the performance strongly depend on the prepruning value for $impr$ for SLIM and GUIDE and $alpha$ for MOB and CTree, the simulations are carried out for different values of these parameters. In addition, two different sample sizes $n$ are chosen. 
-All MBT algorithms are fitted as standalone models on the original data and as surrogate models on a correctly specified linear model or GAM and on an xgboost model with correctly specified interactions. The configurations of the xgboost models are listed in the appendix in table \ref{tab:app_xgboost_config}.
+Since the number of leafnodes and the performance strongly depend on the prepruning value of $impr$ for SLIM and GUIDE and $alpha$ for MOB and CTree, the simulations are carried out for different values of these parameters for all three scenarios. In addition, two different sample sizes $n$ are chosen. 
+All MBT algorithms are fitted as standalone models on the original data and as surrogate models on a correctly specified linear model or GAM and on an xgboost model with correctly specified interactions. The configurations of the xgboost models are listed in the appendix in Table \ref{tab:app_xgboost_config}.
 Table \ref{tab:simulation_setting} lists all varied factors and their levels. In total, there are $3 \times 2 \times 3 \times 3 = 54$ variants for each of the 4 MBT algorithms.
-Settings that are fixed in all variants are maximum tree depth of $6$ and a minimum node size of $50$.
-The experiment is repeated $N = 100$ times.
+Settings that are fixed in all variants are a  maximum tree depth of $6$ and a minimum node size of $50$.
+The experiments are repeated $100$ times.
 
 \begin{table}[!htb] 
 \centering \small
@@ -121,7 +83,7 @@ Usage of MBT  & standalone, surrogate for lm, surrogate for xgboost \\
 \end{table}
 
 Performance and Interaction measures are calculated in each simulation run.  
-The RIs are calculated following the simulation based on pairwise comparisons of clusterings of an evaluation dataset. The simulation setup is as follows
+The RIs are calculated following the simulation based on pairwise comparisons of clusterings of an evaluation data set. The simulation setup is as follows:
 
 \begin{enumerate}
     \item simulate evaluation data ($50000$ observations) from the data generating process
@@ -133,7 +95,7 @@ The RIs are calculated following the simulation based on pairwise comparisons of
     \end{enumerate}
     \item for each of the ($100(100-1)/2 = 4950$ MBT pairs
     \begin{enumerate}
-        \item sample 1000 observation ids from the evaluation datasat
+        \item sample 1000 observation ids from the evaluation data sets
         \item if both trees have the same number of leaf nodes, calculate the $RI$ for the two clusterings of the evaluation data subset
     \end{enumerate}
 \end{enumerate}
@@ -143,18 +105,27 @@ The RIs are calculated following the simulation based on pairwise comparisons of
 The most important findings from the simulations of the basic scenarios are:
 \begin{itemize}
     \item SLIM and GUIDE perform better on subgroup detection tasks (Scenario linear categorical and linear mixed) in terms of better performance and interpretability than MOB and CTree. CTree is the weakest in this task.
-    \item MOB and CTree produce more stable trees in scenarios with smooth interactions (Linear smooth and linear mixed). This is probably mainly due to the different pruning techniques. There is room for improvement here with SLIM and GUIDE.
-    \item The statement that stability increases when MBTs are used as surrogate models is confirmed in most results. An exception is the scenario linear categorical with a GAM as black box model, which does not model the subgroups well enough. As a result, SLIM and GUIDE can no longer recognise them so well and the stability decreases considerably.
+    \item MOB and CTree produce more stable trees in scenarios with smooth interactions (Linear smooth and linear mixed). This is probably mainly due to the different pruning techniques. There is need for improvement with SLIM and GUIDE.
+    \item The statement that stability increases when MBTs are used as surrogate models is confirmed in most results. An exception is the scenario linear categorical with a GAM as black box model, which does not model the subgroups well enough. As a result, SLIM and GUIDE can no longer detect them so well and the stability decreases considerably.
     \item A fundamental problem is that smooth interactions can often only be modelled well by a large number of binary splits, which makes MBTs difficult to interpret on such data. In such cases, MBTs are probably not the best choice for a surrogate model and other models such as GA2M \citep{Lou.2013} should be considered.
 
 \end{itemize}
 
+In the following, the basic simulation scenarios and a part of the detailed  results are presented and discussed. Additional results can be found in the appendix \ref{app:basic_scenarios}.
+\subsubsection{Linear smooth} 
 
-\subsubsection{Detailed Results}
-In the following, parts of the detailed simulation results are presented and discussed. Additional results can be found in the appendix.
+\paragraph{Simulation scenario}
+The data generating processes of the basic scenarios linear smooth is defined as follows:
 
-\paragraph{Linear Smooth}
-For a comparison of the different MBT algorithms as standalone model on the scenario linear smooth the aggregated results are listed in table \ref{tab:linear_smooth_summary} for sample size $n = 1500$. 
+\begin{itemize}
+    \item $\textbf{x}_1,..., \textbf{x}_{3} \sim U(-1,1)$
+    \item $ f(\textbf{x}) = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3 $
+    \item $\epsilon \sim N(0, 0.1 \cdot sd(f(\textbf{x}))$
+    \item $y = f(\textbf{x}) + \epsilon$
+\end{itemize}    
+
+\paragraph{Results}
+For a comparison of the different MBT algorithms as standalone model on the scenario linear smooth the aggregated results are listed in Table \ref{tab:linear_smooth_summary} for sample size $n = 1500$. 
 
 \begin{table}[!htb] 
 \centering \tiny
@@ -182,7 +153,7 @@ lm & & & & & 0.9902 & 0.0006 & 0.9901 & 0.0008\\
 xgboost & & & & & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 \hline
 \end{tabular}
-\caption{Mean simulation results on 100 simulation runs as stand alone models on scenario \textbf{linear smooth} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
+\caption{Mean simulation results on 100 simulation runs as standalone models on scenario \textbf{linear smooth} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \label{tab:linear_smooth_summary}
 \end{table}
 
@@ -194,13 +165,13 @@ At $impr = 0.1$ and $alpha = 0.001$, all four models have a similar mean number 
 
 \begin{figure}[!htb] 
 \centering
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_nleaves.png}
-    \caption{Pairwise plot of the number of leaf nodes vs the accuracy measures $R^2$ train and $R^2$ test scenario \textbf{linear smooth} with $n=1500, alpha = 0.001, impr = 0.1$}
+    \includegraphics[width=12cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_r2_nleaves.png}
+    \caption{Pairwise plot of the number of leaf nodes vs the accuracy measures $R^2$ train scenario \textbf{linear smooth} with $n=1500, alpha = 0.001, impr = 0.1$}
     \label{fig:ls_1000_standalone_r2_nleaves}
 \end{figure} 
 
 
-In figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that, as expected, the performance accuracy increases with increasing number of leafnodes for all models. Noticeable, however, are the two different performance levels of SLIM and GUIDE for trees with $7$ to $9$ leafnodes. This is due to the fact that trees with different symmetry properties were generated by SLIM and GUIDE in this range. While in the MBTs with higher performance the distribution of the observations on the different leafnodes is approximately equal, in the group with lower performance one leaf node each was generated with almost half of the observations and the remaining half is distributed on the remaining leafnodes. This is shown in more detail in the appendix \textbf{appendix einfügen}. There one can also see that the strongly assymmetric trees with one leaf node each with the large number of observations have only just fallen short of the prepruning criterion $impr$ in this node. The choice of the parameter $impr$ therefore also has a decisive influence on the resulting tree at this point.
+In Figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that, as expected, the performance accuracy increases with increasing number of leafnodes for all models. Noticeable, however, are the two different performance levels of SLIM and GUIDE for trees with $7$ to $9$ leafnodes. This is due to the fact that trees with different symmetry properties were generated by SLIM and GUIDE in this range. While in the MBTs with higher performance the distribution of the observations on the different leafnodes is approximately equal, in the group with lower performance one leaf node each was generated with almost half of the observations and the remaining half is distributed on the remaining leafnodes. Examples for trees with different symmetry properties are shown in the Figures \ref{fig:app_tree_high_symmetry} and \ref{fig:app_tree_low_symmetry} in  the appendix. There one can also see that the shown strongly assymmetric tree has only just fallen short of the prepruning criterion $impr$ in the big node. The choice of the parameter $impr$ therefore has a decisive influence on the resulting tree at this point.
 
 
 
@@ -214,11 +185,12 @@ In figure \ref{fig:ls_1000_standalone_r2_nleaves} it can be seen that, as expect
 \end{figure} 
 
 Figure \ref{fig:ls_1000_standalone_r2_test} shows the accuracy depending on the number of leaf nodes for the four different MBTs.
-The numbers below each box indicate how many of the $100$ trees created with each of the four algorithms have the respective number of leafnodes. For example, 8 of the 100 SLIM trees have 10 leafnodes and the corresponding box was created from these 10 results. Note that the numbers do not add up to a hundred, as there is also a small number of trees with leafnodes outside the range shown here. The results of SLIM and GUIDE are divided into two groups for 8 and 9 leafnodes for this plot. Trees with low symmetry are here defined as trees in which the largest leafnode contains at least 350 observations. The results between the two groups differ greatly, as already recognised in figure \ref{fig:ls_1000_standalone_r2_nleaves}.
-The figure shows that accuracy is very high in all four MBT. Over the range shown, MOB and CTree (from number of leaves = 9) have slightly higher performance than SLIM and GUIDE with the same number of leaf nodes, i.e. MOB and CTree achieve a better trade-off between performance and interpretability in this scenario as standalone model.
+The numbers below each box indicate how many of the $100$ trees created with each of the four algorithms have the respective number of leafnodes. For example, 8 of the 100 SLIM trees have 10 leafnodes and the corresponding box was created from these 10 results. Note that the numbers do not add up to a hundred, as there is also a small number of trees with leafnodes outside the range shown here. The results of SLIM and GUIDE are divided into two groups for 8 and 9 leafnodes for this plot. Trees with low symmetry are here defined as trees in which the largest leafnode contains at least 350 observations. The results between the two groups differ greatly, as already recognised in Figure \ref{fig:ls_1000_standalone_r2_nleaves}.
+Figure shows that accuracy is very high in all four MBT. Over the range shown, MOB and CTree (from number of leaves = 9) have slightly higher performance than SLIM and GUIDE with the same number of leaf nodes, i.e. MOB and CTree achieve a better trade-off between performance and interpretability in this scenario as standalone model.
 As can be seen in Figure \ref{fig:app_ls_1000_standalone_symmetrie} in the appendix, SLIM and GUIDE have a higher average maximum leafsize (lower symmetrie) over the entire comparable range of leafnodes than MOB and GUIDE, which could be a reason for the slightly worse performance.
-However, when the models are used as surrogate models on lm predictions, the performance of the different MBTs with the same number of leafnodes is very close (see appendix Figures \ref{fig:app_ls_1000_lm_r2_test}, \ref{fig:app_ls_1000_xgboost_r2_test})
+However, when the models are used as surrogate models on lm predictions, the performance of the different MBTs with the same number of leafnodes is very close (see appendix Figures \ref{fig:app_ls_1000_lm_r2_test}, \ref{fig:app_ls_1000_xgboost_r2_test}).
 Overall, it should  be noted that the number of leafnodes required to achieve a similar performance as the correctly specified linear model is very high, considering that it is actually a very simple data generating process. This is because the smooth interaction can only be well approximated through many binary splits. 
+As in this scenario the number of possible split points is identically for all features, selection bias is not a problem.
 
 
 
@@ -228,12 +200,12 @@ Overall, it should  be noted that the number of leafnodes required to achieve a 
 \begin{figure}[!htb] 
 \centering
     \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_int.png}
-    \label{fig:ls_1000_int}
     \caption{Number of leafnodes linear smooth}
+    \label{fig:ls_1000_int}
 \end{figure} 
 
 
-As can be seen in figure \ref{fig:ls_1000_standalone_r2_nleaves}, the number of leaf nodes fluctuates considerably more with SLIM and GUIDE than with MOB and CTree. 
+As can be seen in Figure \ref{fig:ls_1000_standalone_r2_nleaves}, the number of leaf nodes fluctuates considerably more for SLIM and GUIDE than for MOB and CTree. 
 Figure \ref{fig:ls_1000_int} shows that this is also the case when the MBTs are used as surrogate models. 
 
 
@@ -241,21 +213,34 @@ Figure \ref{fig:ls_1000_int} shows that this is also the case when the MBTs are 
 \centering
     \centering
     \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_sta.png}
-    \label{fig:ls_1000_standalone_sta}
     \caption{Rand Indices for scenario \textbf{linear smooth}}
-
+    \label{fig:ls_1000_standalone_sta}
 \end{figure}
 
-This observation is already a sign of lower stability of SLIM and GUIDE compared to MOB and CTree. Moreover, in figure \ref{fig:ls_1000_standalone_sta} the rand indices of the different algorithms are plotted for tree pairs with identical number of leafnodes. There one can see that even with identical numbers of leafnodes, MOB and CTree generate more stable trees.
+This observation is already a sign of lower stability of SLIM and GUIDE compared to MOB and CTree. Moreover, in Figure \ref{fig:ls_1000_standalone_sta} the rand indices of the different algorithms are plotted for tree pairs with identical number of leafnodes. The numbers below the boxes in this plot indicate the number of tree pairs (from 4950 pairs total), in which both trees have the according number of leafnodes. 
+
+There one can see that even with identical numbers of leafnodes, MOB and CTree seem to generate more stable trees.
 
 
 
 
 
 
+\subsubsection{Linear categorical} 
 
-\paragraph{Linear Categorical} 
-In the linear categorical scenario, the data-generating process is not determined by a smooth interaction, but can be fully described by main effect models in four subgroups.
+\paragraph{Simulation scenario}
+Numerical and binary features with linear effects and subgroup specific linear effects:
+\begin{itemize}
+    \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3 \sim Bern(0.5)$,  
+    \item $ f(x) =  \textbf{x}_{1} - 8  \textbf{x}_2 + 16  \textbf{x}_2  \mathbf{I}_{\textbf{x}_3 = 0} + 8  \textbf{x}_2  \mathbf{I}_{\textbf{x}_1 > mean(\textbf{x}_1)} $
+    \item $\epsilon \sim N(0, 0.1 \cdot sd(f(\textbf{x}))$
+    \item $y = f(\textbf{x}) + \epsilon$          
+\end{itemize}
+
+The scenario is based on a simulation example in \citep{Herbinger.2022}.
+
+\paragraph{Results}
+In this scenario, the data-generating process is not determined by a smooth interaction, but can be fully described by main effect models in four subgroups.
 This would require a split at the empirical mean of  feature $\textbf{x}_1$ and a split with respect to the binary variable $\textbf{x}_3$. 
 SLIM and GUIDE differ greatly from MOB and CTree in their ability to find these splits, which can be seen in Table \ref{tab:linear_abrupt_summary}. 
 The column share $\textbf{x}_2$ indicates what proportion of all split observations were split on average with respect to the variable $\textbf{x}_2$.
@@ -306,9 +291,10 @@ In contrast to the scenario linear smooth, the variation in the number of leafno
 \begin{figure}[!htb]
 \centering
     \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_abrupt/la_1000_standalone_r2_test.png}
-    \label{fig:la_1000_standalone_r2_test}
     \caption{Test accuracy $R^2$ vs number of leaf nodes scenario     
 \textbf{linear categorical} with $n=1500, alpha = 0.001, impr = 0.05$}
+    \label{fig:la_1000_standalone_r2_test}
+
 \end{figure} 
 
 Figure \ref{fig:la_1000_standalone_r2_test} shows the performance by number of leafnodes for impr = 0.05 and alpha = 0.001. There one can see again that SLIM and GUIDE achieve a very high $R^2$ despite the low number of leafnodes. 
@@ -318,13 +304,25 @@ This could be because, according to \citep{Schlosser.2019}, the M-fluctuation te
 
 
 
-If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases, as can be seen in table \ref{tab:app_linear_abrupt_1000} in the appendix. This indicates that the interactions with the GAM were not fitted well enough, despite a  $R^2_{test} = 0.97$ see table \ref{tab:linear_abrupt_summary}). The statement that SLIM is more stable when used as a surrogate model than when used as a standalone model \citep{Hu.2020} is therefore not true in this case.
+If SLIM and GUIDE are fitted as surrogate models on the predictions of a GAM (linear main effects, interaction by means of tensorproduct interaction), the number of leafnodes increases and the variability also increases, as can be seen in Table \ref{tab:app_linear_abrupt_1000} in the appendix. This indicates that the interactions with the GAM were not fitted well enough, despite a  $R^2_{test} = 0.97$ see Table \ref{tab:linear_abrupt_summary}). The statement that SLIM is more stable when used as a surrogate model than when used as a standalone model \citep{Hu.2020} is therefore not true in this case.
 Nevertheless, the mean performance of SLIM and GUIDE is better than that of the other MBTs, as can be seen in Table \ref{tab:app_linear_abrupt_1000} in the appendix.
 
 
 
 
-\paragraph{Linear Mixed}
+\subsubsection{Linear mixed}
+\paragraph{Simulation scenario}
+Numerical and binary features with linear effects, subgroup dependent and smooth two- and three-way interactions:
+\begin{itemize}
+    \item $\textbf{x}_1, \textbf{x}_2 \sim U(-1,1)$, $\textbf{x}_3, \textbf{x}_4 \sim Bern(0.5)$
+    \item $f(\textbf{c}) = 4   \textbf{x}_2 + 2   \textbf{x}_4  + 4   \textbf{x}_2   \textbf{x}_1 + 8   \textbf{x}_2   \mathbf{I}_{\textbf{x}_3 = 0} +  8 \textbf{x}_1   \textbf{x}_2 \mathbf{I}_{\textbf{x}_4 = 1}$
+    \item $\epsilon \sim N(0, 0.1 \cdot sd(f(x))$
+    \item $y = f(\textbf{x}) + \epsilon$
+\end{itemize}
+
+
+\paragraph{Results}
+
 \begin{table}[!htb]
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
@@ -364,27 +362,29 @@ lm & & & & & 0.9902 & 0.0006 & 0.9898 & 0.0008 &\\
 \end{table}
 
 The scenario linear mixed contains both smooth interactions that can only be handled by splits with respect to the numerical variables $\textbf{x}_1$ and $\textbf{x}_2$, and subgroups defined by the binary variables $\textbf{x}_3$ and $\textbf{x}_4$. 
-The average proportion of splits carried out with respect to the two numerical variables is shown in table \ref{tab:linear_mixed_summary}.
+The average proportion of splits carried out with respect to the two numerical variables is shown in Table \ref{tab:linear_mixed_summary}.
 For $alpha = 0.001$ and $impr = 0.05$ the mean number of leaf nodes is similar for all four MBT algorithms. The table shows that the average performance of SLIM and GUIDE for this setting is higher than that of the other two MBTs and at the same time the mean proportion of splits with respect to the numerical variable is lower.  This means that SLIM and GUIDE use the binary variables more often to reveal the subgroups defined by them, while MOB and even more pronounced CTree split almost exclusively along the numerical features and thus perform worse despite having the same mean number of leafnodes. 
 
 In this example, SLIM and GUIDE achieve a better trade-off between performance and interpretability than MOB and CTree.
-In the figures \ref{fig:lm_1000_standalone_r2_test}  and \ref{fig:lm_1000_standalone_share_x3x4} this is broken down in more detail.
+In Figure \ref{fig:lm_1000_standalone_r2_test}  and Figure \ref{fig:lm_1000_standalone_share_x3x4} this is broken down in more detail.
 
 
 \begin{figure}[!htb]
 \centering
     \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_r2_test.png}
-    \label{fig:lm_1000_standalone_r2_test}
     \caption{Test accuracy $R^2$ vs number of leaf nodes scenario
 \textbf{linear mixed} with $n=1500, alpha = 0.001, impr = 0.05$}
+    \label{fig:lm_1000_standalone_r2_test}
+
 \end{figure} 
 
 
 \begin{figure}[!htb]
 \centering
     \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_share_x3x4.png}
-    \label{fig:lm_1000_standalone_share_x3x4}
     \caption{Share of splitted observations by features $\textbf{x}_3, \textbf{x}_4$ vs number of leaf nodes scenario linear mixed with $n=1500, alpha = 0.001, impr = 0.05$}
+    \label{fig:lm_1000_standalone_share_x3x4}
+
 \end{figure} 
 
 
@@ -392,11 +392,11 @@ In the figures \ref{fig:lm_1000_standalone_r2_test}  and \ref{fig:lm_1000_standa
 
 \begin{figure}[!htb]
     \includegraphics[width=16cm]{Figures/simulations/batchtools/basic_scenarios/linear_mixed/lm_1000_standalone_lm_sta.png}
-    \label{fig:lm_1000_standalone_lm_sta}
     \caption{Rand Indices for scenario linear mixed}
+    \label{fig:lm_1000_standalone_lm_sta}
 \end{figure}
 
-For the comparison of stability one can look at figure \ref{fig:lm_1000_standalone_lm_sta}. On the one hand, it can be seen that MOB and CTree seem to be somewhat more stable than SLIM and GUIDE with the same number of leafnodes, but the difference is not great. Furthermore, it can be seen that in most cases the stability of trees with the same number of leafnodes is higher when they are used as surrogates than when they are used as standalone models. Here, the assertion of \citep{Hu.2020} that SLIM is more stable when used as a surrogate is true and also applies to the other algorithms.
+For the comparison of stability one can look at Figure \ref{fig:lm_1000_standalone_lm_sta}. On the one hand, it can be seen that MOB and CTree seem to be somewhat more stable than SLIM and GUIDE with the same number of leafnodes, but the difference is not great. Furthermore, it can be seen that in most cases the stability of trees with the same number of leafnodes is higher when they are used as surrogates than when they are used as standalone models. Here, the assertion of \citep{Hu.2020} that SLIM is more stable when used as a surrogate is true and also applies to the other algorithms.
 
 
 \newpage
@@ -404,16 +404,16 @@ For the comparison of stability one can look at figure \ref{fig:lm_1000_standalo
 While in the basic scenarios the features were independent of each other, this scenario examines how a correlations between features influence the MBTs. For this purpose, the "linear smooth" scenario is modified so that there is a correlation between $x_1$ and $x_3$.
 \begin{itemize}
     \item $\textbf{x}_1,..., \textbf{x}_3 \sim U(-1,1), Corr(\textbf{x}_1, \textbf{x}_3) = \rho_{13} \in {0.1, 0.5, 0.9}$
-    \item $ f_{ls}(\textbf{x}) = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3 $
-    \item $\epsilon \sim N(0, 0.1 sd(f_{ls}(x))$
-    \item $y = f_{ls}(\textbf{x}) + \epsilon$
+    \item $ f(\textbf{x}) = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3 $
+    \item $\epsilon \sim N(0, 0.1 sd(f(x))$
+    \item $y = f(\textbf{x}) + \epsilon$
 \end{itemize}
 
               
 It is to be examined whether the modification causes the feature $\textbf{x}_1$ to be incorrectly selected as a splitting variable.
 
 
-For the simulation, the MBTs are fitted on a dataset with sample size $ n = 1500$ ($1000$ training, $500$ test observations) using the pruning parameter settings $alpha = 0.001$ and $impr = 0.01$. The parameters were chosen so that the average number of leafnodes is similar for the different MBTs. The trees are fitted both as standalone models on the original data and as surrogate models on correctly specified linear models. The simulation is repeated $250$ times.
+For the simulation, the MBTs are fitted on a data set with sample size $ n = 1500$ ($1000$ training, $500$ test observations) using the pruning parameter settings $alpha = 0.001$ and $impr = 0.01$. The parameters were chosen so that the average number of leafnodes is similar for the different MBTs. The trees are fitted both as standalone models on the original data and as surrogate models on correctly specified linear models. The simulation is repeated $250$ times.
 
 
 \begin{table}[!htb]
@@ -467,7 +467,7 @@ lm & CTree & 0.9 & 0.000 & 15.144 & 14 & 17 & 0.9995 & 0.0001 & 0.9994 & 0.0001\
 Table \ref{tab:linear_smooth_correlated_summary} shows the average performance and the number of leaf nodes of MBTs  as well as the frequency of trees freq where $\textbf{x}_1$ is wrongly chosen as the splitting variable.
 If the MBTs are used as standalone, SLIM and GUIDE choose feature $\textbf{x}_1$ as splitting variable already at a very low correlation of 0.1 in some cases. As the correlation increases, this frequency increases. MOB and CTree, on the other hand, only use the variables actually involved in the interaction for the splits at $\rho \in \{0.1, 0.5\}$, but at a very high correlation $rho = 0.9$ they also include $x_1$ for the split in a small number of cases. 
 Since the use of ridge regression for correlated features is becoming more common, SLIM was also fitted with ridge regression models in the nodes. The choice of the penalization parameter is made in each recursion step by minimising the BIC. Instead of the SSE, the penalised SSE is used as objective function. However, this does not result in any systematic improvement. 
-If the MBTs are used as surrogates for the lm predictions instead of standalone models, there are hardly any false splits in this scenario. So it seems that the problem of correlated features is reduced when the models are used as surrogates.
+If the MBTs are used as surrogates for the linear regression predictions instead of standalone models, there are hardly any false splits in this scenario. So it seems that the problem of correlated features is reduced when the models are used as surrogates.
 
 
 \subsection{Linear smooth with noise features}
@@ -476,13 +476,14 @@ In addition to the usual models, SLIM models were fitted with lasso regression m
 
 \begin{itemize}
     \item $\textbf{x}_1,..., \textbf{x}_{10} \sim U(-1,1)$
-    \item $ f_{ls}(\textbf{x}) = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3 $
-    \item $\epsilon \sim N(0, 0.1 \cdot sd(f_{ls}(x))$
-    \item $y = f_{ls}(\textbf{x}) + \epsilon$
+    \item $ f(\textbf{x}) = \textbf{x}_1 + 4   \textbf{x}_2 + 3   \textbf{x}_2   \textbf{x}_3 $
+    \item $\epsilon \sim N(0, 0.1 \cdot sd(f(x))$
+    \item $y = f(\textbf{x}) + \epsilon$
 \end{itemize}
 
-This examines whether the noise variables are incorrectly used as splitting variables.
+
 As in the previous scenario the MBTs are fitted as standalone models and surrogates on lm predictions on a dataset with sample size $ n = 3000$ ($2000$ training, $1000$ test observations) using the pruning parameter settings $alpha = 0.001$ and $impr = 0.1$. The simulation is repeated $250$ times.
+The aim of the simulation is to investigate whether the noise variables are incorrectly chosen as splitting variables.
 
 \begin{table}[!htb]
 \centering \tiny
@@ -511,32 +512,32 @@ lm & MOB & 0.000 & 0.5073 & 15.960 & 15 & 16 & 0.9995 & 0.0000 & 0.9993 & 0.0001
 lm & CTree & 0.000 & 0.5003 & 15.564 & 13 & 16 & 0.9994 & 0.0001 & 0.9992 & 0.0001\\
 \hline
 \end{tabular}
-\label{tab:linear_smooth_noisy_summary}
 \caption{Mean simulation results as stand alone model and as surrogate on lm predictions on scenario Linear smooth with noise features}
+\label{tab:linear_smooth_noisy_summary}
 \end{table}
 
-Table \ref{tab:linear_smooth_noisy_summary} shows the mean simulation results. freq $ \textbf{x}_{wrong}$ is the proportion of trees in which at least one of the noise variables was used as a splitting variable. 
-As in the correlated data scenario, wrong variables are only used as splitting variables for the specified settings if the MBTs are used as standalone models. However, MOB and CTree do not select false variables even then. For the SLIM MBTs it can be seen that freq $\textbf{x}_{wrong}$ decreases with a strong penalty (df = 2 and df = 3). GUIDE, on the other hand, has the most problems with the noise variables and the highest value for freq $x_{wrong}$.
+Table \ref{tab:linear_smooth_noisy_summary} shows the mean simulation results. freq $ \textbf{x}_{noise}$ is the proportion of trees in which at least one of the noise variables was used as a splitting variable. 
+As in the correlated data scenario, wrong variables are only used as splitting variables for the specified settings if the MBTs are used as standalone models. However, MOB and CTree do not select false variables even then. For the SLIM MBTs it can be seen that freq $\textbf{x}_{noise}$ decreases with a strong penalty (df = 2 and df = 3). GUIDE, on the other hand, has the most problems with the noise variables and the highest value for freq $x_{noise}$.
 An interesting effect of using a lasso model with a maximum of 2 effective degrees of freedom is that for the splitting almost exclusively variable $\textbf{x}_3$ is used, although otherwise $\textbf{x}_2$ and $\textbf{x}_3$ are mostly chosen similarly often. This could be because $\textbf{x}_3$ does not have a main effect on the response, but $\textbf{x}_2$ and $\textbf{x}_1$ do.  Due to the strong penalisation, only these two features are used for modelling in the leafs. Since $\textbf{x}_3$ is not included in the modelling, it is instead more often used as a splitting variable.
 The interpretability of this MBT is thus increased on the one hand by the very sparse models in the leaf nodes and on the other hand by the fact that the splits are almost only carried out with respect to $\textbf{x}_3$, which is easier to keep track of than if the feature space is split with respect to several different variables.
-The average number of leafnodes for SLIM with lasso df 2 is smaller than for the standard SLIM MBT, which is why the performance cannot be directly compared.  However, it can be seen that the training performance of SLIM with lasso df 2 is further below that of the standard SLIM than the test performance. This means that with the strong penalisation, the overfitting can also be reduced.
-In the appendix in the figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone_r2_test_slim} there is a more detailed presentation of the individual results. It is particularly noticeable that, as with the basic scenario linear smooth, all SLIM MBTs and GUIDE generate some strongly asymmetrical trees, which then have a considerable poorer performance.
+The average number of leafnodes for SLIM with lasso df 2 is smaller than for the standard SLIM MBT, which is why the performance cannot be directly compared. However, it can be seen that the training performance of SLIM with lasso df 2 is further below that of the standard SLIM than the test performance. This indicates that with the strong penalisation, overfitting can also be reduced.
+In the appendix in figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone_r2_test_slim} there is a more detailed presentation of the individual results. It is particularly noticeable that, as with the basic scenario linear smooth, all SLIM MBTs and GUIDE generate some strongly asymmetrical trees, which then have a considerable poorer performance.
 
 
 
 
 \subsection{Non-linear Effects}
-While the main goal so far has been to compare the different MBT algorithms on simple scenarios with linear maineffects, the following scenario will investigate how the choice of different objective functions affects the interpretability and performance of SLIM MBTs when non-linear maineffects enter the data generating process. 
-As it is very flexible in the selection of the objective, only the SLIM algorithm is used.
+While the main goal so far has been to compare the different MBT algorithms on simple scenarios with linear main effects, the following scenario will investigate how the choice of different objective functions affects the interpretability and performance of SLIM MBTs when non-linear main effects are included in the data generating process. 
+As it is very flexible in the selection of the objective, only the SLIM algorithm is used. The data is defined as follows:
 
 \begin{itemize}
     \item $\textbf{x}_1, ..., \textbf{x}_5 \sim U(-1,1)$, $\textbf{x}_6 \sim Bern(0.5)$, 
-    \item $ f_{nl}(\textbf{x}) = \textbf{x}_1 + 2 \textbf{x}_2^2 + \textbf{x}_3log(abs(\textbf{x}_3)) + \textbf{x}_4\textbf{x}_5 + \textbf{x}_1\textbf{x}_4\mathbf{I}_{\textbf{x}_6 = 0}$
-    \item $\epsilon \sim N(0,  0.1 \cdot sd(f_{nl}(x))$
-    \item $y = f_{nl}(\textbf{x}) + \epsilon$     
+    \item $ f(\textbf{x}) = \textbf{x}_1 + 2 \textbf{x}_2^2 + \textbf{x}_3log(abs(\textbf{x}_3)) + \textbf{x}_4\textbf{x}_5 + \textbf{x}_1\textbf{x}_4\mathbf{I}_{\textbf{x}_6 = 0}$
+    \item $\epsilon \sim N(0,  0.1 \cdot sd(f(x))$
+    \item $y = f(\textbf{x}) + \epsilon$     
 \end{itemize}
 
-SLIM is fitted here with four different objectives.
+SLIM is fitted on the data with four different objectives.
 \begin{enumerate}
     \item linear regression model (lm)
     \item polynomial regression of degree $2$ with lasso penalization (penalized poly)
@@ -545,32 +546,31 @@ SLIM is fitted here with four different objectives.
 \end{enumerate}
 
 
-Since the models in the leafnodes are of different complexity for different objectives, it is not sufficient in this case to use only the number of leafnodes as a measure of interpretability. In addition, the following criteria are considered:
+Since the models in the leafnodes are of different complexity for the different objectives, it is not sufficient in this case to use only the number of leafnodes as a measure of interpretability. In addition, the following criteria are considered:
 \begin{itemize}
     \item effective degrees of freedoms of the leaf node models (lm and penalized poly), as sparse models are easier to interpret
     \item proportion of observation splits where the split is actually due to an interaction rather than an incompletely modelled main effect
     \item interpretable weights versus merely visually interpretability
 \end{itemize}
 
-In order to enable a comparison of the interpretability, the $R^2$ is used for prepruning in this scenario in addition to the prepruning by means of minimum loss reduction. As soon as the $R^2$ exceeds a certain value in a node, it is no longer split. 
+In order to enable a comparison of the interpretability, the $R^2$ is used for prepruning in this scenario in addition to the prepruning with $impr$. As soon as the $R^2$ exceeds a certain value in a node, it is no longer split. 
 
-Three different settings were simulated
+Trees with two different prepruning settings were trained on the data
 \begin{table}[!htt]
     \centering
     \begin{tabular}{l|r|r}
         \hline
-        scenario  &  impr & $R^2$ \\
+        setting  &  impr & $R^2$ \\
         \hline
-        scenario 1 & 0.05 & 0.9 \\
-        scenario 2 & 0.05 & 0.95 \\
-        scenario 3 & 0.10 & 1  \\
+        setting 1 & 0.05 & 0.9 \\
+        setting 2 & 0.10 & 1  \\
         \hline
 
     \end{tabular}
-    \caption{simulation setting nonlinear}
+    \caption{Prepruning setting nonlinear}
 \end{table}
 
-For all three scenarios a sample size of 3000 is used and the simulation is repeated 50 times. The MBTs are fitted both as standalone models and as surrogate models on predictions of an xgboost model.
+The simulated data contains 3000 observations (2000 train/ 1000 test). The SLIM MBTs are fitted both as standalone models and as surrogate models on predictions of an xgboost model. The hyperparameter of the xgboost model are listed in the appendix in Table \ref{tab:app_xgboost_config_nonlinear}.
 
 
 \begin{table}[!htb]
@@ -596,21 +596,23 @@ xgboost & gam & 1.90 & 1 & 4 & 0.88 & 0 & 2 & 0.0000 &  & \\
 
 \end{table}
 
-Table \ref{tab:linear_mixed_1_interpretability} lists the mean results regarding the interpretability of the different MBTs for scenario 1, in which the prepruning in a node already applies at an $R^2$ of 0.9. For SLIM with linear regression models in the nodes, this results in very large trees which can hardly be used for interpretation purposes.
-In addition, in average $45\%$ ($61\%$ if used as surrogate) of all split observations were not split with respect to an interaction, but with respect to an insufficiently modelled maineffect. Moreover, in some simulation runs all features are used as splitting variables, which further increases the lack of interpretability.
+Table \ref{tab:linear_mixed_1_interpretability} lists the mean results regarding the interpretability of the different SLIM trees for setting 1, in which the prepruning in a node already applies at an $R^2$ of 0.9. For SLIM with linear regression models in the nodes, this results in large trees which can hardly be used for interpretation purposes.
+In addition, in average $45\%$ ($61\%$ if used as surrogate) of all split observations were not split with respect to an interaction, but with respect to an insufficiently modelled main effect. Moreover, in some simulation runs all features are used as splitting variables, which further increases the lack of interpretability.
 The fact that the models in the leaf nodes are very simple can hardly compensate for this. 
 
 SLIM in conjunction with penalised polynomial regression in the nodes, on the other hand, achieves comparable performance with far fewer splits.
 There are also considerable fewer different features used for splitting, but the proportion of observations where the splits were performed with respect to a main effect variable is still high, albeit better than with SLIM lm.
 
-Both SLIM with linear bspline transformed variables and GAMs require on average only two leafnodes, i.e. one split, to achieve an $R^2$ of $0.9$. The models in the leafnodes can only be interpreted visually, but since the number of models is very small, the degree of interpretability is comparatively high. Moreover, these models actually only split by interactions, as the non-linear main effects are already modelled sufficiently well. If it is not explicitly required that the model weights are directly interpretable and it should also be ensured that they are actually split according to interactions, models with splines are the best choice in this case. GAMs are preferable to unpenalised bsplines in terms of their generalisation error, but the computational effort is much higher.
+Both SLIM with linear bspline transformed variables and GAMs require on average only two leafnodes, i.e. one split, to achieve an $R^2$ of $0.9$. The models in the leafnodes can only be interpreted visually, but since the number of models is very small, the degree of interpretability is comparatively high. Moreover, these models actually only split by interactions, as the non-linear main effects are already modelled sufficiently well. 
+
+If it is not explicitly required that the model weights are directly interpretable and it should also be ensured that they are actually split according to interactions, models with splines are the best choice in this case. GAMs are preferable to unpenalised bsplines in terms of their generalisation error, but the computational effort is much higher.
 
 
 
 
 \begin{table}[!htb]
 
-\centering \tiny
+\centering 
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline
 black box & MBT & R2 train & R2 train sd & R2 test & R2 test sd & time\\
@@ -635,54 +637,11 @@ xgboost & xgboost & 0.9386 & 0.0295 & 0.9199 & 0.0362 & 3.1163\\
 
 
 
-\begin{table}[!htb]
-
-\centering \tiny
-\begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
-\hline
-black box & model & n leaves & n l min & n l max & n split feat & n sf min & n sf max & \% main effect & df & sd df\\
-\hline
-standalone & basic lm & 43.06 & 36 & 48 & 5.68 & 4 & 6 & 0.5089 & 6.5804 & 0.1249\\
-standalone & penalized poly & 19.32 & 16 & 22 & 4.26 & 3 & 5 & 0.2374 & 8.8768 & 0.3681\\
-standalone & bsplines & 18.38 & 13 & 22 & 4.26 & 3 & 6 & 0.0126 & & \\
-standalone & gam & 17.60 & 12 & 22 & 3.44 & 2 & 4 & 0.0007 & & \\
-\hline
-xgboost & basic lm & 30.38 & 2 & 47 & 4.56 & 1 & 6 & 0.6732 & 6.8519 & 0.1558\\
-xgboost & penalized poly & 20.66 & 16 & 24 & 4.70 & 3 & 6 & 0.2327 & 9.2909 & 0.4347\\
-xgboost & bsplines & 17.38 & 2 & 25 & 4.70 & 1 & 6 & 0.0597 & &\\
-xgboost & gam & 15.28 & 2 & 24 & 4.00 & 1 & 6 & 0.0191 & &\\
-\hline
-\end{tabular}
-\caption{mean interpretability simulation results nonlinear scenario 3}
-
-\end{table}
 
 
-\begin{table}[!htb] 
-
-\centering \tiny
-\begin{tabular}[t]{l|l|r|r|r|r|r}
-\hline
-black box & model & $R^2_{train}$  & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & time in sec\\
-\hline
-standalone & basic lm & 0.9633 & 0.0035 & 0.9469 & 0.0048 & 102.2842\\
-standalone & penalized poly & 0.9824 & 0.0015 & 0.9781 & 0.0020 & 195.4385\\
-standalone & bsplines & 0.9929 & 0.0013 & 0.9714 & 0.0029 & 113.2447\\
-standalone & gam & 0.9880 & 0.0016 & 0.9835 & 0.0017 & 1544.3393\\
-\hline
-xgboost & basic lm & 0.9198 & 0.0516 & 0.9030 & 0.0417 & 72.3790\\
-xgboost & penalized poly & 0.9750 & 0.0033 & 0.9634 & 0.0051 & 206.5870\\
-xgboost & bsplines & 0.9865 & 0.0141 & 0.9591 & 0.0092 & 97.9321\\
-xgboost & gam & 0.9786 & 0.0127 & 0.9672 & 0.0115 & 1728.6021\\
-\hline
-xgboost & xgboost & 0.9392 & 0.0342 & 0.9216 & 0.0405 & 3.0131\\
-\hline
-\end{tabular}
-\caption{mean performance simulation results nonlinear scenario 3}
-
-\end{table}
 
 
+The results for setting 2 are listed in the appendix in the tables \ref{tab:app_nonlinear_interpretability} and \ref{tab:app_nonlinear_performance}
 
 
 
