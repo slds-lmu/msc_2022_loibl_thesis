@@ -3,20 +3,20 @@ library(kableExtra)
 
 
 # Reduce results
-source("R/simulations/batchtools/reduce_results.R")
-reg_corr = loadRegistry("Data/simulations/batchtools/correlated_data/batchtools/"
-                        ,conf.file = NA
-)
-ades_corr = NULL
-pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9))
-
-savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
-
-result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)$mean
+# source("R/simulations/chapter_5_simulation_study/reduce_results.R")
+# reg_corr = loadRegistry("Data/simulations/chapter_5_simulation_study/correlated_data/batchtools/"
+#                         ,conf.file = NA
+# )
+# ades_corr = NULL
+# pdes_corr = expand.grid(n = c(1500), type = c("linear_smooth_corr"), rho = c(0.1, 0.5, 0.9))
+# 
+# savedir_corr = "Data/simulations/batchtools/correlated_data/results/"
+# 
+# result_corr = reduce_trees(ades_corr, pdes_corr, savedir_corr, reg_corr)$mean
 
 
 # analyse results correlated data
-result_corr = readRDS("Data/simulations/batchtools/correlated_data/results/result_summary.rds")
+result_corr = readRDS("Data/simulations/chapter_5_simulation_study/correlated_data/results/result_summary.rds")
 result_corr_sd = result_corr$sd
 setnames(result_corr_sd, c("r2_train", "r2_test"), c("r2_train_sd", "r2_test_sd"))
 result_corr_mean = cbind(result_corr$mean, result_corr_sd[,.(r2_train_sd, r2_test_sd)])

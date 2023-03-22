@@ -1,6 +1,6 @@
 # reduce results basic scenarios
 
-# source("R/simulations/reduce_results.R")
+# source("R/simulations/chapter_5_simulation_study/reduce_results.R")
 # reg_basic = loadRegistry("Data/simulations/chapter_5_simulation_study/basic_scenarios/batchtools/"
 #                          ,conf.file = NA
 #                          )

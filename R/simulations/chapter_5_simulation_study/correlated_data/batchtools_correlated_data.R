@@ -2,22 +2,21 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/correlated_data")) dir.create("Data/simulations/batchtools/correlated_data", recursive = TRUE)
+if (!dir.exists("Data/simulations/chapter_5_simulation_study/correlated_data")) dir.create("Data/simulations/chapter_5_simulation_study/correlated_data", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/correlated_data/batchtools",
-                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
-                                        "R/mob_fitting_functions.R",
-                                        "R/simulations/batchtools/helper_simulations.R",
-                                        "R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R",
-                                        "R/simulations/batchtools/correlated_data/helper_simulations_correlated_data.R"),
-                             seed = 1
-                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
+reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_5_simulation_study/correlated_data/batchtools",
+                             source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R",
+                                        "R/simulations/mob_fitting_functions.R",
+                                        "R/simulations/chapter_5_simulation_study/helper_simulations.R",
+                                        "R/simulations/chapter_5_simulation_study/basic_scenarios/helper_simulations_basic_scenarios.R",
+                                        "R/simulations/chapter_5_simulation_study/correlated_data/helper_simulations_correlated_data.R"),
+                             seed = 1, conf.file = NA
 )
 
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
-source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/simulations/simulation_setting_definition.R")
 
 # add problems and setting definitions
 
@@ -26,7 +25,7 @@ pdes = list("correlated_data" = expand.grid(n = c(1500), type = c("linear_smooth
 
 
 # add algorithm
-source("R/simulations/batchtools/correlated_data/helper_simulations_correlated_data.R")
+source("R/simulations/chapter_5_simulation_study/correlated_data/helper_simulations_correlated_data.R")
 
 addAlgorithm(name = "get_sim_results_corr", fun = get_sim_results_corr)
 

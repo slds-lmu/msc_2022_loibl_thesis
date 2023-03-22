@@ -9,9 +9,7 @@ reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_5_simulation_s
                                         "R/mob_fitting_functions.R",
                                         "R/simulations/helper_simulations.R",
                                         "R/simulations/chapter_5_simulation_study/basic_scenarios/helper_simulations_basic_scenarios.R"),
-                             seed = 1, NA)
-reg = loadRegistry("Data/simulations/chapter_5_simulation_study/basic_scenarios/batchtools", writeable = TRUE,
-                   conf.file = "Data/simulations/chapter_5_simulation_study/.batchtools.conf.R")
+                             seed = 1, conf.file = NA)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
