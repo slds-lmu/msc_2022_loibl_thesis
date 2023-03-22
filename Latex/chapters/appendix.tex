@@ -164,13 +164,13 @@ In Table \ref{tab:app_xgboost_config} the XGBoost hyperparameter settings, which
 The Figures \ref{fig:app_tree_low_symmetry} and \ref{fig:app_tree_high_symmetry} each show an example of a SLIM tree with high and low symmetry on the scenario linear smooth with each 8 leafnodes. The value impr in the plot is the potential relative improvement of the objective through the best split for this node in relation to the improvement in the parent node. In the tree \ref{fig:app_tree_high_symmetry}, the required improvement of $10 \%$ in node 2 is just missed, which is why this node is not split further.
 \begin{figure}[!htb]
     \centering    
-    \includegraphics[width = 16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/tree_high_symmetry.png}  
+    \includegraphics[width = 16cm]{Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_smooth/tree_high_symmetry.png}  
     \caption{SLIM tree with high symmetry on scenario linear smooth}
     \label{fig:app_tree_high_symmetry}
 \end{figure}
 
 \begin{figure}[!htb]
-    \includegraphics[width = 16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/tree_low_symmetry.png}
+    \includegraphics[width = 16cm]{Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_smooth/tree_low_symmetry.png}
     \caption{SLIM tree with low symmetry on scenario linear smooth}
     \label{fig:app_tree_low_symmetry}
 \end{figure}
@@ -226,7 +226,7 @@ XGBoost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 
 \begin{figure}[!htb]
      \centering
-    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_standalone_symmetrie.png}
+    \includegraphics[width=14cm]{Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_smooth/ls_1000_standalone_symmetrie.png}
     \caption{Maximum leaf size of standalone MBTs vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
 \label{fig:app_ls_1000_standalone_symmetrie}
 \end{figure} 
@@ -234,14 +234,14 @@ XGBoost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 
 \begin{figure}[!htb]
      \centering
-    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_lm_r2_test.png}
+    \includegraphics[width=14cm]{Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_smooth/ls_1000_lm_r2_test.png}
     \caption{Test fidelity $R^2$ as surrogate on lm predictions vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
 \label{fig:app_ls_1000_lm_r2_test}
 \end{figure} 
 
 \begin{figure}[!htb]
      \centering     
-    \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_xgboost_r2_test.png}
+    \includegraphics[width=14cm]{Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_smooth/ls_1000_xgboost_r2_test.png}
     \caption{Test fidelity $R^2$ as surrogate on XGBoost predictions vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
     \label{fig:app_ls_1000_xgboost_r2_test}
 \end{figure} 
@@ -545,14 +545,14 @@ Figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone
 \begin{figure}[!htb]
      \centering
      
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/lasso/lasso_standalone_r2_test.png}
+    \includegraphics[width=16cm]{Figures/simulations/chapter_5_simulation_study/lasso/lasso_standalone_r2_test.png}
     \caption{Test accuracy $R^2$ of MBTs on scenario Linear smooth with noise features with $n=2000, alpha = 0.001, impr = 0.1$ with $n leaves \geq 11$}
     \label{fig:app_lasso_standalone_r2_test}
 \end{figure} 
 
 \begin{figure}[!htb]
      \centering
-    \includegraphics[width=16cm]{Figures/simulations/batchtools/lasso/lasso_standalone_r2_test_slim.png}
+    \includegraphics[width=16cm]{Figures/simulations/chapter_5_simulation_study/lasso/lasso_standalone_r2_test_slim.png}
     \caption{Test accuracy $R^2$ of SLIM and GUIDE MBTs on scenario Linear smooth with noise features with $n=2000, alpha = 0.001, impr = 0.1$ with $n leaves \leq 11$}
 \label{fig:app_lasso_standalone_r2_test_slim}
 \end{figure} 
