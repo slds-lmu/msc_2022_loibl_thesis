@@ -1,5 +1,5 @@
-source("R/mob_fitting_functions.R")
-source("R/simulations/batchtools/helper_simulations.R")
+source("R/simulations/mob_fitting_functions.R")
+source("R/simulations/helper_simulations.R")
 
 get_sim_results = function(data, job, instance, tree_methods = c("slim", "mob", "ctree", "guide"), n.quantiles = 100,
                            exclude.categoricals = FALSE, min.split = 50, maxdepth = 7, correct.bias = TRUE, approximate = FALSE,

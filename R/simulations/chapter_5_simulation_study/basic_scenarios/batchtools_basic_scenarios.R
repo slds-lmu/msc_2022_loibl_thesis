@@ -2,22 +2,20 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/basic_scenarios")) dir.create("Data/simulations/batchtools/basic_scenarios", recursive = TRUE)
+if (!dir.exists("Data/simulations/chapter_5_simulation_study/basic_scenarios")) dir.create("Data/simulations/chapter_5_simulation_study/basic_scenarios", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/basic_scenarios/batchtools",
-                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
+reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_5_simulation_study/basic_scenarios/batchtools",
+                             source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/mob_fitting_functions.R",
-                                        "R/simulations/batchtools/helper_simulations.R",
-                                        "R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R"),
-                             seed = 1
-                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
-                             )
-reg = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools", writeable = TRUE,
-                   conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
+                                        "R/simulations/helper_simulations.R",
+                                        "R/simulations/chapter_5_simulation_study/basic_scenarios/helper_simulations_basic_scenarios.R"),
+                             seed = 1, NA)
+reg = loadRegistry("Data/simulations/chapter_5_simulation_study/basic_scenarios/batchtools", writeable = TRUE,
+                   conf.file = "Data/simulations/chapter_5_simulation_study/.batchtools.conf.R")
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
-source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/simulations/simulation_setting_definition.R")
 
 # add problems and setting definitions
 repls = 100L
@@ -33,7 +31,7 @@ pdes = list("basic_scenarios" = expand.grid(n = c(1500, 7500), type = c("linear_
 
 
 # add algorithm
-source("R/simulations/batchtools/basic_scenarios/helper_simulations_basic_scenarios.R")
+source("R/simulations/chapter_5_simulation_study/basic_scenarios/helper_simulations_basic_scenarios.R")
 
 addAlgorithm(name = "get_sim_results", fun = get_sim_results)
 ades = list(get_sim_results = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05)))
@@ -48,9 +46,7 @@ addExperiments(
   repls = repls)
 
 summarizeExperiments()
-submitJobs(1201:1800)
+submitJobs()
 
-testJob(1205)
 
-# pars = unwrap(getJobPars(reg = reg))
 

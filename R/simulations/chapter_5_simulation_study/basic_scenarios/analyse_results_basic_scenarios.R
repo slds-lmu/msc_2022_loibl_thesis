@@ -1,14 +1,14 @@
 # reduce results basic scenarios
-# source("R/simulations/batchtools/reduce_results.R")
-# reg_basic = loadRegistry("Data/simulations/batchtools/basic_scenarios/batchtools/"
+
+# source("R/simulations/reduce_results.R")
+# reg_basic = loadRegistry("Data/simulations/chapter_5_simulation_study/basic_scenarios/batchtools/"
 #                          ,conf.file = NA
 #                          )
 # 
 # ades_basic = data.frame(alpha = c(0.001, 0.01, 0.05), impr.par = c(0.15, 0.1, 0.05))
 # pdes_basic = expand.grid(n = c(1500, 7500), type = c("linear_smooth", "linear_abrupt", "linear_mixed"))
 # 
-# # savedir_basic = "Data/simulations/batchtools/basic_scenarios/results/"
-# savedir_basic = "Data/simulations/batchtools/basic_scenarios/results_new/"
+# savedir_basic = "Data/simulations/chapter_5_simulation_study/basic_scenarios/results/"
 # 
 # 
 # reduce_trees(ades_basic, pdes_basic, savedir_basic, reg_basic)
@@ -41,7 +41,7 @@ experiments = merge(ades_basic, pdes_basic, by = NULL)
 # ----- 1. Linear Smooth -----
 # stand-alone
 
-result_basic = readRDS("Data/simulations/batchtools/basic_scenarios/results/result_summary.rds")
+result_basic = readRDS("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/result_summary.rds")
 result_basic_mean = result_basic$mean
 result_basic_sd = result_basic$sd
 setnames(result_basic_sd, c("r2_train", "r2_test", paste0("share_x",1:4), "n_leaves"), 
@@ -50,7 +50,7 @@ result_basic_mean = cbind(result_basic_mean,
                           result_basic_sd[,.(r2_train_sd, r2_test_sd, share_x2_sd, n_leaves_sd)])
 result_basic_mean[type == "linear_mixed" & mbt == "SLIM" & n == 1500]
 
-list.files("Data/simulations/batchtools/basic_scenarios/results/")
+list.files("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/")
 
 
 
@@ -69,12 +69,12 @@ result_basic_mean[n == 7500 & type == "linear_smooth" &  ((surrogate %in% c("sta
 
 # --- overview ----
 
-save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_smooth/"
+save_dir = "Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_smooth/"
 if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
 
-res_ls_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios/results/1_res_experiments.rds")
+res_ls_n1500_alpha001 = readRDS("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/1_res_experiments.rds")
 
-res_ls_n1500_alpha01 = readRDS("Data/simulations/batchtools/basic_scenarios/results/2_res_experiments.rds")
+res_ls_n1500_alpha01 = readRDS("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/2_res_experiments.rds")
 
 # standalone
 overview_ls = rbind(unique(res_ls_n1500_alpha01[mbt %in% c("SLIM", "GUIDE"),
@@ -355,7 +355,7 @@ ggexport(p_ls_1000_standalone_symmetrie, filename = paste0(save_dir, "ls_1000_st
 source("R/tree_splitting_slim.R")
 source("R/helper_general.R")
 source("R/load_packages.R")
-source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/simulations/simulation_setting_definition.R")
 
 # asymmetric tree
 set.seed(162)
@@ -479,15 +479,15 @@ result_basic_mean[n == 1500 & type == "linear_abrupt" &  ((surrogate %in% c("lm"
 
 
 # --- overview ----
-save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_abrupt/"
+save_dir = "Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_abrupt/"
 if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
 
 
 # alpha = 0.001 for mob and ctree
-res_la_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios/results/7_res_experiments.rds")
+res_la_n1500_alpha001 = readRDS("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/7_res_experiments.rds")
 
 # alpha = 0.05 i.e. impr = 0.05 for slim and guide
-res_la_n1500_alpha05 = readRDS("Data/simulations/batchtools/basic_scenarios/results/9_res_experiments.rds")
+res_la_n1500_alpha05 = readRDS("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/9_res_experiments.rds")
 
 # standalone
 overview_la = rbind(unique(res_la_n1500_alpha05[mbt %in% c("SLIM", "GUIDE") ,
@@ -715,14 +715,14 @@ result_basic_mean[n == 1500 & type == "linear_mixed" &  ((surrogate %in% c("stan
 
 
 # --- overview ---
-save_dir = "Figures/simulations/batchtools/basic_scenarios/linear_mixed/"
+save_dir = "Figures/simulations/chapter_5_simulation_study/basic_scenarios/linear_mixed/"
 if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
 
-res_lm_n1500_alpha001 = readRDS("Data/simulations/batchtools/basic_scenarios/results/13_res_experiments.rds")
+res_lm_n1500_alpha001 = readRDS("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/13_res_experiments.rds")
 res_lm_n1500_alpha001[, ":="(share_x1_x2 = share_x1+share_x2,
                              share_x3_x4 = share_x3+share_x4)]
 
-res_lm_n1500_alpha05 = readRDS("Data/simulations/batchtools/basic_scenarios/results/15_res_experiments.rds")
+res_lm_n1500_alpha05 = readRDS("Data/simulations/chapter_5_simulation_study/basic_scenarios/results/15_res_experiments.rds")
 res_lm_n1500_alpha05[, ":="(share_x1_x2 = share_x1+share_x2,
                              share_x3_x4 = share_x3+share_x4)]
 
