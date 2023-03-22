@@ -24,7 +24,7 @@ A approach that tries to combine the advantages of global and local surrogate me
 The idea is to subdivide the feature space into appropriate subregions where fitting easy-to-interpret models is sufficient.
 With K-LIME (K local interpretable model-agnostic explanations), \citet{Hall.2017}  pursue the approach of unsupervised partitioning of the feature space into K subregions using a K-means clustering algorithm. 
 SLIM \citep{Hu.2020}, on the other hand, uses a supervised approach (MBT) to subdivides the feature space according to a given objective. According to \citep{Hu.2018}, SLIM is superior to K-LIME, which is mainly because K-LIME does not include the objective in the clustering. 
-Another recent approach, called maidrr (Model-Agnostic Interpretable Data-driven suRRogate) is presented in \citet{Henckaerts.2022}. There the feature space is partitioned on the basis of partial dependence plots and then linear models in categorical format are fitted in the subregions. The categorial format is intended to increase interpretability, but thereby has a negative effect on the performance.
+Another recent approach, called maidrr (Model-Agnostic Interpretable Data-driven suRRogate) is presented in \citet{Henckaerts.2022}. There, the feature space is partitioned on the basis of partial dependence plots and then linear models in categorical format are fitted in the subregions. The categorical format is intended to increase interpretability, but thereby has a negative effect on the performance.
 
 In this thesis, the SLIM algorithm is used and compared with other algorithms that can create MBTs.
 

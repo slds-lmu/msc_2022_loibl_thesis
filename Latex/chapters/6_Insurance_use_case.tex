@@ -34,17 +34,17 @@ Basic observations across all subregions are:
 \end{itemize}
 
 The strength of the effects, however, differs in the different subregions found by SLIM.
-The five leafnodes can be roughly divided into two regions with similar effects:
+The five leaf nodes can be roughly divided into two regions with similar effects:
 \begin{itemize}
     \item Region 1 (Nodes 2,8): High duration ($30$) or high age ($>48$) and medium duration (between $13$ and $30$)
     \item Region 2 (Nodes 5,6,7): Low - medium duration with low age or high age with low duration ($\leq 12$)
 \end{itemize}
 
-In Region 1 sex male and age seem to have a higher positive effect on  BPV\_pred than in region 2. The negative effect of duration, on the other hand, is smaller in region 1. This indicates a non-linearity of duration.
+In Region 1 sex male and age seem to have a higher positive effect on  BPV\_pred than in region 2. The negative effect of duration, on the other hand, is smaller in region 1. This indicates a nonlinearity of duration.
 
 If SLIM is fitted as a standalone model instead of a surrogate model in the same configuration, the differences in the split points are very small. This indicates that the black box model captures the underlying relationships very well. The corresponding tree is shown in the appendix in Figure \ref{fig:app_ins_slim_lm_standalone_tree}.
 
-In the following, the fidelity of the different MBT with algorithms with linear models is compared. For this purpose, all four algorithms were fitted with a maximum depth of 3. For SLIM and GUIDE, $impr$ is set to $0.05$ and for MOB and CTree $alpha$ is set to $0.05$. Furthermore, a minimum nodesize of 200 observations is required.
+In the following, the fidelity of the different MBT with algorithms with linear models is compared. For this purpose, all four algorithms were fitted with a maximum depth of 3. For SLIM and GUIDE, $impr$ is set to $0.05$ and for MOB and CTree $alpha$ is set to $0.05$. Furthermore, a minimum node size of 200 observations is required.
 The MBTs are compared with a baseline model, which is a linear regression model on the entire feature space. In addition to the $R^2$ and the MSE, the mean absolute error (MAE) and the maximum absolute error (max AE) are included as measures of fidelity. The max AE is particularly important here, as it is strictly regulated in order not to discriminate against any individual. 
 The results are listed in Table \ref{tab:ins_k2204_lm_surrogates_perf}. It shows that all MBTs achieve considerable improvement over the baseline model.
 
@@ -68,7 +68,7 @@ CTree & 0.995091 & 0.000066 & 0.005740 & 0.042931 & 8\\
 \end{table}
 
 GUIDE achieves the best performance slightly ahead of SLIM. CTree obtains the worst performance.
-Since all algorithms generate MBTs with the same number of leafnodes, the difference in performance must be explained by different split features or points.
+Since all algorithms generate MBTs with the same number of leaf nodes, the difference in performance must be explained by different split features or points.
 Table \ref{tab:ins_k2204_lm_surrogates_share} lists the share of observations that were split with respect to the different features.
 
 \begin{table}[!htb]
@@ -90,13 +90,13 @@ CTree & 0.00 & 0.96 & 0.04\\
 
 
 It is noticeable that SLIM and GUIDE split by age more often than the other two algorithms.
-Furthermore, it should be considered that particulary the SLIM tree could be influenced by selection bias and therefore sex with only one possible split point could be disadvantaged as a splitting variable. SLIM actually chooses sex less often as splitting variable than MOB and CTree, but sex is also rarely chosen by GUIDE and no selection bias in the independence case between numerical variables with different numbers of splitting variables could be found in GUIDE in chapter \ref{selection}. 
+Furthermore, it should be considered that particularly the SLIM tree could be influenced by selection bias and therefore sex with only one possible split point could be disadvantaged as a splitting variable. SLIM actually chooses sex less often as splitting variable than MOB and CTree, but sex is also rarely chosen by GUIDE and no selection bias in the independence case between numerical variables with different numbers of splitting variables could be found in GUIDE in chapter \ref{selection}. 
 Moreover, the effect of selection bias would not be so dramatic here, since the two variables with which sex could interact - and probably does to a small extent, as the varying parameter estimates indicate - are chosen as splitting variables. The small interaction of sex with age and duration is thus reflected in the model, even if sex is not chosen as a splitting variable.
 
 \subsubsection{MBTs with B-spline models}
 
-In order to better capture non-linearities and thus reduce the risk of splitting with respect to non-linearities instead of interactions, all MBT algorithms are fitted with B-spline transformed feature age and duration as surrogate models. 
-Two different maximal depths are used, 3 for interpretable shallow trees and 6 for deep trees with higher fidelity. The settings for $alpha$, $impr$ and minimum nodesize remain the same as for the MBTs with linear models.  Again, a baseline model is fitted, in this case a regression model with the feature sex and B-spline transformed features age and duration on the entire feature space. 
+In order to better capture nonlinearities and thus reduce the risk of splitting with respect to nonlinearities instead of interactions, all MBT algorithms are fitted with B-spline transformed feature age and duration as surrogate models. 
+Two different maximal depths are used, 3 for interpretable shallow trees and 6 for deep trees with higher fidelity. The settings for $alpha$, $impr$ and minimum node size remain the same as for the MBTs with linear models.  Again, a baseline model is fitted, in this case a regression model with the feature sex and B-spline transformed features age and duration on the entire feature space. 
 
 Figure \ref{fig:ins_k2204_fit} plots the prediction of the baseline B-spline model and the two B-spline SLIM surrogates against BPV\_pred to visualise performance improvement. This shows a considerable improvement from the baseline model to the shallow tree. For the deep tree, the observations seem to be even somewhat closer to the identity line. 
 
@@ -109,7 +109,7 @@ Figure \ref{fig:ins_k2204_fit} plots the prediction of the baseline B-spline mod
 
 The fidelity results for all B-spline surrogates are listed in Table \ref{tab:ins_k2204_bsplines_surrogates_perf} .
 
-\begin{table}
+\begin{table}[!htb]
 \centering \scriptsize
 \begin{tabular}[t]{l|r|r|r|r|r}
 \hline
@@ -128,12 +128,12 @@ MOB deep & 0.9996858 & 4.20e-06 & 0.0013448 & 0.0119785 & 21\\
 CTree deep & 0.9997091 & 3.90e-06 & 0.0012936 & 0.0123686 & 20\\
 \hline
 \end{tabular}
-\label{tab:ins_k2204_bsplines_surrogates_perf}
 \caption{Fidelity of K2204 B-spline baseline model and  B-spline MBTs}
+\label{tab:ins_k2204_bsplines_surrogates_perf}
 \end{table}
 
 
-The improvement of the shallow MBTs over the baseline model is large, but not as substantial as in the trees with linear models without B-spline transformations. This is probably due to the fact that the splits in the MBTs with linear models also handled non-linearities that could not be adjusted in the linear baseline model. In the baseline model with B-spline transformations, on the other hand, the non-linearities are already taken into account and the splits then actually capture primarily the interactions, which is what is desired. 
+The improvement of the shallow MBTs over the baseline model is large, but not as substantial as in the trees with linear models without B-spline transformations. This is probably due to the fact that the splits in the MBTs with linear models also handled nonlinearities that could not be adjusted in the linear baseline model. In the baseline model with B-spline transformations, on the other hand, the nonlinearities are already taken into account and the splits then actually capture primarily the interactions, which is what is desired. 
 The deeper splitting improves the performance of all MBTs considerably. The MAE of the deep trees, for example, is only 52\%-61\% of the MAE of the shallow trees. CTree achieves the greatest improvement and obtains better fidelity in the deep trees than MOB (except for max AE). The better performance of all MBTs, however, comes at the cost of interpretability. Additionally, there is an increased risk of overfitting.
 
 
@@ -166,7 +166,7 @@ With the deep trees, the values for share and also the fidelity values of the di
 
 
 
-For the interpretation, the shallow SLIM B-spline tree is analysed in more detail.
+For the interpretation, the shallow SLIM B-spline tree shown in Figure \ref{fig:ins_slim_bsplines_tree} is analysed in more detail.
 
 \begin{figure}[!htb]
     \centering   
@@ -191,9 +191,9 @@ few observations in this area, which is shown in Figure \ref{fig:app_ins_k2204_h
 
 
 
-With the feature duration, it can be seen that the negative effect seems to decrease with increasing duration, which is again just a non-linearity.
+With the feature duration, it can be seen that the negative effect seems to decrease with increasing duration, which is again just a nonlinearity.
 
-To investigate the effect of splits with respect to feature age, on the one hand nodes 4,7 and 8 are compared, which cover the featurespace for duration $\leq 25$, and on the other hand nodes 11 and 12, which cover the featurespace for $25 > $duration $<= 40$. In the Figures \ref{fig:ins_k2204_effects_age_low_duration} and \ref{fig:ins_k2204_effects_age_medium_duration} the corresponding input-output relations of the features are shown.
+To investigate the effect of splits with respect to feature age, on the one hand nodes 4,7 and 8 are compared, which cover the feature space for duration $\leq 25$, and on the other hand nodes 11 and 12, which cover the feature space for $25 < $duration $<= 40$. In the Figures \ref{fig:ins_k2204_effects_age_low_duration} and \ref{fig:ins_k2204_effects_age_medium_duration} the corresponding input-output relations of the features are shown.
 
 \begin{figure}[!htb]
     \centering    
@@ -244,9 +244,9 @@ The data set R1\_08 contains the data of an annuity insurance tariff. Instead of
 R1\_08 includes, in addition to sex, age and duration, the features birth\_year, payment\_period, in\_year\_payments\_exkasso (categorical with 4 levels), guarantee\_period and increment\_factor.
 The value range of the features age and duration is limited to a range in which no correlation exists ($25 \leq$ age $\leq 35$ and $30 \leq$ duration $\leq 40$).
  Here, as well, the BPV and BPV\_pred predicted by a black box model are analysed as target variables.
-For the application of the MBTs, subsets of the training and test datasets including BPV and BPV\_pred are drawn, each with 100000 observations.
+For the application of the MBTs, subsets of the training and test data sets including BPV and BPV\_pred are drawn, each with 100000 observations.
 
-In order to model non-linearities in the nodes, MBTs with B-spline models are used. As with K2204, trees with two different depths are evaluated, shallow trees with a maximum depth of 3 and deep trees with a maximum depth of 7. $impr$ and $alpha$ are set to 0.05 and a minimum nodesize of 500 observations is required.
+In order to model nonlinearities in the nodes, MBTs with B-spline models are used. As with K2204, trees with two different depths are evaluated, shallow trees with a maximum depth of 3 and deep trees with a maximum depth of 7. $impr$ and $alpha$ are set to 0.05 and a minimum node size of 500 observations is required.
 
 For the interpretation of the splits and models, the shallow SLIM tree is examined in more detail. Its structure is shown in Figure \ref{fig:ins_k108_slim_bsplines_small_tree}.
 
@@ -258,7 +258,7 @@ For the interpretation of the splits and models, the shallow SLIM tree is examin
 \end{figure}
 
 
-It is noticeable that the featurespace in the first splits is only divided with regard to increment\_factor. The effects of these splits on the other features are shown in Figure \ref{fig:ins_k108_effects_increment}.
+It is noticeable that the feature space in the first splits is only divided with regard to increment\_factor. The effects of these splits on the other features are shown in Figure \ref{fig:ins_k108_effects_increment}.
 
 \begin{figure}[!htb]
     \centering    
@@ -271,7 +271,7 @@ The effects of the features payment\_period and guarantee\_period are not shown 
 The interaction with increment\_factor is clearly visible in all the features shown. For all features, an increasing increment\_factor increases the feature effects.
 
 
-The consequences of the splits with respect to duration are shown in Figure \ref{fig:ins_k108_effects_duration}. It shows that across all shown features a higher duration weakens the feature main effects.
+The consequences of the splits with respect to duration are shown in Figure \ref{fig:ins_k108_effects_duration}. It indicates that across all features a higher duration weakens the feature main effects.
 
 \begin{figure}[!htb]
     \centering 
@@ -281,7 +281,7 @@ The consequences of the splits with respect to duration are shown in Figure \ref
 \end{figure}
 
 
-Since increment\_factor interacts with so many features, the splits are very effective here and bring a great improvement in performance. Table \ref{tab:ins_k108_share} shows the share of the splits by the different features. From this it can be seen that MOB and CTree split shallow MBTs considerably less by increment\_factor than SLIM and GUIDE. At the same time, their performance is behind that of SLIM and GUIDE, as can be seen in Table \ref{tab:ins_k108_bsplines_surrogates_perf}. SLIM achieves the best performance.
+Since increment\_factor interacts with so many features, the splits are very effective here and bring a great improvement in performance. Table \ref{tab:ins_k108_share} lists the share of the splits by the different features. From this it can be seen that MOB and CTree split shallow MBTs considerably less by increment\_factor than SLIM and GUIDE. At the same time, their performance is behind that of SLIM and GUIDE, as can be seen in Table \ref{tab:ins_k108_bsplines_surrogates_perf}. SLIM achieves the best performance.
 
 
 If the tree is fitted on the test data instead of the training data, exactly the same splits result. The same applies if the tree is used as a standalone model for BPV instead of a surrogate model. This indicates that the black box model replicates the true data and relationships well.
@@ -370,3 +370,5 @@ Blackbox & 1.0000000 & 0.0000023 & 0.0011006 & 0.0096827 & 1.0000000 & 0.0000023
 \caption{Accuracy of standalone B-spline SLIM MBTs and of the black box model K1\_08}
 \label{tab:ins_k108_standalone_slim}
 \end{table}
+
+The results of the application of the MBT algorithms were discussed with an expert and the plausibility of the resulting interpretations was verified.
