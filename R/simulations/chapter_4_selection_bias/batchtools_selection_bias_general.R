@@ -2,20 +2,18 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/selection_bias_general")) dir.create("Data/simulations/batchtools/selection_bias_general", recursive = TRUE)
+if (!dir.exists("Data/simulations/chapter_4_selection_bias/selection_bias_general")) dir.create("Data/simulations/chapter_4_selection_bias/selection_bias_general", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_general/batchtools",
-                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
-                                        "R/mob_fitting_functions.R"),
-                             conf.file = "Data/simulations/batchtools/.batchtools.conf.R",
+reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_4_selection_bias/selection_bias_general/batchtools",
+                             source = c("R/simulations/chapter_4_selection_bias/simulation_setting_definition.R", "R/tree_splitting_slim.R",
+                                        "R/simulations/mob_fitting_functions.R"),
+                             conf.file = NA,
                              seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
-reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools",
-                   conf.file = "Data/simulations/batchtools/.batchtools.conf.R", writeable = TRUE)
 
-source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/simulations/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
@@ -30,7 +28,7 @@ pdes = list("selection_bias" = pdes)
 
 
 # add algorithm
-source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
+source("R/simulations/chapter_4_selection_bias/helper_simulation_selection_bias.R")
 
 addAlgorithm(name = "get_results_selection_bias", fun = get_sim_results_selection_bias)
 
@@ -56,7 +54,6 @@ print(id1)
 
 testJob(id = 101)
 
-pars[type == "selection_bias_interaction_numerical_vs_numrical",job.id]
 
 # submit jobs
 pars = unwrap(getJobPars(reg = reg))
@@ -64,8 +61,6 @@ pars = unwrap(getJobPars(reg = reg))
 submitJobs(reg = reg)
 submitJobs(pars[type == "selection_bias_interaction_numerical_vs_numrical",job.id])
 
-# reg = loadRegistry("Data/simulations/batchtools/selection_bias_general/batchtools",
-#                    conf.file = "Data/simulations/batchtools/.batchtools.conf.R", writeable = TRUE)
 
 
 # reduce jobs/ summarise results
@@ -78,35 +73,8 @@ tab = ijoin(pars, results)
 head(tab)
 
 
-library(ggplot2)
-library(ggpubr)
-library(stringr)
 
-savedir = "Data/simulations/batchtools/selection_bias_general/results/"
-figuredir = "Figures/simulations/batchtools/selection_bias_general/"
+savedir = "Data/simulations/chapter_4_selection_bias/selection_bias_general/results/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 saveRDS(tab, paste0(savedir,"selection_bias_general.rds"))
-
-# if (!dir.exists(figuredir)) dir.create(figuredir, recursive = TRUE)
-# 
-# for (t in unique(tab$type)){
-#   for (n_data in unique(tab[type == t , n])){
-#     tab_t_n = tab[type == t & n == n_data, ]
-#     result = list(slim = table(tab_t_n$split_slim),
-#                   mob = table(tab_t_n$split_mob),
-#                   ctree = table(tab_t_n$split_ctree),
-#                   guide = table(tab_t_n$split_guide))
-#     saveRDS(result, file = paste0(savedir, str_remove(t, "selection_bias_"), "_n", n_data, ".rds"))
-# 
-#     p = ggplot(stack(tab_t_n[,.(split_slim, split_mob, split_ctree, split_guide)]),
-#                aes(x = values, color=ind, fill = ind)) +
-#       stat_count(position = "dodge") +
-#       ggtitle("Frequency of selection", subtitle = paste(str_replace_all(str_remove(t, "selection_bias_"), "_", " "), "n", n_data)) +
-#       labs(x="selected variable", y="frequency", color = "surrogate", fill = "surrogate")
-# 
-#     ggexport(p, filename = paste0(figuredir, str_remove(t, "selection_bias_"), "_n", n_data, ".pdf"), width = 8, height = 3.8)
-# 
-#   }
-# }
-

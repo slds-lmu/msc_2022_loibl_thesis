@@ -2,15 +2,15 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/selection_bias_guide")) dir.create("Data/simulations/batchtools/selection_bias_guide", recursive = TRUE)
+if (!dir.exists("Data/simulations/chapter_4_selection_bias/selection_bias_guide")) dir.create("Data/simulations/chapter_4_selection_bias/selection_bias_guide", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/selection_bias_guide/batchtools",
-                                 source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
+reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_4_selection_bias/selection_bias_guide/batchtools",
+                             source = c("R/simulations/chapter_4_selection_bias/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
                              seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
-source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/simulations/simulation_setting_definition.R")
 
 # add problems and setting definitions
 addProblem(name = "selection_bias", fun = create_sim_data, reg = reg)
@@ -24,7 +24,8 @@ pdes = list("selection_bias" = pdes)
 
 
 # add algorithm
-source("R/simulations/batchtools/selection_bias/helper_simulation_selection_bias.R")
+source("R/simulations/chapter_4_selection_bias/helper_simulation_selection_bias.R")
+
 formals(get_sim_results_selection_bias)$exclude.categoricals = c(TRUE, FALSE)
 formals(get_sim_results_selection_bias)$correct.bias = c(TRUE, FALSE)
 formals(get_sim_results_selection_bias)$tree_methods = "guide"
@@ -70,11 +71,7 @@ head(tab)
 
 
 
-library(ggplot2)
-library(ggpubr)
-library(stringr)
-
-savedir = "Data/simulations/batchtools/selection_bias_guide/results/"
+savedir = "Data/simulations/chapter_4_selection_bias/selection_bias_guide/results/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 

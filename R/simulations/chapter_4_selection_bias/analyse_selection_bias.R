@@ -8,11 +8,11 @@ library(ggpubr)
 library(stringr)
 # load results
 
-list.files("Data/simulations/batchtools/selection_bias_general/results/", full.names = TRUE)
-tab = readRDS("Data/simulations/batchtools/selection_bias_general/results/selection_bias_general.rds")
+list.files("Data/simulations/chapter_4_selection_bias/selection_bias_general/results/", full.names = TRUE)
+tab = readRDS("Data/simulations/chapter_4_selection_bias/selection_bias_general/results/selection_bias_general.rds")
 
-savedir = "Data/simulations/batchtools/selection_bias_general/results/"
-figuredir = "Figures/simulations/batchtools/selection_bias_general/"
+savedir = "Data/simulations/chapter_4_selection_bias/selection_bias_general/results/"
+figuredir = "Figures/simulations/chapter_4_selection_bias/selection_bias_general/"
 
 if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
@@ -95,8 +95,8 @@ ggexport(p_interactions, filename = paste0(figuredir, "interactions.png"), width
 
 # ---- 3. guide selection bias ----
 
-list.files("Data/simulations/batchtools/selection_bias_guide/results/", full.names = TRUE)
-split_data = readRDS("Data/simulations/batchtools/selection_bias_guide/results/selection_bias_guide.rds")
+list.files("Data/simulations/chapter_4_selection_bias/selection_bias_guide/results/", full.names = TRUE)
+split_data = readRDS("Data/simulations/chapter_4_selection_bias/selection_bias_guide/results/selection_bias_guide.rds")
 nrow(split_data)
 
 # frequency of selected splitvariables for example guide (biased and bootstrap corrected)
@@ -114,8 +114,8 @@ guide_table%>%
 
 
 # ---- 4. Slim selection bias correction approach - different values of n.quantiles ----
-selection_bias_slim = readRDS("Data/simulations/batchtools/selection_bias_slim/results/selection_bias_slim.rds")
-savedir_slim = "Data/simulations/batchtools/selection_bias_slim/results/"
+selection_bias_slim = readRDS("Data/simulations/chapter_4_selection_bias/selection_bias_slim/results/selection_bias_slim.rds")
+savedir_slim = "Data/simulations/chapter_4_selection_bias/selection_bias_slim/results/"
 
 if (!dir.exists(savedir_slim)) dir.create(savedir_slim, recursive = TRUE)
 
