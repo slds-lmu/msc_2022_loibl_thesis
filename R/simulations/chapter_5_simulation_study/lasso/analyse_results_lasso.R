@@ -8,8 +8,8 @@ library(ggpubr)
 
 
 # Reduce results
-# source("R/simulations/batchtools/reduce_results.R")
-# reg_lasso = loadRegistry("Data/simulations/batchtools/lasso/batchtools/"
+# source("R/simulations/chapter_5_simulation_study/reduce_results.R")
+# reg_lasso = loadRegistry("Data/simulations/chapter_5_simulation_study/lasso/batchtools/"
 #                          ,conf.file = NA)
 # 
 # ades_lasso = NULL
@@ -32,7 +32,7 @@ colors_surrogate = c("standalone" = "white", "lm" = "lightgrey", xgboost = "corn
 
 
 # analyse scenario noise features results
-result_lasso = readRDS("Data/simulations/batchtools/lasso/results/result_summary.rds")
+result_lasso = readRDS("Data/simulations/chapter_5_simulation_study/lasso/results/result_summary.rds")
 result_lasso_sd = result_lasso$sd
 setnames(result_lasso_sd, c("r2_train", "r2_test"), c("r2_train_sd", "r2_test_sd"))
 result_lasso_mean = cbind(result_lasso$mean, result_lasso_sd[,.(r2_train_sd, r2_test_sd)])
@@ -50,10 +50,10 @@ result_lasso_mean[,.(surrogate, mbt, x_wrong, share_x3, n_leaves, n_leaves_min, 
   kable_minimal(full_width = F)
 
 
-save_dir = "Figures/simulations/batchtools/lasso/"
+save_dir = "Figures/simulations/chapter_5_simulation_study/lasso/"
 if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
 
-res_lasso = readRDS("Data/simulations/batchtools/lasso/results/1_res_experiments.rds")
+res_lasso = readRDS("Data/simulations/chapter_5_simulation_study/lasso/results/1_res_experiments.rds")
 
 # ---- standalone ----
 # Performance

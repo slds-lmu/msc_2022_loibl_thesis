@@ -1,5 +1,5 @@
-source("R/mob_fitting_functions.R")
-source("R/simulations/batchtools/helper_simulations.R")
+source("R/simulations/mob_fitting_functions.R")
+source("R/simulations/helper_simulations.R")
 
 get_sim_results_lasso = function(data, job, instance, 
                                 n.quantiles = 100, min.split = 100, maxdepth = 6, 

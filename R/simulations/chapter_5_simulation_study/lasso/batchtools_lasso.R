@@ -2,22 +2,21 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/lasso")) dir.create("Data/simulations/batchtools/lasso", recursive = TRUE)
+if (!dir.exists("Data/simulations/chapter_5_simulation_study/lasso")) dir.create("Data/simulations/chapter_5_simulation_study/lasso", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/lasso/batchtools",
-                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
-                                        "R/mob_fitting_functions.R",
-                                        "R/simulations/batchtools/helper_simulations.R",
-                                        "R/simulations/batchtools/lasso/helper_simulations_lasso.R"),
+reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_5_simulation_study/lasso/batchtools",
+                             source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R",
+                                        "R/simulations/mob_fitting_functions.R",
+                                        "R/simulations/chapter_5_simulation_study/helper_simulations.R",
+                                        "R/simulations/chapter_5_simulation_study/lasso/helper_simulations_lasso.R"),
                              seed = 1
-                             , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
+                             , conf.file = NA
 )
-reg = loadRegistry("Data/simulations/batchtools/lasso/batchtools", writeable = TRUE, conf.file = "Data/simulations/batchtools/.batchtools.conf.R")
 
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
-source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/simulations/simulation_setting_definition.R")
 
 # add problems and setting definitions
 
@@ -26,7 +25,7 @@ pdes = list("noisy_data" = data.frame(n = c(3000), type = c("linear_smooth_lasso
 
 
 # add algorithm
-source("R/simulations/batchtools/lasso/helper_simulations_lasso.R")
+source("R/simulations/chapter_5_simulation_study/lasso/helper_simulations_lasso.R")
 
 addAlgorithm(name = "get_sim_results_lasso", fun = get_sim_results_lasso)
 
