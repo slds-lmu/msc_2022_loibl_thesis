@@ -92,9 +92,9 @@ reduce_trees_nonlinear = function(ades, pdes, savedir, reg){
 
 pdes = data.frame(n = c(4500), type = c("nonlinear_mixed"))
 ades = data.frame(r2 = c(1,0.95,0.9), impr.par = c(0.1, 0.05, 0.05))
-reg_nonlinear = loadRegistry("Data/simulations/batchtools/nonlinear/batchtools/",
+reg_nonlinear = loadRegistry("Data/simulations/chapter_5_simulation_study/nonlinear/batchtools/",
                              conf.file = NA)
-savedir = "Data/simulations/batchtools/nonlinear/results/"
+savedir = "Data/simulations/chapter_5_simulation_study/nonlinear/results/"
 
 
 reduce_trees_nonlinear(ades, pdes, savedir, reg_nonlinear)

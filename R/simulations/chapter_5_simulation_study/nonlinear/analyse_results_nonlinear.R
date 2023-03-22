@@ -1,18 +1,9 @@
 library(dplyr)
-library(REdaS)
 library(kableExtra)
-library(batchtools)
-library(data.table)
-library(GGally)
-library(ggpubr)
 
-result_nonlinear = readRDS("Data/simulations/batchtools/nonlinear/results/result_summary.rds")
-unique(result_nonlinear$model)
 
-colors_mbt =c("basic_lm" = 'purple', "bsplines" = , "bsplines_approx" = , "gam" = , "penalized_poly" = , "xgboost")
-colors_surrogate = c( = "white", "lm" = "lightgrey", xgboost = "cornsilk")
+result_nonlinear = readRDS("Data/simulations/chapter_5_simulation_study/nonlinear/results/result_summary.rds")
 
-colnames(result_nonlinear)
 
 result_nonlinear[r2 == 0.9,.(surrogate, model, n_leaves, n_leaves_min, n_leaves_max, n_splitting_variables, n_splitting_variables_min, n_splitting_variables_max, share_main_effect_split,
                df, df_sd)] %>%

@@ -2,23 +2,21 @@ library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
-if (!dir.exists("Data/simulations/batchtools/nonlinear")) dir.create("Data/simulations/batchtools/nonlinear", recursive = TRUE)
+if (!dir.exists("Data/simulations/chapter_5_simulation_study/nonlinear")) dir.create("Data/simulations/chapter_5_simulation_study/nonlinear", recursive = TRUE)
 
-reg = makeExperimentRegistry(file.dir = "Data/simulations/batchtools/nonlinear/batchtools",
-                             source = c("R/simulations/batchtools/simulation_setting_definition.R", "R/tree_splitting_slim.R",
-                                        "R/mob_fitting_functions.R",
-                                        "R/simulations/batchtools/nonlinear/helper_simulations_nonlinear.R"),
+reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_5_simulation_study/nonlinear/batchtools",
+                             source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R",
+                                        "R/simulations/mob_fitting_functions.R",
+                                        "R/simulations/chapter_5_simulation_study/nonlinear/helper_simulations_nonlinear.R"),
                              seed = 111,
                              conf.file = NA
-                             # , conf.file = "Data/simulations/batchtools/.batchtools.conf.R"
 )
 
-# reg = loadRegistry("Data/simulations/batchtools/nonlinear/batchtools", writeable = TRUE, conf.file = NA)
 
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
-source("R/simulations/batchtools/simulation_setting_definition.R")
+source("R/simulations/simulation_setting_definition.R")
 
 # add problems and setting definitions
 
@@ -27,7 +25,7 @@ pdes = list("nonlinear_data" = data.frame(n = c(4500), type = c("nonlinear_mixed
 
 
 # add algorithm
-source("R/simulations/batchtools/nonlinear/helper_simulations_nonlinear.R")
+source("R/simulations/chapter_5_simulation_study/nonlinear/helper_simulations_nonlinear.R")
 
 addAlgorithm(name = "get_sim_results_nonlinear", fun = get_sim_results_nonlinear)
 
@@ -45,4 +43,3 @@ pars = unwrap(getJobPars(reg = reg))
 testJob(101)
 
 submitJobs(resources = list(walltime = 9000))
-# submitJobs(resources = list(walltime = 9000))
