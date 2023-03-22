@@ -68,7 +68,7 @@ The values of $MSE_{test}$ are not very meaningful here, as there is no dependen
 100 & $MSE_{test}$ & 1.0166 & 1.0157 & 1.0155 & 1.0151 & 1.0146 & 1.0129 & 1.0087\\
 \hline
 \end{tabular}
-\caption{frequency of feature selection and mean MSE for four different grid sizes and seven different values of n.quantiles}
+\caption{Frequency of feature selection and mean MSE for four different grid sizes and seven different values of n.quantiles}
 \label{tab:app_selection_bias_independence_grid}
 \end{table}
 
@@ -100,7 +100,7 @@ mixed & $MSE_{train}$ & 0.9528 & 0.9535 & 0.9538 & 0.9541 & 0.9550 & 0.9567 & 0.
 mixed & $MSE_{test}$ & 1.0515 & 1.0498 & 1.0493 & 1.0486 & 1.0475 & 1.0450 & 1.0399\\
 \hline
 \end{tabular}
-\caption{frequency of feature selection and mean MSE for scenarios selection bias independence numeric and independence mixed and seven different values of n.quantiles}
+\caption{Frequency of feature selection and mean MSE for scenarios selection bias independence numeric and independence mixed and seven different values of n.quantiles}
 \label{tab:app_selection_bias_independence}
 \end{table}
 
@@ -128,7 +128,7 @@ $MSE_{train}$ & 0.0373 & 0.0375 & 0.0376 & 0.0377 & 0.0380 & 0.0379 & 0.0393\\
 $MSE_{test}$ & 0.0391 & 0.0393 & 0.0393 & 0.0393 & 0.0392 & 0.0392 & 0.0404\\
 \hline
 \end{tabular}
-\caption{frequency of feature selection and mean MSE for scenario selection bias numerical vs numerical and seven different values of n.quantiles}
+\caption{Frequency of feature selection and mean MSE for scenario selection bias numerical vs numerical and seven different values of n.quantiles}
 \label{tab:app_selection_bias_interaction}
 \end{table}
 
@@ -140,8 +140,8 @@ $MSE_{test}$ & 0.0391 & 0.0393 & 0.0393 & 0.0393 & 0.0392 & 0.0392 & 0.0404\\
 \subsection{Simulation results}
 \subsubsection{Basic scenarios}\label{app:basic_scenarios}
 
-\paragraph{xgboost configurations}
-In Table \ref{tab:app_xgboost_config} the xgboost hyperparameter settings, which were used for the simulation of the basic scenarios are listed.
+\paragraph{XGBoost configurations}
+In Table \ref{tab:app_xgboost_config} the XGBoost hyperparameter settings, which were used for the simulation of the basic scenarios are listed.
 \begin{table}[!htb]
     \centering
     \begin{tabular}{l|r|r|r}
@@ -155,17 +155,17 @@ In Table \ref{tab:app_xgboost_config} the xgboost hyperparameter settings, which
     nrounds & 400 & 350 & 500\\
     \hline
     \end{tabular}
-    \caption{xgboost hyperparameters for basic scenarios after hyperparametertuning}
+    \caption{XGBoost hyperparameters for basic scenarios after hyperparametertuning}
     \label{tab:app_xgboost_config}
 \end{table}
 
 
 \paragraph{Simulation Results}
-The Figures \ref{fig:app_tree_low_symmetry} and \ref{fig:app_tree_high_symmetry} each show an example of a SLIM tree with high and low symmetry on the scenario linear smooth with each 8 leafnodes. The value impr is the potential relative improvement of the objective through the best split for this node in relation to the improvement in the parent node. In the tree \ref{fig:app_tree_high_symmetry}, the required improvement of $10 \%$ in node 2 is just missed, which is why this node is not split further.
+The Figures \ref{fig:app_tree_low_symmetry} and \ref{fig:app_tree_high_symmetry} each show an example of a SLIM tree with high and low symmetry on the scenario linear smooth with each 8 leafnodes. The value impr in the plot is the potential relative improvement of the objective through the best split for this node in relation to the improvement in the parent node. In the tree \ref{fig:app_tree_high_symmetry}, the required improvement of $10 \%$ in node 2 is just missed, which is why this node is not split further.
 \begin{figure}[!htb]
     \centering    
     \includegraphics[width = 16cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/tree_high_symmetry.png}  
-    \caption{SLIM tree with (relativly) high symmetry on scenario linear smooth}
+    \caption{SLIM tree with high symmetry on scenario linear smooth}
     \label{fig:app_tree_high_symmetry}
 \end{figure}
 
@@ -185,7 +185,7 @@ In the following tables and figures the mean simulation results of the basic sce
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black box & MBT & impr & alpha & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
+black box & MBT & $impr$ & $alpha$ & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
 \hline
 lm & SLIM & 0.15 & & 2.06 & 2 & 3 & 0.9650 & 0.0043 & 0.9631 & 0.0046\\
 lm & SLIM & 0.10 & & 12.11 & 5 & 16 & 0.9965 & 0.0052 & 0.9958 & 0.0060\\
@@ -203,24 +203,24 @@ lm & CTree & & 0.050 & 15.22 & 13 & 17 & 0.9993 & 0.0001 & 0.9992 & 0.0001\\
 lm &  & & & & &  & 0.9902 & 0.0006 & 0.9901 & 0.0008\\
 \hline
 
-xgboost & SLIM & 0.15 & & 2.31 & 2 & 6 & 0.9665 & 0.0069 & 0.9629 & 0.0079\\
-xgboost & SLIM & 0.10 & & 7.33 & 2 & 14 & 0.9850 & 0.0060 & 0.9814 & 0.0062\\
-xgboost & SLIM & 0.05 & & 14.30 & 8 & 17 & 0.9948 & 0.0010 & 0.9909 & 0.0017\\
-xgboost & GUIDE & 0.15 & & 2.26 & 2 & 5 & 0.9664 & 0.0067 & 0.9628 & 0.0077\\
-xgboost & GUIDE & 0.10 & & 6.92 & 2 & 14 & 0.9847 & 0.0061 & 0.9811 & 0.0062\\
-xgboost & GUIDE & 0.05 & & 14.15 & 8 & 17 & 0.9945 & 0.0010 & 0.9906 & 0.0017\\
-xgboost & MOB & & 0.001 & 10.89 & 8 & 13 & 0.9944 & 0.0005 & 0.9904 & 0.0011\\
-xgboost & MOB & & 0.010 & 11.96 & 9 & 15 & 0.9946 & 0.0005 & 0.9906 & 0.0011\\
-xgboost & MOB & & 0.050 & 12.86 & 11 & 15 & 0.9948 & 0.0005 & 0.9908 & 0.0011\\
-xgboost & CTree & & 0.001 & 12.09 & 9 & 15 & 0.9940 & 0.0006 & 0.9900 & 0.0012\\
-xgboost & CTree & & 0.010 & 13.21 & 10 & 15 & 0.9943 & 0.0006 & 0.9902 & 0.0013\\
-xgboost & CTree & & 0.050 & 14.09 & 11 & 17 & 0.9944 & 0.0006 & 0.9904 & 0.0012\\
+XGBoost & SLIM & 0.15 & & 2.31 & 2 & 6 & 0.9665 & 0.0069 & 0.9629 & 0.0079\\
+XGBoost & SLIM & 0.10 & & 7.33 & 2 & 14 & 0.9850 & 0.0060 & 0.9814 & 0.0062\\
+XGBoost & SLIM & 0.05 & & 14.30 & 8 & 17 & 0.9948 & 0.0010 & 0.9909 & 0.0017\\
+XGBoost & GUIDE & 0.15 & & 2.26 & 2 & 5 & 0.9664 & 0.0067 & 0.9628 & 0.0077\\
+XGBoost & GUIDE & 0.10 & & 6.92 & 2 & 14 & 0.9847 & 0.0061 & 0.9811 & 0.0062\\
+XGBoost & GUIDE & 0.05 & & 14.15 & 8 & 17 & 0.9945 & 0.0010 & 0.9906 & 0.0017\\
+XGBoost & MOB & & 0.001 & 10.89 & 8 & 13 & 0.9944 & 0.0005 & 0.9904 & 0.0011\\
+XGBoost & MOB & & 0.010 & 11.96 & 9 & 15 & 0.9946 & 0.0005 & 0.9906 & 0.0011\\
+XGBoost & MOB & & 0.050 & 12.86 & 11 & 15 & 0.9948 & 0.0005 & 0.9908 & 0.0011\\
+XGBoost & CTree & & 0.001 & 12.09 & 9 & 15 & 0.9940 & 0.0006 & 0.9900 & 0.0012\\
+XGBoost & CTree & & 0.010 & 13.21 & 10 & 15 & 0.9943 & 0.0006 & 0.9902 & 0.0013\\
+XGBoost & CTree & & 0.050 & 14.09 & 11 & 17 & 0.9944 & 0.0006 & 0.9904 & 0.0012\\
 \hline
-xgboost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
+XGBoost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 \hline
 \end{tabular}
+\caption{Mean simulation results on 100 simulation runs as surrogate models on scenario \textbf{linear smooth} with sample size $n = 1500$ for different values of $impr$ and $alpha$}
 \label{tab:app_linear_smooth_1000}
-\caption{Mean simulation results on 100 simulation runs as surrogate models on scenario \textbf{linear smooth} with sample size $n = 1500$ for different values of impr and alpha}
 \end{table}
 
 
@@ -240,10 +240,9 @@ xgboost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 \end{figure} 
 
 \begin{figure}[!htb]
-     \centering
-     
+     \centering     
     \includegraphics[width=14cm]{Figures/simulations/batchtools/basic_scenarios/linear_smooth/ls_1000_xgboost_r2_test.png}
-    \caption{Test fidelity $R^2$ as surrogate on xgboost predictions vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
+    \caption{Test fidelity $R^2$ as surrogate on XGBoost predictions vs number of leaf nodes scenario linear smooth with $n=1500, alpha = 0.001, impr = 0.1$}
     \label{fig:app_ls_1000_xgboost_r2_test}
 \end{figure} 
 
@@ -254,7 +253,7 @@ xgboost &  & & &  &  &  & 0.9858 & 0.0008 & 0.9768 & 0.0018\\
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black box & MBT & impr & alpha & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
+black box & MBT & $impr$ & $alpha$ & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
 
 \hline
 
@@ -291,25 +290,25 @@ lm & & & & & & & 0.9901 & 0.0002 & 0.9901 & 0.0003\\
 
 
 
-xgboost & SLIM & 0.15 & & 2.22 & 2 & 7 & 0.9647 & 0.0063 & 0.9643 & 0.0063\\
-xgboost & SLIM & 0.10 & & 19.23 & 3 & 40 & 0.9908 & 0.0062 & 0.9902 & 0.0062\\
-xgboost & SLIM & 0.05 & & 49.05 & 34 & 56 & 0.9978 & 0.0003 & 0.9972 & 0.0003\\
-xgboost & CTree & 0.15 & & 32.81 & 26 & 41 & 0.9972 & 0.0002 & 0.9965 & 0.0003\\
-xgboost & CTree & 0.10 & & 36.36 & 29 & 43 & 0.9973 & 0.0002 & 0.9966 & 0.0003\\
-xgboost & CTree & 0.05 & & 39.37 & 32 & 47 & 0.9974 & 0.0002 & 0.9967 & 0.0003\\
-xgboost & MOB & & 0.001 & 38.44 & 29 & 47 & 0.9979 & 0.0002 & 0.9972 & 0.0003\\
-xgboost & MOB & & 0.010 & 42.62 & 31 & 53 & 0.9980 & 0.0002 & 0.9973 & 0.0003\\
-xgboost & MOB & & 0.050 & 46.02 & 39 & 55 & 0.9981 & 0.0002 & 0.9974 & 0.0003\\
-xgboost & GUIDE & & 0.001 & 2.21 & 2 & 8 & 0.9645 & 0.0061 & 0.9641 & 0.0062\\
-xgboost & GUIDE & & 0.010 & 19.27 & 3 & 38 & 0.9907 & 0.0062 & 0.9900 & 0.0062\\
-xgboost & GUIDE & & 0.050 & 49.90 & 34 & 58 & 0.9977 & 0.0003 & 0.9970 & 0.0004\\
+XGBoost & SLIM & 0.15 & & 2.22 & 2 & 7 & 0.9647 & 0.0063 & 0.9643 & 0.0063\\
+XGBoost & SLIM & 0.10 & & 19.23 & 3 & 40 & 0.9908 & 0.0062 & 0.9902 & 0.0062\\
+XGBoost & SLIM & 0.05 & & 49.05 & 34 & 56 & 0.9978 & 0.0003 & 0.9972 & 0.0003\\
+XGBoost & CTree & 0.15 & & 32.81 & 26 & 41 & 0.9972 & 0.0002 & 0.9965 & 0.0003\\
+XGBoost & CTree & 0.10 & & 36.36 & 29 & 43 & 0.9973 & 0.0002 & 0.9966 & 0.0003\\
+XGBoost & CTree & 0.05 & & 39.37 & 32 & 47 & 0.9974 & 0.0002 & 0.9967 & 0.0003\\
+XGBoost & MOB & & 0.001 & 38.44 & 29 & 47 & 0.9979 & 0.0002 & 0.9972 & 0.0003\\
+XGBoost & MOB & & 0.010 & 42.62 & 31 & 53 & 0.9980 & 0.0002 & 0.9973 & 0.0003\\
+XGBoost & MOB & & 0.050 & 46.02 & 39 & 55 & 0.9981 & 0.0002 & 0.9974 & 0.0003\\
+XGBoost & GUIDE & & 0.001 & 2.21 & 2 & 8 & 0.9645 & 0.0061 & 0.9641 & 0.0062\\
+XGBoost & GUIDE & & 0.010 & 19.27 & 3 & 38 & 0.9907 & 0.0062 & 0.9900 & 0.0062\\
+XGBoost & GUIDE & & 0.050 & 49.90 & 34 & 58 & 0.9977 & 0.0003 & 0.9970 & 0.0004\\
 \hline
-xgboost & & & & & & & 0.9877 & 0.0003 & 0.9852 & 0.0006\\
+XGBoost & & & & & & & 0.9877 & 0.0003 & 0.9852 & 0.0006\\
 \hline
 
 \hline
 \end{tabular}
-\caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario \textbf{linear smooth} with sample size n = 5000 for different values of $impr$ and $alpha$}
+\caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario linear smooth with sample size $n = 5000$ for different values of $impr$ and $alpha$}
 \label{tab:app_linear_smooth_5000}
 
 \end{table}
@@ -321,7 +320,7 @@ xgboost & & & & & & & 0.9877 & 0.0003 & 0.9852 & 0.0006\\
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black box & MBT & impr & alpha & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
+black box & MBT & $impr$ & $alpha$ & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
 \hline
 gam & SLIM & 0.15 & & 2.00 & 2 & 2 & 0.8528 & 0.0064 & 0.8513 & 0.0108\\
 gam & SLIM & 0.10 & & 2.64 & 2 & 4 & 0.8972 & 0.0432 & 0.8937 & 0.0440\\
@@ -339,24 +338,24 @@ gam & CTree & & 0.050 & 14.86 & 13 & 16 & 0.9783 & 0.0016 & 0.9729 & 0.0028\\
 gam & & & & & & & 0.9702 & 0.0018 & 0.9694 & 0.0029\\
 \hline
 
-xgboost & SLIM & 0.15 & & 2.00 & 2 & 2 & 0.8321 & 0.0075 & 0.8323 & 0.0118\\
-xgboost & SLIM & 0.10 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
-xgboost & SLIM & 0.05 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
-xgboost & GUIDE & 0.15 & & 2.00 & 2 & 2 & 0.8321 & 0.0075 & 0.8323 & 0.0118\\
-xgboost & GUIDE & 0.10 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
-xgboost & GUIDE & 0.05 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
-xgboost & MOB & & 0.001 & 13.45 & 11 & 16 & 0.9793 & 0.0063 & 0.9729 & 0.0069\\
-xgboost & MOB & & 0.010 & 14.38 & 13 & 16 & 0.9831 & 0.0055 & 0.9765 & 0.0066\\
-xgboost & MOB & & 0.050 & 14.63 & 13 & 16 & 0.9837 & 0.0052 & 0.9771 & 0.0062\\
-xgboost & CTree & & 0.001 & 11.96 & 10 & 14 & 0.9602 & 0.0030 & 0.9545 & 0.0049\\
-xgboost & CTree & & 0.010 & 12.76 & 10 & 15 & 0.9612 & 0.0033 & 0.9550 & 0.0050\\
-xgboost & CTree & & 0.050 & 13.46 & 10 & 16 & 0.9623 & 0.0036 & 0.9558 & 0.0052\\
+XGBoost & SLIM & 0.15 & & 2.00 & 2 & 2 & 0.8321 & 0.0075 & 0.8323 & 0.0118\\
+XGBoost & SLIM & 0.10 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
+XGBoost & SLIM & 0.05 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
+XGBoost & GUIDE & 0.15 & & 2.00 & 2 & 2 & 0.8321 & 0.0075 & 0.8323 & 0.0118\\
+XGBoost & GUIDE & 0.10 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
+XGBoost & GUIDE & 0.05 & & 4.00 & 4 & 4 & 0.9923 & 0.0012 & 0.9870 & 0.0029\\
+XGBoost & MOB & & 0.001 & 13.45 & 11 & 16 & 0.9793 & 0.0063 & 0.9729 & 0.0069\\
+XGBoost & MOB & & 0.010 & 14.38 & 13 & 16 & 0.9831 & 0.0055 & 0.9765 & 0.0066\\
+XGBoost & MOB & & 0.050 & 14.63 & 13 & 16 & 0.9837 & 0.0052 & 0.9771 & 0.0062\\
+XGBoost & CTree & & 0.001 & 11.96 & 10 & 14 & 0.9602 & 0.0030 & 0.9545 & 0.0049\\
+XGBoost & CTree & & 0.010 & 12.76 & 10 & 15 & 0.9612 & 0.0033 & 0.9550 & 0.0050\\
+XGBoost & CTree & & 0.050 & 13.46 & 10 & 16 & 0.9623 & 0.0036 & 0.9558 & 0.0052\\
 \hline
-xgboost & & & & & & & 0.9876 & 0.0015 & 0.9778 & 0.0031\\
+XGBoost & & & & & & & 0.9876 & 0.0015 & 0.9778 & 0.0031\\
 \hline
 \end{tabular}
+\caption{Mean simulation results on 100 simulation runs as surrogate models  on scenario linear categorical with sample size $n=1500$ for different values of $impr$ and $alpha$}
 \label{tab:app_linear_abrupt_1000}
-\caption{Mean simulation results on 100 simulation runs as surrogate models  on scenario \textbf{linear categorical} with sample size n=1500 for different values of impr and alpha}
 
 \end{table}
 
@@ -367,7 +366,7 @@ xgboost & & & & & & & 0.9876 & 0.0015 & 0.9778 & 0.0031\\
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black box & MBT & impr & alpha & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
+black box & MBT & $impr$ & $alpha$ & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
 \hline
 standalone & SLIM & 0.15 & & 2.00 & 2 & 2 & 0.8277 & 0.0032 & 0.8267 & 0.0048\\
 standalone & SLIM & 0.10 & & 4.00 & 4 & 4 & 0.9887 & 0.0008 & 0.9886 & 0.0011\\
@@ -400,24 +399,24 @@ gam & CTree & & 0.050 & 39.43 & 36 & 45 & 0.9798 & 0.0010 & 0.9776 & 0.0013\\
 gam & & & & & & & 0.9701 & 0.0010 & 0.9698 & 0.0014\\
 \hline
 
-xgboost & SLIM & 0.15 & & 2.00 & 2 & 2 & 0.8335 & 0.0033 & 0.8334 & 0.0048\\
-xgboost & SLIM & 0.10 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
-xgboost & SLIM & 0.05 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
-xgboost & GUIDE & 0.15 & & 2.00 & 2 & 2 & 0.8335 & 0.0033 & 0.8334 & 0.0048\\
-xgboost & GUIDE & 0.10 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
-xgboost & GUIDE & 0.05 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
-xgboost & MOB & & 0.001 & 53.91 & 49 & 60 & 0.9987 & 0.0002 & 0.9974 & 0.0007\\
-xgboost & MOB & & 0.010 & 55.38 & 49 & 60 & 0.9988 & 0.0002 & 0.9974 & 0.0007\\
-xgboost & MOB & & 0.050 & 56.40 & 50 & 61 & 0.9988 & 0.0002 & 0.9974 & 0.0007\\
-xgboost & CTree & & 0.001 & 24.16 & 19 & 29 & 0.9600 & 0.0016 & 0.9577 & 0.0021\\
-xgboost & CTree &  & 0.010 & 26.39 & 21 & 32 & 0.9605 & 0.0015 & 0.9581 & 0.0021\\
-xgboost & CTree & & 0.050 & 28.97 & 22 & 36 & 0.9612 & 0.0017 & 0.9587 & 0.0023\\
+XGBoost & SLIM & 0.15 & & 2.00 & 2 & 2 & 0.8335 & 0.0033 & 0.8334 & 0.0048\\
+XGBoost & SLIM & 0.10 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
+XGBoost & SLIM & 0.05 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
+XGBoost & GUIDE & 0.15 & & 2.00 & 2 & 2 & 0.8335 & 0.0033 & 0.8334 & 0.0048\\
+XGBoost & GUIDE & 0.10 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
+XGBoost & GUIDE & 0.05 & & 4.00 & 4 & 4 & 0.9949 & 0.0009 & 0.9942 & 0.0011\\
+XGBoost & MOB & & 0.001 & 53.91 & 49 & 60 & 0.9987 & 0.0002 & 0.9974 & 0.0007\\
+XGBoost & MOB & & 0.010 & 55.38 & 49 & 60 & 0.9988 & 0.0002 & 0.9974 & 0.0007\\
+XGBoost & MOB & & 0.050 & 56.40 & 50 & 61 & 0.9988 & 0.0002 & 0.9974 & 0.0007\\
+XGBoost & CTree & & 0.001 & 24.16 & 19 & 29 & 0.9600 & 0.0016 & 0.9577 & 0.0021\\
+XGBoost & CTree &  & 0.010 & 26.39 & 21 & 32 & 0.9605 & 0.0015 & 0.9581 & 0.0021\\
+XGBoost & CTree & & 0.050 & 28.97 & 22 & 36 & 0.9612 & 0.0017 & 0.9587 & 0.0023\\
 \hline
-xgboost & & & & & & & 0.9880 & 0.0009 & 0.9852 & 0.0009\\
+XGBoost & & & & & & & 0.9880 & 0.0009 & 0.9852 & 0.0009\\
 \hline
 
 \end{tabular}
-\caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario \textbf{linear categorical} with sample size n = 5000 for different values of impr and alpha}
+\caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario linear categorical with sample size $n = 5000$ for different values of $impr$ and $alpha$}
 \label{tab:app_linear_abrupt_5000}
 
 \end{table}
@@ -430,7 +429,7 @@ xgboost & & & & & & & 0.9880 & 0.0009 & 0.9852 & 0.0009\\
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black box & MBT & impr & alpha & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
+black box & MBT & $impr$ & $alpha$ & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
 \hline
 lm & SLIM & 0.15 & & 3.20 & 2 & 13 & 0.8879 & 0.0309 & 0.8806 & 0.0331\\
 lm & SLIM & 0.10 & & 13.07 & 5 & 16 & 0.9875 & 0.0098 & 0.9843 & 0.0108\\
@@ -450,23 +449,23 @@ lm & & & & & & & 0.9902 & 0.0006 & 0.9898 & 0.0008\\
 \hline
 
 
-xgboost & SLIM & 0.15 & & 4.47 & 2 & 13 & 0.9067 & 0.0336 & 0.9013 & 0.0339\\
-xgboost & SLIM & 0.10 & & 12.80 & 7 & 16 & 0.9832 & 0.0089 & 0.9724 & 0.0103\\
-xgboost & SLIM & 0.05 & & 14.80 & 12 & 17 & 0.9870 & 0.0018 & 0.9764 & 0.0044\\
-xgboost & GUIDE & 0.15 & & 4.37 & 2 & 13 & 0.9059 & 0.0335 & 0.9005 & 0.0339\\
-xgboost & GUIDE & 0.10 & & 12.48 & 6 & 16 & 0.9822 & 0.0098 & 0.9715 & 0.0112\\
-xgboost & GUIDE & 0.05 & & 14.47 & 12 & 17 & 0.9863 & 0.0022 & 0.9758 & 0.0047\\
-xgboost & MOB & & 0.001 & 14.82 & 13 & 17 & 0.9853 & 0.0018 & 0.9745 & 0.0047\\
-xgboost & MOB & & 0.010 & 14.94 & 13 & 17 & 0.9854 & 0.0017 & 0.9746 & 0.0046\\
-xgboost & MOB & & 0.050 & 14.94 & 13 & 17 & 0.9854 & 0.0017 & 0.9746 & 0.0046\\
-xgboost & CTree & & 0.001 & 15.03 & 13 & 17 & 0.9850 & 0.0017 & 0.9743 & 0.0042\\
-xgboost & CTree & & 0.010 & 15.07 & 13 & 17 & 0.9850 & 0.0017 & 0.9743 & 0.0042\\
-xgboost & CTree & & 0.050 & 15.07 & 13 & 17 & 0.9850 & 0.0017 & 0.9743 & 0.0042\\
+XGBoost & SLIM & 0.15 & & 4.47 & 2 & 13 & 0.9067 & 0.0336 & 0.9013 & 0.0339\\
+XGBoost & SLIM & 0.10 & & 12.80 & 7 & 16 & 0.9832 & 0.0089 & 0.9724 & 0.0103\\
+XGBoost & SLIM & 0.05 & & 14.80 & 12 & 17 & 0.9870 & 0.0018 & 0.9764 & 0.0044\\
+XGBoost & GUIDE & 0.15 & & 4.37 & 2 & 13 & 0.9059 & 0.0335 & 0.9005 & 0.0339\\
+XGBoost & GUIDE & 0.10 & & 12.48 & 6 & 16 & 0.9822 & 0.0098 & 0.9715 & 0.0112\\
+XGBoost & GUIDE & 0.05 & & 14.47 & 12 & 17 & 0.9863 & 0.0022 & 0.9758 & 0.0047\\
+XGBoost & MOB & & 0.001 & 14.82 & 13 & 17 & 0.9853 & 0.0018 & 0.9745 & 0.0047\\
+XGBoost & MOB & & 0.010 & 14.94 & 13 & 17 & 0.9854 & 0.0017 & 0.9746 & 0.0046\\
+XGBoost & MOB & & 0.050 & 14.94 & 13 & 17 & 0.9854 & 0.0017 & 0.9746 & 0.0046\\
+XGBoost & CTree & & 0.001 & 15.03 & 13 & 17 & 0.9850 & 0.0017 & 0.9743 & 0.0042\\
+XGBoost & CTree & & 0.010 & 15.07 & 13 & 17 & 0.9850 & 0.0017 & 0.9743 & 0.0042\\
+XGBoost & CTree & & 0.050 & 15.07 & 13 & 17 & 0.9850 & 0.0017 & 0.9743 & 0.0042\\
 \hline
-xgboost & & & & & & & 0.9859 & 0.0014 & 0.9682 & 0.0042\\
+XGBoost & & & & & & & 0.9859 & 0.0014 & 0.9682 & 0.0042\\
 \hline
 \end{tabular}
-\caption{Mean simulation results on 100 simulation runs as surrogate models on scenario \textbf{linear mixed} with sample size $n=1500$ for different values of impr and alpha}
+\caption{Mean simulation results on 100 simulation runs as surrogate models on scenario linear mixed with sample size $n=1500$ for different values of $impr$ and $alpha$}
 \label{tab:app_linear_mixed_1000}
 
 \end{table}
@@ -480,7 +479,7 @@ xgboost & & & & & & & 0.9859 & 0.0014 & 0.9682 & 0.0042\\
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black box & MBT & impr & alpha & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
+black box & MBT & $impr$ & $alpha$ & n leaves & n leaves min & n leaves max &  $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$\\
 \hline
 standalone & SLIM & 0.15 & & 2.30 & 2 & 8 & 0.8637 & 0.0165 & 0.8626 & 0.0176\\
 standalone & SLIM & 0.10 & & 38.96 & 21 & 54 & 0.9865 & 0.0029 & 0.9849 & 0.0030\\
@@ -514,31 +513,30 @@ lm & & & & & & & 0.9901 & 0.0003 & 0.9902 & 0.0004\\
 
 
 \hline
-xgboost & SLIM & 0.15 & & 2.22 & 2 & 12 & 0.8693 & 0.0121 & 0.8706 & 0.0129\\
-xgboost & SLIM & 0.10 & & 39.52 & 23 & 53 & 0.9931 & 0.0027 & 0.9914 & 0.0027\\
-xgboost & SLIM & 0.05 & & 56.86 & 46 & 63 & 0.9964 & 0.0005 & 0.9948 & 0.0007\\
-xgboost & GUIDE & 0.15 & & 2.15 & 2 & 9 & 0.8693 & 0.0119 & 0.8705 & 0.0127\\
-xgboost & GUIDE & 0.10 & & 38.13 & 22 & 52 & 0.9928 & 0.0027 & 0.9912 & 0.0028\\
-xgboost & GUIDE & 0.05 & & 56.72 & 46 & 63 & 0.9963 & 0.0006 & 0.9946 & 0.0007\\
-xgboost & MOB & & 0.001 & 58.76 & 54 & 63 & 0.9961 & 0.0003 & 0.9942 & 0.0005\\
-xgboost & MOB & & 0.010 & 59.47 & 55 & 64 & 0.9961 & 0.0003 & 0.9943 & 0.0005\\
-xgboost & MOB & & 0.050 & 59.69 & 55 & 64 & 0.9961 & 0.0003 & 0.9943 & 0.0005\\
-xgboost & CTree & & 0.001 & 58.51 & 53 & 62 & 0.9956 & 0.0003 & 0.9936 & 0.0005\\
-xgboost & CTree & & 0.010 & 58.95 & 54 & 63 & 0.9956 & 0.0003 & 0.9936 & 0.0005\\
-xgboost & CTree & & 0.050 & 59.09 & 54 & 63 & 0.9956 & 0.0003 & 0.9936 & 0.0005\\
+XGBoost & SLIM & 0.15 & & 2.22 & 2 & 12 & 0.8693 & 0.0121 & 0.8706 & 0.0129\\
+XGBoost & SLIM & 0.10 & & 39.52 & 23 & 53 & 0.9931 & 0.0027 & 0.9914 & 0.0027\\
+XGBoost & SLIM & 0.05 & & 56.86 & 46 & 63 & 0.9964 & 0.0005 & 0.9948 & 0.0007\\
+XGBoost & GUIDE & 0.15 & & 2.15 & 2 & 9 & 0.8693 & 0.0119 & 0.8705 & 0.0127\\
+XGBoost & GUIDE & 0.10 & & 38.13 & 22 & 52 & 0.9928 & 0.0027 & 0.9912 & 0.0028\\
+XGBoost & GUIDE & 0.05 & & 56.72 & 46 & 63 & 0.9963 & 0.0006 & 0.9946 & 0.0007\\
+XGBoost & MOB & & 0.001 & 58.76 & 54 & 63 & 0.9961 & 0.0003 & 0.9942 & 0.0005\\
+XGBoost & MOB & & 0.010 & 59.47 & 55 & 64 & 0.9961 & 0.0003 & 0.9943 & 0.0005\\
+XGBoost & MOB & & 0.050 & 59.69 & 55 & 64 & 0.9961 & 0.0003 & 0.9943 & 0.0005\\
+XGBoost & CTree & & 0.001 & 58.51 & 53 & 62 & 0.9956 & 0.0003 & 0.9936 & 0.0005\\
+XGBoost & CTree & & 0.010 & 58.95 & 54 & 63 & 0.9956 & 0.0003 & 0.9936 & 0.0005\\
+XGBoost & CTree & & 0.050 & 59.09 & 54 & 63 & 0.9956 & 0.0003 & 0.9936 & 0.0005\\
 \hline
-xgboost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
+XGBoost & & & & & & & 0.9877 & 0.0007 & 0.9836 & 0.0011\\
 \hline
 
 \end{tabular}
-\caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario \textbf{linear mixed} with sample size n = 5000 for different values of impr and alpha}
+\caption{Mean simulation results on 100 simulation runs as stand alone and surrogate models on scenario linear mixed with sample size $n = 5000$ for different values of $impr$ and $alpha$}
 \label{tab:app_linear_mixed_5000}
 
 \end{table}
 
 
 \clearpage
-\subsubsection{Correlated features}
 
 \subsubsection{Linear smooth with noise features}
 Figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone_r2_test_slim} show the the $R^2$ test accuracy in scenario linear smooth with noise features. Figure \ref{fig:app_lasso_standalone_r2_test_slim} shows that in this scenario asymmetric trees (i.e. trees with a maximum leafsize $> 700$) lead to poorer performance in SLIM and GUIDE.
@@ -559,10 +557,10 @@ Figures \ref{fig:app_lasso_standalone_r2_test} and \ref{fig:app_lasso_standalone
 \label{fig:app_lasso_standalone_r2_test_slim}
 \end{figure} 
 
-\subsubsection{Nonlinear}
+\subsubsection{Nonlinear effects}
 
-\paragraph{xgboost configurations}
-In Table \ref{tab:app_xgboost_config_nonlinear} the xgboost hyperparameter setting for simulation nonlinear is shown.
+\paragraph{XGBoost configurations}
+In Table \ref{tab:app_xgboost_config_nonlinear} the XGBoost hyperparameter setting for simulation nonlinear is shown.
 \begin{table}[!htb]
     \centering
     \begin{tabular}{l|r}
@@ -576,7 +574,7 @@ In Table \ref{tab:app_xgboost_config_nonlinear} the xgboost hyperparameter setti
     nrounds & 700 \\
     \hline
     \end{tabular}
-    \caption{xgboost hyperparameters for scenario nonlinear after hyperparametertuning}
+    \caption{XGBoost hyperparameters for scenario nonlinear after hyperparametertuning}
     \label{tab:app_xgboost_config_nonlinear}
 \end{table}
 
@@ -590,44 +588,43 @@ black box & model & n leaves & n l min & n l max & n split feat & n sf min & n s
 \hline
 standalone & basic lm & 43.06 & 36 & 48 & 5.68 & 4 & 6 & 0.5089 & 6.5804 & 0.1249\\
 standalone & penalized poly & 19.32 & 16 & 22 & 4.26 & 3 & 5 & 0.2374 & 8.8768 & 0.3681\\
-standalone & bsplines & 18.38 & 13 & 22 & 4.26 & 3 & 6 & 0.0126 & & \\
+standalone & B-Splines & 18.38 & 13 & 22 & 4.26 & 3 & 6 & 0.0126 & & \\
 standalone & gam & 17.60 & 12 & 22 & 3.44 & 2 & 4 & 0.0007 & & \\
 \hline
-xgboost & basic lm & 30.38 & 2 & 47 & 4.56 & 1 & 6 & 0.6732 & 6.8519 & 0.1558\\
-xgboost & penalized poly & 20.66 & 16 & 24 & 4.70 & 3 & 6 & 0.2327 & 9.2909 & 0.4347\\
-xgboost & bsplines & 17.38 & 2 & 25 & 4.70 & 1 & 6 & 0.0597 & &\\
-xgboost & gam & 15.28 & 2 & 24 & 4.00 & 1 & 6 & 0.0191 & &\\
+XGBoost & basic lm & 30.38 & 2 & 47 & 4.56 & 1 & 6 & 0.6732 & 6.8519 & 0.1558\\
+XGBoost & penalized poly & 20.66 & 16 & 24 & 4.70 & 3 & 6 & 0.2327 & 9.2909 & 0.4347\\
+XGBoost & B-Splines & 17.38 & 2 & 25 & 4.70 & 1 & 6 & 0.0597 & &\\
+XGBoost & gam & 15.28 & 2 & 24 & 4.00 & 1 & 6 & 0.0191 & &\\
 \hline
 \end{tabular}
+\caption{Mean interpretability simulation results nonlinear scenario 2}
 \label{tab:app_nonlinear_interpretability}
-\caption{mean interpretability simulation results nonlinear scenario 2}
 
 \end{table}
 
 
 \begin{table}[!htb] 
 
-\centering \tiny
+\centering \footnotesize
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline
 black box & model & $R^2_{train}$  & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & time in sec\\
 \hline
 standalone & basic lm & 0.9633 & 0.0035 & 0.9469 & 0.0048 & 102.2842\\
 standalone & penalized poly & 0.9824 & 0.0015 & 0.9781 & 0.0020 & 195.4385\\
-standalone & bsplines & 0.9929 & 0.0013 & 0.9714 & 0.0029 & 113.2447\\
+standalone & B-Splines & 0.9929 & 0.0013 & 0.9714 & 0.0029 & 113.2447\\
 standalone & gam & 0.9880 & 0.0016 & 0.9835 & 0.0017 & 1544.3393\\
 \hline
-xgboost & basic lm & 0.9198 & 0.0516 & 0.9030 & 0.0417 & 72.3790\\
-xgboost & penalized poly & 0.9750 & 0.0033 & 0.9634 & 0.0051 & 206.5870\\
-xgboost & bsplines & 0.9865 & 0.0141 & 0.9591 & 0.0092 & 97.9321\\
-xgboost & gam & 0.9786 & 0.0127 & 0.9672 & 0.0115 & 1728.6021\\
+XGBoost & basic lm & 0.9198 & 0.0516 & 0.9030 & 0.0417 & 72.3790\\
+XGBoost & penalized poly & 0.9750 & 0.0033 & 0.9634 & 0.0051 & 206.5870\\
+XGBoost & B-Splines & 0.9865 & 0.0141 & 0.9591 & 0.0092 & 97.9321\\
+XGBoost & gam & 0.9786 & 0.0127 & 0.9672 & 0.0115 & 1728.6021\\
 \hline
-xgboost & xgboost & 0.9392 & 0.0342 & 0.9216 & 0.0405 & 3.0131\\
+XGBoost & XGBoost & 0.9392 & 0.0342 & 0.9216 & 0.0405 & 3.0131\\
 \hline
 \end{tabular}
+\caption{Mean performance simulation results nonlinear effects variant 2}
 \label{tab:app_nonlinear_performance}
-\caption{mean performance simulation results nonlinear scenario 2}
-
 \end{table}
 
 
@@ -732,7 +729,7 @@ CTree deep & 0.9997083 & 0.0493729 & 0.1451053 & 1.385141 & 20\\
 
 
 
-Table \ref{tab:ins_k2204_ppv_bsplines_surrogates_share}  shows the proportions of observations that were split according to the different features. 
+Table \ref{tab:ins_k2204_ppv_bsplines_surrogates_share} shows the proportions of observations that were split according to the different features. 
 
 
 \begin{table}[!htb]

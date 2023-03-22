@@ -12,6 +12,7 @@
 bindingoffset = 0mm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{diagbox}
+\usepackage{bbold}
 \usepackage{makecell}
 \usepackage{ragged2e}
 \usepackage{xcolor}
@@ -20,6 +21,7 @@ bindingoffset = 0mm]{geometry}
 \newcommand{\changefont}{%
     \fontsize{8}{11}\selectfont
 }
+
 \usepackage[onehalfspacing]{setspace}
 \usepackage{amsmath}
 \usepackage{hyperref}
@@ -76,7 +78,7 @@ Ludwig-Maximilians-Universität München
 \vfill
 
 \large
-Munich, Month Day\textsuperscript{th}, Year
+Munich, March 24\textsuperscript{th}, 2023
       
 \vfill
 
@@ -85,6 +87,7 @@ Munich, Month Day\textsuperscript{th}, Year
 \vfill
 
 \normalsize
+Submitted in partial fulfillment of the requirements for the degree of M.Sc. in Statistik mit wirtschafts- und sozialwissenschaftlicher Ausrichtung \\
 Supervised by \mysupervisor
 
 \end{center}
@@ -97,7 +100,7 @@ Supervised by \mysupervisor
 
 \begin{abstract}
 
-Surrogate models allow complex but powerful black box machine learning models to be interpreted retrospectively. In this work, the following requirements are placed on a surrogate model: It should divide the feature space in subregions where interpretable models that only include main effects can approximate the black box model. In this way, both good interpretability and high performance should be achieved. For the generation of such models, four different algorithms for the generation of model-based trees are compared: SLIM, GUIDE, MOB and CTree. Selection bias, performance, interpretability and stability of the different methods are investigated. In the presence of subgroup-specific main effects, SLIM and GUIDE convince with their results regarding interpretability and performance.
+Surrogate models allow complex but powerful black box machine learning models to be interpreted retrospectively. In this work, the following requirement is placed on a surrogate model: It should divide the feature space in subregions where interpretable models that only include main effects can approximate the black box model. In this way, both good interpretability and high performance should be achieved. For the generation of such models, four different algorithms for the generation of model-based trees are compared: SLIM, GUIDE, MOB and CTree. Selection bias, performance, interpretability and stability of the different methods are investigated. In the presence of subgroup-specific main effects, SLIM and GUIDE convince with their results regarding interpretability and performance.
 
 \end{abstract}
 
@@ -126,7 +129,7 @@ Surrogate models allow complex but powerful black box machine learning models to
 \input{Latex/chapters/2_Related_work}
 \newpage
 
-\section{Background}
+\section{Model-based Trees}
 \label{background}
 \input{Latex/chapters/3_Background}
 \newpage
@@ -175,11 +178,6 @@ Surrogate models allow complex but powerful black box machine learning models to
 \input{chapters/appendix}
 \newpage
 \clearpage
-
-\section{Electronic appendix}
-\label{el_app}
-
-Data, code and figures are provided in electronic form.
 
     
 % ------------------------------------------------------------------------------
