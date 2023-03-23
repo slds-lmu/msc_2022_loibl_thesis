@@ -947,6 +947,8 @@ get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
   return(data.frame(prediction))
 }
 
+
+# Reguralized regression with glmnet
 get_model_glmnet = function(y, x, .family, .alpha, .degree.poly = 1, .df.spline, .fit.bsplines, .exclude.categoricals, .lambda, .df.max, .type = "model", ...) {
   y = unlist(y)
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
@@ -1082,6 +1084,8 @@ get_prediction_glmnet = function(model, x, .exclude.categoricals, ...) {
   return(prediction)
 }
 
+
+# LAD regression
 get_model_lad = function(y, x, .exclude.categoricals, .type = "model", ...){
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   if (.exclude.categoricals){
@@ -1113,6 +1117,8 @@ get_prediction_lad = function(model, x, .exclude.categoricals, ...) {
 }																	   
 
 
+
+# GAM
 get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, .type = "model", ...) {
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   term = c()
