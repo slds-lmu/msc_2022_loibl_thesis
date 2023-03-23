@@ -47,7 +47,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
     res_df[, config_id:=.GRP,by = group_cols]
     
     
-    # summarize results (calculate mean, sd, min, max,... by group)
+    # summarize results (calculate mean, sd, min, max, qunatiles, ... by group)
     group_cols = c(group_cols, "config_id")
     
     res_mean_exp = res_df[, lapply(.SD, function(col){mean(as.numeric(col), na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
@@ -90,29 +90,27 @@ reduce_trees = function(ades, pdes, savedir, reg){
 
     # calculate rand indices (only for basic scenarios)
     if("stability" %in% colnames(res_df)){
-      # create all possible pairs of simulation repititions
+      # create all possible pairs of simulation repititions (4950)
       pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
-
-      set_index = rep(1:100,50)
+      
       stability_list = lapply(seq_along(pair_ids), function(p){
         pair = pair_ids[[p]]
         stability_df = data.frame(config_id = integer(), ri = double(),
                                   job.id = integer(), evaluationset_seed = integer(), stability_same_size = logical())
-
+        
+        # set seed to make results reproducable
         set.seed(p+10000)
         stability_index_set = sample(1:50000, 1000)
         for(conf in unique(res_df$config_id)){
           s1_region =  res_df[job.id == pair[[1]] & config_id == conf, stability][[1]][stability_index_set]
           s2_region =  res_df[job.id == pair[[2]] & config_id == conf, stability][[1]][stability_index_set]
-
-
-
+          
           if(length(s1_region)>1){
             stability_same_size = (length(unique(s1_region)) == length(unique(s2_region)))
-
+            
             if(stability_same_size){
               ri = rand.index(as.numeric(s1_region), as.numeric(s2_region))
-
+              
               stability_df = rbind(stability_df,
                                    c(config_id = conf, ri = ri, job.id = pair[[1]],
                                      evaluationset_seed = p+10000, stability_same_size = stability_same_size),
@@ -120,31 +118,26 @@ reduce_trees = function(ades, pdes, savedir, reg){
                                      evaluationset_seed = p+10000, stability_same_size = stability_same_size))
             }
           }
-
-
         }
-
+        
         colnames(stability_df) = c("config_id", "ri", "job.id", "evaluationset_seed", "stability_same_size")
         return(stability_df)
       })
-     stability_df = data.table(do.call("rbind", stability_list))
-    
       
+      stability_df = data.table(do.call("rbind", stability_list))
+  
       res_df[, ":="(stability = NULL)]
-      
       res_save = ijoin(res_df, stability_df, by = c("job.id", "config_id"))
       
-      # save (detailed) results
+      # save (detailed) results inclusive rand indices
       saveRDS(res_save, paste0(savedir, exp, "_res_experiments.rds" ))
       
-      
       stability_mean = stability_df[, .(ri = mean(ri, na.rm = TRUE),
-                                           ri_05 = lower_bound(ri),
-                                           ri_95 = upper_bound(ri)), by = config_id]
+                                        ri_05 = lower_bound(ri),
+                                        ri_95 = upper_bound(ri)), by = config_id]
       
-
+      
       stability_sd = stability_df[, lapply(.SD, function(col){sd(col, na.rm = TRUE)}), by = config_id, .SDcols = c("ri")]
-      
       
       res_mean_exp = ljoin(res_mean_exp, stability_mean)
       res_sd_exp = ljoin(res_sd_exp, stability_sd)

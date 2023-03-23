@@ -16,16 +16,6 @@
 
 
 
-library(dplyr)
-library(REdaS)
-library(kableExtra)
-library(batchtools)
-library(data.table)
-library(GGally)
-library(ggpubr)
-
-
-
 
 colors_mbt =c("SLIM" = 'purple', "SLIM low symmetry" = "purple3", "GUIDE" = 'olivedrab3', "GUIDE low symmetry" = 'olivedrab4', 
               "MOB" ='skyblue', "CTree" = 'salmon')

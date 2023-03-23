@@ -1,7 +1,7 @@
 # install.packages(c("R6", "BBmisc", "stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table",
 #                    "dplyr", "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", "splines",
 #                    "partitions", "partykit", "checkmate", "mlr3", "mlr3learners", "mlr3measures",
-#                    "mlr3pipelines", "mlr3tuning", "caTools", "igraph", "fossil"))
+#                    "mlr3pipelines", "mlr3tuning", "caTools", "igraph", "fossil", "kableExtra))
 
 library(R6)
 library(BBmisc)
@@ -29,3 +29,4 @@ library(caTools)
 library(igraph)
 library(batchtools)
 library(fossil)
+library(kableExtra)
