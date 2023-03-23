@@ -39,8 +39,7 @@ The resulting frequencies are shown in Figure \ref{fig:selection_bias_independen
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=10cm]{Figures/simulations/chapter_4_selection_bias/selection_bias_general/independence_numerical.png}
-    \caption{Simulated frequencies of selected splitting features for scenario independence numeric}
-    \label{fig:selection_bias_independence_numeric}
+    \caption{Simulated frequencies of selected splitting features for scenario independence numeric}   \label{fig:selection_bias_independence_numeric}
 \end{figure}
 
 
@@ -83,7 +82,7 @@ The difference between the categorical ($\textbf{x}_5$ and $\textbf{x}_6$) and t
 
 
 
-As a possible correction approach for the selection bias in SLIM, I investigated how the number of quantiles considered as potential split points affects the selection bias and the performance (mean square error) of SLIM. The simulation setup and results are shown in the appendix \ref{app:selection_bias_correction}. In summary, although selection bias can be reduced for numerical variables in the case of an independent target variable, this correction can lead to unpredictable biases if interactions are actually present. For this reason, the approach is not recommended. 
+As a possible correction approach for the selection bias in SLIM, I investigated how the number of quantiles considered as potential split points affects the selection bias and the performance of SLIM. The simulation setup and results are shown in the appendix \ref{app:selection_bias_correction}. In summary, although selection bias can be reduced for numerical variables in the case of an independent target variable, this correction can lead to unpredictable biases if interactions are actually present. For this reason, the approach is not recommended. 
 For all simulations in this chapter, each unique value was seen as a potential split point for SLIM.
 
 

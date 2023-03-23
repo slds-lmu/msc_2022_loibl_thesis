@@ -5,7 +5,7 @@
 \usepackage{alltt}
 
 \newcommand{\mytitle}{Interpretation of black box models using tree-based surrogate models}
-\newcommand{\myname}{Sofia Loibl}
+\newcommand{\myname}{Sofia Maria Loibl}
 \newcommand{\mysupervisor}{Dr. Giuseppe Casalicchio}
 
 \usepackage[a4paper, width = 160mm, top = 35mm, bottom = 30mm, 
@@ -16,6 +16,7 @@ bindingoffset = 0mm]{geometry}
 \usepackage{makecell}
 \usepackage{ragged2e}
 \usepackage{xcolor}
+\usepackage[nottoc]{tocbibind}
 \usepackage[round, comma]{natbib}
 \usepackage{fancyhdr}
 \newcommand{\changefont}{%
@@ -100,7 +101,7 @@ Supervised by \mysupervisor
 
 \begin{abstract}
 
-Surrogate models allow complex but powerful black box machine learning models to be interpreted retrospectively. In this work, the following requirement is placed on a surrogate model: It should divide the feature space in subregions where interpretable models that only include main effects can approximate the black box model. In this way, both good interpretability and high performance should be achieved. For the generation of such models, four different algorithms for the generation of model-based trees are compared: SLIM, GUIDE, MOB and CTree. Selection bias, performance, interpretability and stability of the different methods are investigated. In the presence of subgroup-specific main effects, SLIM and GUIDE convince with their results regarding interpretability and performance.
+Surrogate models allow complex but powerful black box machine learning models to be interpreted retrospectively. In this work, the following requirement is placed on a surrogate model: It should divide the feature space in subregions where interpretable models that only include main effects can approximate the black box model. In this way, both good interpretability and high performance should be achieved. For the generation of such models, four different model-based tree algorithms  are compared: SLIM, GUIDE, MOB and CTree. Selection bias, performance, interpretability and stability of the different methods are investigated. In the presence of subgroup-specific main effects, SLIM and GUIDE convince with their results regarding interpretability and performance.
 
 \end{abstract}
 
@@ -124,12 +125,12 @@ Surrogate models allow complex but powerful black box machine learning models to
 \input{Latex/chapters/1_Introduction}
 \newpage
 
-\section{Related Work}
+\section{Related work}
 \label{related}
 \input{Latex/chapters/2_Related_work}
 \newpage
 
-\section{Model-based Trees}
+\section{Model-based trees}
 \label{background}
 \input{Latex/chapters/3_Background}
 \newpage
@@ -159,18 +160,30 @@ Surrogate models allow complex but powerful black box machine learning models to
 
 \newpage
 
-% ------------------------------------------------------------------------------
-% APPENDIX ---------------------------------------------------------------------
-% ------------------------------------------------------------------------------
-    
+
+
+
+
+\newpage
+  
 \pagenumbering{Roman}
+%\setcounter{page}{4} % CHANGE
+% ------------------------------------------------------------------------------
+% BIBLIOGRAPHY -----------------------------------------------------------------
+% ------------------------------------------------------------------------------
+
+\bibliography{bibliography}
+\bibliographystyle{dcu}
+\newpage
 \newpage
 \listoffigures
 \newpage
 \listoftables
 \newpage
-\setcounter{page}{5} % CHANGE
 
+% ------------------------------------------------------------------------------
+% APPENDIX ---------------------------------------------------------------------
+% ------------------------------------------------------------------------------
 \appendix
 
 \section{Appendix}
@@ -179,16 +192,19 @@ Surrogate models allow complex but powerful black box machine learning models to
 \newpage
 \clearpage
 
-    
-% ------------------------------------------------------------------------------
-% BIBLIOGRAPHY -----------------------------------------------------------------
-% ------------------------------------------------------------------------------
-\newpage
+\section{Electronic appendix}
+\label{el_app}
 
-\RaggedRight
-\bibliography{bibliography}
-\bibliographystyle{dcu}
+Data, code and figures are provided in electronic form at \url{https://github.com/slds-lmu/msc_2022_loibl_thesis}.
+All simulations and evaluations were carried out using the statistical software $\mathtt{R}$ \citep{RCoreTeam.2022}.
+The simulations were carried out on the Linux cluster of the Leibniz Supercomputing Centre using the package $\mathtt{batchtools}$ \citep{Lang.2017}.
+The author gratefully acknowledge the Leibniz Supercomputing Centre for funding this project by providing computing time on its Linux-Cluster.
+For data manipulation, the packages $\mathtt{data.table}$ \citep{Dowle.2021}, $\mathtt{dplyr}$ \citep{Wickham.2022} and $\mathtt{stringr}$ \citep{Wickham.2022b} were used. Visualization was done with $\mathtt{ggplot2}$ \citep{Wickham.2016}, $\mathtt{GGally}$ \citep{Schloerke.2021}, $\mathtt{ggpubr}$ \citep{Kassambara.2020} and $\mathtt{igraph}$ \citep{Csardi.2006}. For fitting the black box xgboost models, the package $\mathtt{mlr3}$ \citep{Lang.2019} was used.
+
 \newpage
+\clearpage
+    
+
 
 % ------------------------------------------------------------------------------
 % DECLARATION OF AUTHORSHIP-----------------------------------------------------

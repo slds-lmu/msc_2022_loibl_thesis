@@ -11,7 +11,7 @@ The idea is to find subregions in the feature space in which intrinsically inter
 
 Model-based tree (MBT) algorithms are a promising class to generate such subregional models. 
 The concept of MBTs is based on classical regression trees like CART \citep{Breiman.1984} but a MBT contains models instead of constant values in the subregions (called nodes or leaf nodes).
-It is hence a combination of decision rules and models. If intrinsically interpretable models are chosen for the models, a principally interpretable model is derived. The degree of interpretability and performance, though, depends on the complexity of the decision rules (i.e. depth of the tree or number of leaf nodes) and of the models.
+It is hence a combination of decision rules and models. If intrinsically interpretable models are chosen for the models, a principally interpretable MBT is derived. The degree of interpretability and performance, though, depends on the complexity of the decision rules (i.e. depth of the tree or number of leaf nodes) and of the models.
 In order to enable a good interpretability of the models in the leaf nodes, this thesis sets the constraint that only main effect models are fitted in the nodes. 
 In the ideal case, interactions should then be handled by  splits, so that the models in the leaf nodes are free from interaction effects.
 To ensure that the splits are actually due to interactions and not to nonlinearities, it is necessary that potentially nonlinear main effects are modelled appropriately.
