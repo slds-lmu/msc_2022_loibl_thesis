@@ -1,12 +1,11 @@
-library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
 if (!dir.exists("Data/simulations/chapter_4_selection_bias/selection_bias_guide")) dir.create("Data/simulations/chapter_4_selection_bias/selection_bias_guide", recursive = TRUE)
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_4_selection_bias/selection_bias_guide/batchtools",
-                             source = c("R/simulations/chapter_4_selection_bias/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
-                             seed = 1)
+                             source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
+                             seed = 1, conf.file = NA)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
 
@@ -43,10 +42,7 @@ summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 
 
 # test jobs
-id1 = head(findExperiments(algo.name = "selection_bias"), 1)
-print(id1)
-
-testJob(id = id1)
+testJob(id = 1)
 
 
 

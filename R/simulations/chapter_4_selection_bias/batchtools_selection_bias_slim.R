@@ -1,12 +1,11 @@
-library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
 if (!dir.exists("Data/simulations/chapter_4_selection_bias/selection_bias_slim")) dir.create("Data/simulations/chapter_4_selection_bias/selection_bias_slim", recursive = TRUE)
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_4_selection_bias/selection_bias_slim/batchtools",
-                             source = c("R/simulations/chapter_4_selection_bias/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
-                             # conf.file = NA,
+                             source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R"),
+                             conf.file = NA,
                              seed = 1)
 
 # --- 2. ADD PROBLEMS, ALGORITHMS, EXPERIMENTS ---
@@ -51,7 +50,7 @@ addExperiments(
 summarizeExperiments()
 summarizeExperiments(by = c("problem", "algorithm", "n", "type"))
 
-
+testJob(1)
 # test jobs
 ids = getJobTable(reg = reg)[, .(job.id, problem, algorithm)]
 ids[, chunk := batchtools::chunk(job.id, n.chunks = 250)]
@@ -62,7 +61,6 @@ testJob(4)
 submitJobs(ids = ids, list(walltime = 10000, memory = 512))
 
 
-# reg = loadRegistry("Data/simulations/batchtools/selection_bias_slim/batchtools", conf.file = NA)
 
 
 # reduce jobs/ summarise results
@@ -73,8 +71,6 @@ head(results)
 pars = unwrap(getJobPars(reg = reg))
 tab = ijoin(pars, results)
 head(tab)
-
-
 
 
 

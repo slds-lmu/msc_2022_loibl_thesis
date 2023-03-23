@@ -1,11 +1,10 @@
-library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
 if (!dir.exists("Data/simulations/chapter_4_selection_bias/selection_bias_general")) dir.create("Data/simulations/chapter_4_selection_bias/selection_bias_general", recursive = TRUE)
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_4_selection_bias/selection_bias_general/batchtools",
-                             source = c("R/simulations/chapter_4_selection_bias/simulation_setting_definition.R", "R/tree_splitting_slim.R",
+                             source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/simulations/mob_fitting_functions.R"),
                              conf.file = NA,
                              seed = 1)
