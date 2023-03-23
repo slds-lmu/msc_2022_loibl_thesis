@@ -7,6 +7,8 @@ guide_test = function(y, x, residuals, xgroups = NULL, optimizer, objective, cor
   # separately for each parameter
   x_factor = colnames(x)[sapply(x, is.factor)]
   ybin = (-1)^((residuals>0)+1)   # -1 or +1
+  
+  # curvature test
   curv_test = sapply(x, function(xval){
     test_curvature(xval = xval, ybin = ybin, xgroups = xgroups)
   })
@@ -19,6 +21,8 @@ guide_test = function(y, x, residuals, xgroups = NULL, optimizer, objective, cor
   curv_test$z.value = ifelse(curv_test$type == "n", curv_test$z.value.orig*correction.factor, curv_test$z.value.orig) 
   curv_test = as.data.table(curv_test)
   
+  # interaction test
+  # create all possible two-way interaction sets
   interaction_set = combn(colnames(x), 2, simplify = FALSE)
   
   int_test = sapply(interaction_set, function(cols){
@@ -40,12 +44,11 @@ guide_test = function(y, x, residuals, xgroups = NULL, optimizer, objective, cor
 
 
 test_curvature = function(xval, ybin, xgroups){
-  # test function returning 'p.value' = log(1-pval) and 'statistic' = log(stat) of independence tests
-  # if all values of the selected covariate are equal return highest possible p.value 
-  # and Teststatistic = 0
+  # exclude features with only one unique value
   if(length(unique(xval))<2) return(list(z.value = log(1-1), statistic = log(0)))
-  # categorize split variable
   
+  
+  # categorize split variable (based on supplementary code of paper "The power of unbiased recursive partitioning: A unifying view of CTree, MOB, and GUIDE", Schlosser, Lisa; Hothorn, Torsten; Zeileis, Achim)
   if(is.numeric(xval)){
     if(length(unique(xval)) <= 4){
       x_cat = as.factor(xval)
@@ -53,7 +56,6 @@ test_curvature = function(xval, ybin, xgroups){
       if(is.null(xgroups)){
         xgroups = 4
       }
-      
       xbreaks = unique(quantile(xval, c(0:xgroups)/xgroups))
       
       x_cat = cut(xval, breaks = xbreaks, labels = c(1:(length(xbreaks)-1)), 
@@ -80,11 +82,12 @@ test_interaction = function(x, xvals, ybin, xgroups){
   xval1 = x[,xvals[1]]
   xval2 = x[,xvals[2]]
   
+  # exclude features pairs where one features has only one unique value
   if(length(unique(xval1)) < 2 | length(unique(xval2)) < 2){
     return(list(z1 = xvals[1], z2 = xvals[2], z.value = log(1-1), statistic = log(0)))
   }
 
-  # categorize split variables
+  # categorize both features
   if(is.null(xgroups)){
     xgroups = 2
   } 
@@ -113,7 +116,7 @@ test_interaction = function(x, xvals, ybin, xgroups){
   } else {
     x2_cat = xval2
   }
-  # combine the two categorized variables in one factor variable
+  # combine the two categorized variables in one factor variable (four levels)
   level_comb = as.data.table(expand.grid(unique(x1_cat), unique(x2_cat)))
   colnames(level_comb) = c("x1", "x2")
   level_comb$id = as.factor(1:nrow(level_comb))
@@ -127,7 +130,6 @@ test_interaction = function(x, xvals, ybin, xgroups){
   
   
   # compute interaction test 
-
   tst_int = chisq.test(x = ybin, y = x_cat_int)
   chisq.test(table(x_cat_int,ybin))
   
@@ -138,6 +140,7 @@ test_interaction = function(x, xvals, ybin, xgroups){
   return(ret)
   
 }
+
 
 find_split_variable_from_tests = function(y, x, curv_test, int_test, optimizer, objective){
   if(max(curv_test[,z.value]) > max(int_test[, z.value])){
