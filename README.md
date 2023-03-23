@@ -19,7 +19,7 @@ This repository contains code, data and figures for my Masters's Thesis "Interpr
     │   |   ├── insurance_use_case/             # Location where figures for insurance use case are stored (generation is in another private repo)
     └── README.md 
     
-To reproduce the simulation studies run the files "batchtools_<experiment>.R" in the simulations folder.
-Afterwards run the file "analyse_<experiment>.R" in the simulations folder, to aggregate the data of one experiment and create the figures shown in the thesis.
+To reproduce the simulation studies run the files "batchtools_....R" in the simulations folder.
+Afterwards run the file "analyse_....R" in the simulations folder, to aggregate the data of one experiment and create the figures shown in the thesis.
 
 To fit a single slim tree, source the file "tree_splitting_slim.R" and run the function compute_tree_slim(...). A description of the input parameters can be found in the file "tree_splitting_slim.R"
