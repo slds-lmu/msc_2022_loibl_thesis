@@ -1,5 +1,6 @@
 # Helper functions
 
+# ----- SLIM tree evaluation -----
 # Get predictions of SLIM tree (type response or node)
 predict_slim = function(tree, newdata, type = "response", degree.poly = 1){
   node_list = data_to_nodes(tree, newdata, nodes = "leafnode", degree.poly = degree.poly)
@@ -88,11 +89,6 @@ data_to_nodes = function(tree, newdata, nodes = "leafnode", degree.poly = 1){
         
         # newdata_n = newdata_n[, colnames(newdata_n) %in% rownames(models[[node_id]]$model$beta)]
         newdata_n = as.matrix(newdata_n)
-		 
-														   
-	   
-							   
-					   
       }
       newdata_n = cbind(newdata_n, row_id = node_data$row_id)
       
@@ -106,8 +102,6 @@ data_to_nodes = function(tree, newdata, nodes = "leafnode", degree.poly = 1){
     }
   }
   return(node_list)
-											
-						   
 }
 
 
@@ -219,10 +213,7 @@ plot_slim_effects = function(tree, data, features, nodes = "leafnode"){
       theme(legend.position="bottom", legend.text=element_text(size=9)) + 
       labs(x = feat, y = "", color = "rule") +
       guides(color=guide_legend(ncol=1, byrow=TRUE))
-    
-
   }
-  
   return(plot_list)
     
 }
@@ -266,8 +257,6 @@ plot_slim_pdp = function(tree, newdata, features, target, nodes = "leafnode", de
     return(pdp_nodes_plot)
   }
 													   
-											
-						   
 }
 
 
@@ -359,27 +348,22 @@ extract_models = function(tree){
 }
 
 
+
+
+
 # helper functions for tree splitting
 
+# ---- helper splitting ----
 # performs one split
 
 split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                              objective, fit, approximate, n.quantiles, penalization, 
                              fit.bsplines, df.spline, split.method, correction.factor, ...) {
   if(split.method == "slim"){
+    # use all features as possible splitting variable
     z = colnames(X)
-  } else if (split.method %in% c("anova", "R2", "R2_adj")){
-    X = X %>% dplyr::select(where(~ n_distinct(.) > 1))
-    interaction_models = find_split_variable_anova(Y = Y, X = X,
-                                                   objective = objective, 
-                                                   fit = fit,
-                                                   split.method = split.method,
-                                                   penalization = penalization, 
-                                                   fit.bsplines = fit.bsplines,
-                                                   df.spline = df.spline)
-    z = interaction_models$z
-
   } else if(split.method == "guide"){
+    # find splitting variable through Chi-squared test
     optimizer = find_best_binary_split
     X = X %>% dplyr::select(where(~ n_distinct(.) > 1))
     z_guide = find_split_variable_guide(Y = Y, X = X,
@@ -390,7 +374,8 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
     z = z_guide$z
     guide_type = z_guide$type
   }
-  # browser()
+  
+  # search for beast split point for the potential partitioning variable(s) z
   split_point = find_split_point(Y = Y, X = X, z = z, n.splits = n.splits,
                                  min.node.size = min.node.size, 
                                  optimizer = optimizer,
@@ -401,19 +386,20 @@ split_parent_node = function(Y, X, n.splits = 1, min.node.size = 10, optimizer,
                                  penalization = penalization, 
                                  fit.bsplines = fit.bsplines,
                                  df.spline = df.spline)
-  # browser()
+
   if(split.method == "guide"){
+    # save if splitting variable was find through curvutare or through interaction test
     split_point$test.type = guide_type
   }
   
   return(split_point)
-  
-  
 }
+
 
 find_split_variable_guide = function(Y, X, objective, fit, optimizer, correction.factor, ...){
   model = fit(y = Y, x = X)
   residuals = Y - predict(model, X)
+  # guide_test function is in defined in file "R\helper_guide.R"
   z_guide = guide_test(y = Y, x = X, residuals = residuals, xgroups = NULL, 
                        optimizer = optimizer, objective = objective, correction.factor = correction.factor)
   return(z_guide)
@@ -421,54 +407,10 @@ find_split_variable_guide = function(Y, X, objective, fit, optimizer, correction
 
 
 
-find_split_variable_anova = function(Y, X, objective, fit, split.method, penalization, 
-                               fit.bsplines, df.spline, ...) {
-  main_effect_model = fit(y = Y, x = X)
-  aov_interaction = lapply(colnames(X), function(z){
-
-      fm = paste("y ~",paste(paste0(z, "*", colnames(X)[colnames(X)!=z]), collapse = " + "))
-      x_new = as.data.frame(model.matrix(as.formula(fm), data = cbind(Y,X)))
-      interaction_model = fit(y = Y, x = x_new)
-      aov = anova(main_effect_model, interaction_model, test = "F")
-      p = aov[["Pr(>F)"]][2]
-      R2_adj = summary(interaction_model)$adj.r.squared
-      R2 = summary(interaction_model)$r.squared
-      
-
-    return(c(p_value = p, R2_adj = R2_adj, R2 = R2))
-  })
-  aov_interaction = as.data.frame(do.call(cbind, aov_interaction))
-  z = colnames(X)
-  if(split.method == "anova"){
-    min_p = aov_interaction["p_value", ] == min(aov_interaction["p_value", ], na.rm = TRUE)
-    min_p[is.na(min_p)] = FALSE
-    aov_best = aov_interaction[, min_p]
-    z = z[min_p]
-    if (length(z)>1){
-      max_r2 = aov_best["R2", ] == max(aov_best["R2", ], na.rm = TRUE)
-      max_r2[is.na(max_r2)] = FALSE
-      aov_best = aov_best[, max_r2]
-      z = z[max_r2]
-    }
-  } else if(split.method == "R2"){
-    max_r2 = aov_interaction["R2", ] == max(aov_interaction["R2", ], na.rm = TRUE)
-    max_r2[is.na(max_r2)] = FALSE
-    z = z[max_r2]
-  } else if(split.method == "R2_adj"){
-    max_r2_adj = aov_interaction["R2_adj", ] == max(aov_interaction["R2_adj", ], na.rm = TRUE)
-    max_r2_adj[is.na(max_r2_adj)] = FALSE
-    z = z[max_r2_adj]
-  }
-
-  return(list(aov_interaction = aov_interaction, z = z))
-}
-
-
-
+# find best split point over all potential splitting variables z
 find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer,
                             objective, fit, approximate = FALSE, n.quantiles, splitpoints = "quantiles", penalization = NULL, 
                             fit.bsplines = FALSE, df.spline = NULL, ...) {
-  # browser()
 # find best split point per splitting feature z
   opt.feature = lapply(z, function(feat) {
     t1 = proc.time()
@@ -479,7 +421,6 @@ find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer
     res$runtime = (t2 - t1)[[3]]
     return(res)
   })
-  # browser()
   names(opt.feature) = z
   result = data.table::rbindlist(lapply(opt.feature, as.data.frame), idcol = "feature")
   result$best.split = result$objective.value == min(result$objective.value)
@@ -499,7 +440,6 @@ find_split_point = function(Y, X, z, n.splits = 1, min.node.size = 10, optimizer
 
 generate_node_index = function(Y, X, result) {
   assert_data_table(result)
-  # TODO: fix bug if more than one feature have the same best objective
   feature = unique(result$feature[result$best.split])
   split.points = unlist(result$split.points[result$best.split])
   if (is.vector(X))
@@ -508,8 +448,6 @@ generate_node_index = function(Y, X, result) {
   
   cuts = c(min(xval), split.points, max(xval))
   sp = cut(xval, breaks = unique(cuts), include.lowest = TRUE)
-  #levels(sp) = paste0(feature, " in ", levels(sp))
-  
   return(list(class = sp, index = split(seq_along(xval), sp)))
 }
 
@@ -537,6 +475,7 @@ find_best_binary_split = function(xval, x, y, n.splits = 1, min.node.size = 10, 
     perform_split(i, xval = xval, x = x, y = y, min.node.size = min.node.size,
                   objective = objective, ...)
   }, FUN.VALUE = NA_real_, USE.NAMES = FALSE)
+  
   # select the split point yielding the minimal objective
   best = which.min(splits)
   if (is.list(q[best])){
@@ -570,7 +509,7 @@ find_best_binary_split_approx = function(xval, x, y, n.splits = 1, min.node.size
   } else if (is.factor(xval)){
     node.number = xval
   }
-  # create with gram matrices for all bins
+  # create gram matrices for all bins
   gram.list = create_gramlist(x = x, y = y, bin = node.number, fit.bsplines = fit.bsplines, penalization = penalization, df.spline = df.spline)
   
   if (is.numeric(xval)){
@@ -592,6 +531,7 @@ find_best_binary_split_approx = function(xval, x, y, n.splits = 1, min.node.size
   return(list(split.points = split.points, objective.value = splits[best], split.type = split.type))
 }
 
+
 generate_split_candidates = function(xval, n.quantiles = NULL, min.node.size = 10) {
   assert_integerish(min.node.size, upper = floor((length(xval) - 1)/2))
   if (is.factor(xval)){
@@ -601,18 +541,13 @@ generate_split_candidates = function(xval, n.quantiles = NULL, min.node.size = 1
     
   } else {
     xval = sort.int(xval)
-    # try to ensure min.node.size between points (is not guaranteed)
-    # chunk.ind = seq.int(min.node.size + 1, length(xval) - min.node.size, by = min.node.size)
-    # #xadj = unique(quantile(xval, prob = chunk.ind/length(xval), type = 1))
-    # xadj = xval[chunk.ind]
     xadj = xval[-c(1:min.node.size, (length(xval)-min.node.size+1):length(xval))]
     if (!is.null(n.quantiles)) {
       if (n.quantiles < 2){
         print(paste0("Minimum value for n.quantiles is 2"))
         n.quantiles = 2
       }
-      # to speedup we use only quantile values as possible split points
-      # qprobs = seq(1/n.quantiles, (n.quantiles - 1)/n.quantiles, by = 1/n.quantiles)
+
       qprobs = seq(0, 1, by = 1/n.quantiles)
       qprobs = qprobs[c(-1,-length(qprobs))]
       q = unique(quantile(xadj, qprobs, type = 1))
@@ -657,14 +592,7 @@ create_gramlist = function(x, y, bin = node.number, fit.bsplines, penalization, 
   gram.list = lapply(data.list, function(bin){
     x = bin[!(colnames(bin) %in% c("y"))] 
     x = as.matrix(x)
-    if (!is.null(penalization)){
-      if (penalization == "L2"){
-        # standardization of features for penalized regression
-        x = apply(x, 2, function(col){
-          x.z = (col - mean(col))/sd(col)
-        })
-      }
-    } 
+    
     # add intercept column
     x = cbind(1,x)
     y = bin$y
@@ -778,7 +706,7 @@ perform_gram_splits_numeric = function(gram.list,
     }
   }
   
-  # include parent.loss nur für Testzwecke
+  # include parent.loss (only experimental)
   if (include.parent.loss){
     return(list(parent.loss = loss.parent, splits = splits))
   } else {
@@ -845,21 +773,13 @@ perform_gram_splits_factor = function(gram.list,
 
 calculate_loss_closed = function(xtx, xty, yty, n.bin, min.node.size, penalization){
   if (n.bin >= min.node.size){
-    if (is.null(penalization)) {
-      try({beta = solve(xtx) %*% xty}, silent = TRUE)
-        
+    try({beta = solve(xtx) %*% xty}, silent = TRUE)
+    
+    if (!is.matrix(beta)) {
+      try({beta = as.matrix(MASS::ginv(xtx) %*% xty )}, silent = TRUE)
       if (!is.matrix(beta)) {
-        try({beta = as.matrix(MASS::ginv(xtx) %*% xty )}, silent = TRUE)
-        if (!is.matrix(beta)) {
-          return(Inf)
-        }
+        return(Inf)
       }
-        
-    } else if (penalization == "L2") {
-      # Todo: CV to select optimal lambda
-      diag.lambda = diag(nrow(xtx)) * lambda
-      diag.lambda[1,1] = 0
-      beta = solve(xtx + diag.lambda) %*% xty
     }
     
     loss = yty - 2 * t(beta) %*% xty + t(beta) %*% xtx %*% beta
@@ -870,7 +790,6 @@ calculate_loss_closed = function(xtx, xty, yty, n.bin, min.node.size, penalizati
 }
 
 
-# helper functions for splitting
 
 adjust_nsplits = function(xval, n.splits) {
   # max. number of splits to be performed must be unique.x-1
@@ -921,7 +840,13 @@ adjust_split_point = function(split.points, xval) {
 }
 
 
-# SLIM specific functions
+
+
+
+
+
+
+# ---- SLIM specific functions ----
 # according to the slim paper
 calculate_split_effects = function(term.predictions.parent, term.predictions, exclude = NULL){
   intersection = intersect(colnames(term.predictions.parent), colnames(term.predictions))
@@ -936,16 +861,28 @@ calculate_split_effects = function(term.predictions.parent, term.predictions, ex
     p = round(c/sum(c), 4)
     return(p)
   }
- 
 }
+
+# calculate r squared
+r_2 = function(y_true, y_hat){
+  y_true = unlist(y_true)
+  y_hat = unlist(y_hat)
+  rss = sum((y_hat - y_true) ^ 2)  ## residual sum of squares
+  tss = sum((y_true - mean(y_true)) ^ 2)  ## total sum of squares
+  r_2 = 1 - rss/tss
+  return(r_2)
+}
+
 
 # objectives and fitting functions
 
+
 get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
                         .exclude.categoricals, .type = "model", ...) {
-  # browser()
+  # only use features as regressors, whoch contain at least two different values
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
   
+  # if exclude.categoricals is set TRUE, categorical features are only used for splitting
   if (.exclude.categoricals){
     x = x %>% dplyr::select(where(~ !is.factor(.)))
   }
@@ -956,12 +893,14 @@ get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
     xval = x[,i]
     xname = colnames(x)[i]
     if(.degree.poly > 1){
+      # define polynomials
       if(is.numeric(xval) & length(unique(xval)) > .degree.poly+1){
         fm_vec[i] = paste0("poly(", xname, ", degree =", .degree.poly,", raw = TRUE)")
       } else{
         fm_vec[i] = xname
       } 
     } else if(.fit.bsplines){
+      # define bspline transformations
       if(is.numeric(xval) & length(unique(xval)) > 2){
         fm_vec[i] = paste0("bs(", xname, ", df = ", .df.spline, ", degree = 1)")
       } else{
@@ -995,33 +934,14 @@ get_objective_lm = function(y, x, .family, .degree.poly, .fit.bsplines = FALSE, 
   return(loss)
 }
 
+# get term predictions (to visualize input-output relation and calculate interaction effect as in SLIM paper)
 get_prediction_lm= function(model, x, .exclude.categoricals, ...) {
   if (.exclude.categoricals){
     x = x %>% select(where(~ !is.factor(.)))
   }
   x = x %>% dplyr::select(where(~ n_distinct(.) > 1))
-  # predict.lm "terms" centres the featureeffects and there is no option to "uncenter" 
   prediction = predict.lm(model, x, type = "terms")
   colnames(prediction) = colnames(x)
-
-  # Therefore calculate manually
-
-  # easy for simple lm
-  # prediction =  t(t(model$model)*as.vector(model$coefficients))[,-1] # delete intercept column
-  # # for bsplines, all spline effects corresponding to one feature muss be sumed up
-  # prediction_compact = data.table()
-  # if(any(str_detect(colnames(prediction), "bs\\("))){
-  #   for(feat in colnames(x)){
-  #     if(sum(str_detect(colnames(prediction), feat)) == 1){
-  #       prediction_compact = cbind(prediction_compact, "newfeat" = prediction[, str_detect(colnames(prediction), feat)])
-  #       setnames(prediction_compact, "newfeat", feat)
-  #     } else {
-  #       prediction_compact = cbind(prediction_compact, "newfeat" = rowSums(prediction[, str_detect(colnames(prediction), feat)], na.rm = TRUE))
-  #       setnames(prediction_compact, "newfeat", feat)
-  #     }
-  #   }
-  #   prediction = prediction_compact
-  # }
 
   return(data.frame(prediction))
 }
@@ -1216,8 +1136,6 @@ get_model_gam = function(y, x, .family, .df.spline, .exclude.categoricals, .type
 get_objective_gam = function(y, x, .family, .df.spline, .exclude.categoricals,  ...) {
   model = get_model_gam(y, x, .family = .family, .df.spline = .df.spline, .exclude.categoricals = .exclude.categoricals, .type = "model")
   loss = crossprod(residuals(model))
-  # use the negative log likelihood (we actually need the penalized log likelihood)
-  # loss = -logLik.gam(model)
   return(loss)
 }
 
@@ -1228,14 +1146,5 @@ get_prediction_gam = function(model, x, .exclude.categoricals, ...) {
   return(prediction)
 }
 
-# calculate r squared
-r_2 = function(y_true, y_hat){
-  y_true = unlist(y_true)
-  y_hat = unlist(y_hat)
-  rss = sum((y_hat - y_true) ^ 2)  ## residual sum of squares
-  tss = sum((y_true - mean(y_true)) ^ 2)  ## total sum of squares
-  r_2 = 1 - rss/tss
-  return(r_2)
-}
 
 
