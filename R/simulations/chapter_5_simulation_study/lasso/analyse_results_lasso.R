@@ -37,8 +37,6 @@ result_lasso_sd = result_lasso$sd
 setnames(result_lasso_sd, c("r2_train", "r2_test"), c("r2_train_sd", "r2_test_sd"))
 result_lasso_mean = cbind(result_lasso$mean, result_lasso_sd[,.(r2_train_sd, r2_test_sd)])
 
-result_lasso_mean[, share_x_wrong := 1- share_x1-share_x2-share_x3]
-
 
 result_lasso_mean[,.(surrogate, mbt, x_wrong, share_x3, n_leaves, n_leaves_min, n_leaves_max, r2_train, r2_train_sd, r2_test, r2_test_sd)] %>%
   arrange(.,desc(surrogate), desc(mbt)) %>%

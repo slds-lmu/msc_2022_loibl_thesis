@@ -1,7 +1,4 @@
 # reduce data simulation 
-library(batchtools)
-library(fossil)
-library(data.table)
 source("R/helper_stability.R")
 
 
