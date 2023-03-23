@@ -1,4 +1,3 @@
-library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
@@ -7,7 +6,7 @@ if (!dir.exists("Data/simulations/chapter_5_simulation_study/lasso")) dir.create
 reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_5_simulation_study/lasso/batchtools",
                              source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R",
                                         "R/simulations/mob_fitting_functions.R",
-                                        "R/simulations/chapter_5_simulation_study/helper_simulations.R",
+                                        "R/simulations/helper_simulations.R",
                                         "R/simulations/chapter_5_simulation_study/lasso/helper_simulations_lasso.R"),
                              seed = 1
                              , conf.file = NA
@@ -40,4 +39,6 @@ addExperiments(
 
 summarizeExperiments()
 testJob(1)
+
+
 submitJobs()

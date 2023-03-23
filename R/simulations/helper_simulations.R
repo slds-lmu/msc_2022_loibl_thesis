@@ -5,6 +5,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
                      n.quantiles, exclude.categoricals, correct.bias, 
                      tree_methods = c("slim", "mob", "ctree", "guide"),
                      extract_variables = FALSE, df.max = NULL){
+  
   if ("slim_lasso" %in% tree_methods){
     x_wrong = paste0("x", 4:10)
   } else if ("slim_ridge" %in% tree_methods){
@@ -173,7 +174,7 @@ fit_trees = function(x_train, y_train, x_test, y_test, data_stability, min.split
   }
   
   if ("slim_ridge" %in% tree_methods){
-    res = rbind(res, slim_ridge_res)
+    res = rbind(slim_res, guide_res, mob_res, ctree_res, slim_ridge_res)
   }
   if ("slim_lasso" %in% tree_methods){
     res = rbind(slim_res, slim_lasso_res, slim_lasso_max_df_res_complete, guide_res, mob_res, ctree_res)

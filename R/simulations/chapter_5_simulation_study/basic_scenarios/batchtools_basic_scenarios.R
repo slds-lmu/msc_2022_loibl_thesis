@@ -1,4 +1,3 @@
-library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
@@ -6,7 +5,7 @@ if (!dir.exists("Data/simulations/chapter_5_simulation_study/basic_scenarios")) 
 
 reg = makeExperimentRegistry(file.dir = "Data/simulations/chapter_5_simulation_study/basic_scenarios/batchtools",
                              source = c("R/simulations/simulation_setting_definition.R", "R/tree_splitting_slim.R",
-                                        "R/mob_fitting_functions.R",
+                                        "R/simulations/mob_fitting_functions.R",
                                         "R/simulations/helper_simulations.R",
                                         "R/simulations/chapter_5_simulation_study/basic_scenarios/helper_simulations_basic_scenarios.R"),
                              seed = 1, conf.file = NA)
@@ -44,6 +43,9 @@ addExperiments(
   repls = repls)
 
 summarizeExperiments()
+testJob(1)
+
+
 submitJobs()
 
 

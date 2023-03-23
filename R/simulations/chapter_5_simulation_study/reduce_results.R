@@ -1,5 +1,5 @@
 # reduce data simulation 
-source("R/helper_stability.R")
+source("R/simulations/chapter_5_simulation_study/helper_stability.R")
 
 
 reduce_trees = function(ades, pdes, savedir, reg){
@@ -11,15 +11,13 @@ reduce_trees = function(ades, pdes, savedir, reg){
   if (!dir.exists(savedir)) dir.create(savedir, recursive = TRUE)
 
   res_mean = data.table()
-
   res_sd = data.table()
 
   
   for(exp in 1:nrow(experiments)){
-    # find all job ids which contain repititions of the experiment
+    # find all job ids which contain repetitions of the experiment
     pars = unwrap(getJobPars(reg = reg))
     toreduce = ijoin(experiments[exp,], pars)
-    # toreduce = ijoin(toreduce$job.id, findDone(reg = reg))
     reduce = function(res) rbind(res)
     res = reduceResultsDataTable(ids = toreduce$job.id, fun = reduce, reg = reg)
     res_list = lapply(1:nrow(res), function(job){
@@ -49,15 +47,12 @@ reduce_trees = function(ades, pdes, savedir, reg){
     res_df[, config_id:=.GRP,by = group_cols]
     
     
-    # summarize results
-   
+    # summarize results (calculate mean, sd, min, max,... by group)
     group_cols = c(group_cols, "config_id")
     
     res_mean_exp = res_df[, lapply(.SD, function(col){mean(as.numeric(col), na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
     res_sd_exp = res_df[, lapply(.SD, function(col){sd(as.numeric(col), na.rm = TRUE)}), by = group_cols, .SDcols = measure_cols]
-    
-
-    
+  
     
     lower_bound = function(col){
       df =  length(col)-1
@@ -93,13 +88,12 @@ reduce_trees = function(ades, pdes, savedir, reg){
     }
 
 
-    
+    # calculate rand indices (only for basic scenarios)
     if("stability" %in% colnames(res_df)){
       # create all possible pairs of simulation repititions
       pair_ids = combn(unique(res_df$job.id), 2, simplify = FALSE)
 
       set_index = rep(1:100,50)
-      # pair_ids = pair_ids[pair_ids_subset]
       stability_list = lapply(seq_along(pair_ids), function(p){
         pair = pair_ids[[p]]
         stability_df = data.frame(config_id = integer(), ri = double(),
@@ -128,9 +122,6 @@ reduce_trees = function(ades, pdes, savedir, reg){
           }
 
 
-
-
-
         }
 
         colnames(stability_df) = c("config_id", "ri", "job.id", "evaluationset_seed", "stability_same_size")
@@ -143,6 +134,7 @@ reduce_trees = function(ades, pdes, savedir, reg){
       
       res_save = ijoin(res_df, stability_df, by = c("job.id", "config_id"))
       
+      # save (detailed) results
       saveRDS(res_save, paste0(savedir, exp, "_res_experiments.rds" ))
       
       

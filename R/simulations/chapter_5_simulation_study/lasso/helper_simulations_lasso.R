@@ -7,7 +7,6 @@ get_sim_results_lasso = function(data, job, instance,
                                 df.max = 2:3, ... ){
   
   
-  # The data used to train the trees and evaluate their performance is re-simulated with each repetition.
   data = instance$data
   
   
@@ -76,13 +75,3 @@ get_sim_results_lasso = function(data, job, instance,
   
 }
 
-marginals_copula = function(cor_matrix, list_distributions, n){
-  l = length(list_distributions)
-  # Correlated Gaussian variables
-  Gauss = rmvnorm(n=n, mean = rep(0,l), sig=cor_matrix)
-  # convert them to uniform distribution.
-  Unif = pnorm(Gauss) 
-  # Convert them to whatever I want
-  vars = sapply(1:l, FUN = function(i) list_distributions[[i]](Unif[,i]))
-  return(vars)
-}
