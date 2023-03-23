@@ -1,5 +1,6 @@
 create_sim_data = function(job, n = 1000, type, rho = 0, ...){
   
+  # basic scenarios
   if (type == "linear_smooth"){
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)
@@ -20,62 +21,9 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
               nrounds = 400,
               interaction_constraints = "[[1,2]]")
     
-    search_space = ps(
-      max_depth = p_int(lower = 2, upper = 5),
-      eta = p_dbl(lower = 0.5, upper = 1),
-      alpha = p_dbl(lower = 0, upper = 2),
-      gamma = p_dbl(lower = 1, upper = 5),
-      nrounds = p_int(lower = 200, upper = 1000)
-    )
-    
    
-    
-  } else if(type == "linear_smooth_corr"){
-    
-    cor_matrix = matrix(c(1,rho,
-                          rho,1), nrow = 2, byrow = TRUE)
-    
-    
-    list_distributions = list(function(n) qunif(n, -1, 1), 
-                              function(n) qunif(n, -1, 1))
-    vars = marginals_copula(cor_matrix, list_distributions, n = n)
-    
-    x1 = vars[,1]
-    x2 = vars[,2]
-    x3 = runif(n, -1, 1)
-    
-
-
-    formula = x1 + 4*x2 + 3*x2*x3 
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-
-    data = data.frame(x1, x2, x3, y)
-    fm = as.formula("y ~ x1 + x2 + x2:x3")
-    lrn = NULL
-
-
-  } else if (type == "linear_smooth_lasso"){
-    x1 = runif(n, -1, 1)
-    x2 = runif(n, -1, 1)
-    x3 = runif(n, -1, 1)
-    for(i in 4:10){
-      x = runif(n, -1, 1)
-      assign(paste0("x",i), x)
-    }
-    
-    
-    formula = x1 + 4*x2 + 3*x2*x3 
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    
-    data = data.frame(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, y)
-    fm = as.formula("y ~ x1 + x2 + x2:x3")
-    lrn = NULL
-    
-    
-    
-  }  else if(type == "linear_abrupt"){
+  # linear categorical
+  } else if(type == "linear_abrupt"){
     
     x1 = runif(n, -1, 1)
     x2 = runif(n, -1, 1)
@@ -99,13 +47,76 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
               nrounds = 350,
               interaction_constraints = "[[0,1], [1,2]]")
     
-    # search_space = ps(
-    #   max_depth = p_int(lower = 2, upper = 8),
-    #   eta = p_dbl(lower = 0.5, upper = 1),
-    #   alpha = p_dbl(lower = 0, upper = 2),
-    #   gamma = p_dbl(lower = 1, upper = 5),
-    #   nrounds = p_int(lower = 5, upper = 1000)
-    # )
+   
+    
+  } else if(type == "linear_mixed"){
+    
+    x1 = runif(n, -1, 1)
+    x2 = runif(n, -1, 1)
+    x3 = as.numeric(rbernoulli(n))
+    x4 = as.numeric(rbernoulli(n))
+    
+    
+    formula = 4*x2 + 2*x4 + 4*x2*x1 + ifelse(x3 == 0, 8*x2,0) + 
+      ifelse(x4 == 1, 8*x1*x2, 0)
+    
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    
+    data = data.frame(mget(paste0("x",1:4)), y)
+    fm = as.formula("y ~ x2 + x4 + x2:x1 + x2:x3 + x1:x2:x4")
+    lrn = lrn("regr.xgboost",
+              max_depth = 5,
+              eta = 0.5,
+              alpha = 2,
+              gamma = 3.5,
+              nrounds = 500,
+              interaction_constraints = "[[0,1], [1,2], [0,1,3]]")
+    
+    
+  } else if(type == "linear_smooth_corr"){
+    
+    cor_matrix = matrix(c(1,rho,
+                          rho,1), nrow = 2, byrow = TRUE)
+    
+    
+    list_distributions = list(function(n) qunif(n, -1, 1), 
+                              function(n) qunif(n, -1, 1))
+    vars = marginals_copula(cor_matrix, list_distributions, n = n)
+    
+    x1 = vars[,1]
+    x2 = vars[,2]
+    x3 = runif(n, -1, 1)
+    
+    
+    
+    formula = x1 + 4*x2 + 3*x2*x3 
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    
+    data = data.frame(x1, x2, x3, y)
+    fm = as.formula("y ~ x1 + x2 + x2:x3")
+    lrn = NULL
+    
+    # noise features
+  } else if (type == "linear_smooth_lasso"){
+    x1 = runif(n, -1, 1)
+    x2 = runif(n, -1, 1)
+    x3 = runif(n, -1, 1)
+    for(i in 4:10){
+      x = runif(n, -1, 1)
+      assign(paste0("x",i), x)
+    }
+    
+    
+    formula = x1 + 4*x2 + 3*x2*x3 
+    eps = rnorm(n, 0, sd(formula)*0.1)
+    y =  formula + eps
+    
+    data = data.frame(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, y)
+    fm = as.formula("y ~ x1 + x2 + x2:x3")
+    lrn = NULL
+    
     
   } else if(type == "nonlinear_mixed"){
     
@@ -132,119 +143,7 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
               nrounds = 700,
               interaction_constraints = "[[3,4],[0,3,5]]")
     
-    
-    search_space = ps()
-    
-  }else if(type == "linear_mixed"){
-    
-    x1 = runif(n, -1, 1)
-    x2 = runif(n, -1, 1)
-    x3 = as.numeric(rbernoulli(n))
-    x4 = as.numeric(rbernoulli(n))
-
-    
-    formula = 4*x2 + 2*x4 + 4*x2*x1 + ifelse(x3 == 0, 8*x2,0) + 
-      ifelse(x4 == 1, 8*x1*x2, 0)
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    
-    data = data.frame(mget(paste0("x",1:4)), y)
-    fm = as.formula("y ~ x2 + x4 + x2:x1 + x2:x3 + x1:x2:x4")
-    lrn = lrn("regr.xgboost",
-              max_depth = 5,
-              eta = 0.5,
-              alpha = 2,
-              gamma = 3.5,
-              nrounds = 500,
-              interaction_constraints = "[[0,1], [1,2], [0,1,3]]")
-    
-    search_space = ps(
-      max_depth = p_int(lower = 4, upper = 10),
-      eta = p_dbl(lower = 0.5, upper = 1),
-      alpha = p_dbl(lower = 0, upper = 2),
-      gamma = p_dbl(lower = 1, upper = 5)
-    )
-    
-  } else if(type == "mixed_large"){
-    
-    # numeric
-    for(i in 1:10){
-      x = runif(n, -1, 1)
-      assign(paste0("x",i), x)
-    }
-    # binary
-    for(i in 11:15){
-      x = as.factor(sample(c(0, 1), size = n, replace = TRUE, prob = c(0.5, 0.5)))
-      assign(paste0("x",i), x)
-    }
-    # multiple categories
-    x16 = as.factor(sample(c(1:3), size = n, replace = TRUE, prob = c(0.2, 0.4, 0.3)))
-    x17 = as.factor(sample(c(1:4), size = n, replace = TRUE, prob = c(0.2, 0.2, 0.3, 0.3)))
-    x18 = as.factor(sample(c(1:4), size = n, replace = TRUE, prob = c(0.1, 0.1, 0.1, 0.7)))
-    x19 = as.factor(sample(c(1:8), size = n, replace = TRUE, prob = c(rep(0.1,6), 0.2, 0.2)))
-    
-    
-    formula = 4*x2 - 4*x4 + 4*x6 - 4*x8 + 4*x10 + 3*x2*x1 + 5*x2*x5 + 7*x2*x8 + ifelse(x13 == 0, I(8*x2),0) + 
-      ifelse(x16 == 1, I(4*x2),0) + ifelse(x16 == 2, I(6*x2),0) + ifelse(x19 %in% c(1,2,3), I(4*x2),0) + ifelse(x19 %in% c(4:6), I(6*x2),0) + 
-      3*x1*x3 + 3*x8*x10 + 3*x7*x9
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    
-    data = data.frame(mget(paste0("x",1:19)), y)
-    fm = as.formula("y ~ x2 + x4 + x6 + x8 + x10 + x2:x1 + x2:x5 + x2:x8 + x13:x2 + x16:x4 + x16:x2 + x19:x2 + x9:x2 +
-                    x1:x3 + x8:x10 + x7:x9")
-    
-    task = as_task_regr(x = data, target = "y")
-    
-    lrn =  lrn("regr.xgboost",
-               max_depth = 9,
-               eta = 1,
-               alpha = 0.3,
-               gamma = 3.5)           
-    
-    fencoder = po("encode", method = "treatment", affect_columns = selector_type("factor"))
-    fencoder$train(list(task))
-    graph = fencoder %>>% lrn
-    lrn = as_learner(graph)
-    
-    
-    search_space = ps(
-      regr.xgboost.max_depth = p_int(lower = 4, upper = 12),
-      regr.xgboost.eta = p_dbl(lower = 0.5, upper = 1),
-      regr.xgboost.alpha = p_dbl(lower = 0, upper = 2),
-      regr.xgboost.gamma = p_dbl(lower = 1, upper = 5)
-    )
-    
-  } else if(type == "nonlinear"){ 
-    
-    for(i in 1:10){
-      x = runif(n, -1, 1)
-      assign(paste0("x",i), x)
-    }
-    
-    formula = 6*x1 + x2^2 - (pi)^(x3) + exp(-2*(x4)^2) + 1/(2+abs(x5)) + x6*log(abs(x6)) + 
-      2*ifelse(x1 > 0, 1,0)*ifelse(x2 > 0, 1,0)*x3 + 2*ifelse(x4 > 0, 1,0)*x2 + 4*(x2*ifelse(x2 > 0, 1,0))^(abs(x6)) + abs(x2 + x8)
-    eps = rnorm(n, 0, 0.5)
-    y =  formula + eps
-    
-    data = data.frame(mget(paste0("x",1:10)), y)
-    fm = NULL
-    lrn = NULL
-  } else   if (type == "slim2"){
-    for(i in 1:10){
-      x = runif(n, -1, 1)
-      assign(paste0("x",i), x)
-    }
-    formula = 3*x1 + x2^3 - pi^x3 + exp(-2*x4^2) + 1/(2+abs(x5)) + x6 * log(abs(x6)) + sqrt(2*abs(x7)) + max(0, x7) + x8^4 + 2*cos(pi*x8) +
-      2*ifelse(x1>0, 1, 0)*ifelse(x2>0, 1, 0)*x3 + 2*ifelse(x1>0, 1, 0)*x4 + 4*(x5*ifelse(x5>0, 1, 0))^(abs(x6)) + abs(x7 + x8)
-    eps = rnorm(n, 0, 0.5)
-    y =  formula + eps
-    
-    data = data.frame(mget(paste0("x",1:10)), y)
-    fm = NULL
-    lrn = NULL
-
+  # Selection Bias
   } else if (type == "selection_bias_independence"){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
@@ -270,6 +169,8 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
     fm = NULL
     lrn = NULL
 
+    
+    # guide replication
   } else if (type == "selection_bias_guide"){
     
     x1 = sample(c(-3,-1,1,3), n, replace = TRUE) 
@@ -296,110 +197,7 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
     fm = NULL
     lrn = NULL
 
-  } else if (type == "selection_bias_cross_1"){
-    
-    x1 = runif(n, 0, 1)
-    x2 = runif(n, 0, 1)
-    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)  
-    x4 = sample(seq(0, 1, 0.01), size = n, replace = TRUE)   
-    
-    formula = 0.2*x3*ifelse(x2 <= 0.5, -1, 1)
-    eps = rnorm(n, 0, 4*sd(formula))
-    
-    y = formula + eps
-    
-    data = data.frame(x1, x2, x3, x4, y)
-    fm = NULL
-    lrn = NULL
-
-    # plot_ly(x=x2,y=x3,z=y)
-    
-  }else if (type == "selection_bias_cross_2"){
-    
-    x1 = runif(n, 0, 1)
-    x2 = runif(n, 0, 1)
-    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)  
-    x4 = sample(seq(0, 1, 0.01), size = n, replace = TRUE)   
-    
-    formula = 0.2*x2*ifelse(x3 <= 0.5, -1, 1)
-    eps = rnorm(n, 0, 4*sd(formula))
-    
-    y = formula + eps
-    
-    data = data.frame(x1, x2, x3, x4, y)
-    fm = NULL
-    lrn = NULL
-
-    # plot_ly(x=x2,y=x3,z=y)
-    
-  } else if (type == "selection_bias_smooth"){
-    
-    x1 = runif(n, 0, 1)
-    x2 = runif(n, 0, 1)
-    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)  
-    x4 = sample(seq(0, 1, 0.01), size = n, replace = TRUE)   
-    formula =  0.4*x2*x3
-    eps = rnorm(n, 0, 4*sd(formula))
-
-    
-    y = formula + eps
-    
-    
-    data = data.frame(x1, x2, x3, x4, y)
-    fm = NULL
-    lrn = NULL
-
-    # plot_ly(x=x2,y=x3,z=y)
-    
-  } else if (type == "selection_bias_guide_steps"){
-    
-    x1 = sample(c(-3,-1,1,3), n, replace = TRUE) 
-    x2 = rexp(n, 1)
-    x3 = rnorm(n) 
-    x4 = as.factor(sample(1:5, n, replace = TRUE))
-    x5 = as.factor(sample(1:10, n, replace = TRUE))
-    
-    eps = rnorm(n, 0, 1)
-    
-    y = 0.2*sign(x1*x3) + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-  } else if (type == "selection_bias_guide_cross"){
-    
-    x1 = sample(c(-3,-1,1,3), n, replace = TRUE) 
-    x2 = rexp(n, 1)
-    x3 = rnorm(n) 
-    x4 = as.factor(sample(1:5, n, replace = TRUE))
-    x5 = as.factor(sample(1:10, n, replace = TRUE))
-    
-    eps = rnorm(n, 0, 1)
-    
-    y = 0.2*sign(x1)*x2 + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-  }
-  
-  else if (type == "selection_bias_full_interaction"){
-    
-    x1 = runif(n, 0, 1)
-    x2 = runif(n, 0, 1)
-    x3 = sample(seq(0,1,0.1), n, replace = TRUE) 
-    x4 = sample(seq(0,1,0.01), n, replace = TRUE) 
-    formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
-
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, y)
-    fm = NULL
-    lrn = NULL
-
-    
-  }
-  else if (type == "selection_bias_independence_10"){
+  } else if (type == "selection_bias_independence_10"){
 
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
@@ -443,117 +241,9 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
     lrn = NULL
     search_space = NULL
 
-  }  
-  #  else if (type == "selection_bias_interaction"){
     
-  #   x1 = runif(n, 0, 1)
-  #   x2 = runif(n, 0, 1)
-  #   x3 = round(runif(n, 0, 1), 1)  
-  #   x4 = round(runif(n, 0, 1), 2) 
-  #   formula = x1 + x2 + x3 + x4 + x1*x2 + x3*x4
-  #   eps = rnorm(n, 0, sd(formula)*0.1)
-  #   y =  formula + eps
-  #   data = data.frame(x1, x2, x3, x4, y)
-  #   fm = NULL
-  #   lrn = NULL
-  #   search_space = NULL
-  #   
-  # } else if (type == "selection_bias_interaction_10"){
-  #   
-  #   x1 = runif(n, 0, 1)
-  #   x2 = runif(n, 0, 1)
-  #   x3 = round(runif(n, 0, 1), 1)  
-  #   # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
-  #   formula = x1*x2 + x1*x3 + x2*x3
-  #   
-  #   eps = rnorm(n, 0, sd(formula)*0.1)
-  #   y =  formula + eps
-  #   data = data.frame(x1, x2, x3, y)
-  #   fm = NULL
-  #   lrn = NULL
-  #   search_space = NULL
-  #   
-  # } else if (type == "selection_bias_interaction_25"){
-  #   
-  #   x1 = runif(n, 0, 1)
-  #   x2 = runif(n, 0, 1)
-  #   x3 = sample(seq(0,1,length.out = 26), n, replace = TRUE) 
-  #   # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
-  #   formula = x1*x2 + x1*x3 + x2*x3
-  #   
-  #   eps = rnorm(n, 0, sd(formula)*0.1)
-  #   y =  formula + eps
-  #   data = data.frame(x1, x2, x3, y)
-  #   fm = NULL
-  #   lrn = NULL
-  #   search_space = NULL
-  #   
-  # } else if (type == "selection_bias_interaction_50"){
-  #   
-  #   x1 = runif(n, 0, 1)
-  #   x2 = runif(n, 0, 1)
-  #   x3 = sample(seq(0,1,length.out = 51), n, replace = TRUE) 
-  #   # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
-  #   formula = x1*x2 + x1*x3 + x2*x3
-  #   
-  #   eps = rnorm(n, 0, sd(formula)*0.1)
-  #   y =  formula + eps
-  #   data = data.frame(x1, x2, x3, y)
-  #   fm = NULL
-  #   lrn = NULL
-  #   search_space = NULL
-  #   
-  # } else if (type == "selection_bias_interaction_100"){
-  #   
-  #   x1 = runif(n, 0, 1)
-  #   x2 = runif(n, 0, 1)
-  #   x3 = round(runif(n, 0, 1), 2)  
-  #   # formula = x1 + x2 + x3 + x1*x2 + x1*x3 + x2*x3
-  #   formula = x1*x2 + x1*x3 + x2*x3    
-  #   eps = rnorm(n, 0, sd(formula)*0.1)
-  #   y =  formula + eps
-  #   data = data.frame(x1, x2, x3, y)
-  #   fm = NULL
-  #   lrn = NULL
-  #   search_space = NULL
-  #   
-  # } else if (type == "selection_bias_full_interaction_25"){
-    
-  #   x1 = runif(n, 0, 1)
-  #   x2 = runif(n, 0, 1)
-  #   x3 = sample(seq(0,1,length.out = 26), n, replace = TRUE) 
-  #   x4 = round(runif(n, 0, 1), 2) 
-  #   # formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
-  #   formula = x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
-  #   
-  #   eps = rnorm(n, 0, sd(formula)*0.1)
-  #   y =  formula + eps
-  #   data = data.frame(x1, x2, x3, x4, y)
-  #   fm = NULL
-  #   lrn = NULL
-  #   search_space = NULL
-  #   
-  #   
-  # } else if (type == "selection_bias_full_interaction_50"){
-  #   
-  #   x1 = runif(n, 0, 1)
-  #   x2 = runif(n, 0, 1)
-  #   x3 = sample(seq(0,1,length.out = 51), n, replace = TRUE) 
-  #   x4 = round(runif(n, 0, 1), 2) 
-  #   # formula = x1 + x2 + x3 + x4 + x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
-  #   formula = x1*x2 + x1*x3+ x1*x4 + x2*x3 + x2*x4 + x3*x4
-  #   
-  #   eps = rnorm(n, 0, sd(formula)*0.1)
-  #   y =  formula + eps
-  #   data = data.frame(x1, x2, x3, x4, y)
-  #   fm = NULL
-  #   lrn = NULL
-  #   search_space = NULL
-  #   
-  #   
-  # } 
-  
-  else if (type == "selection_bias_interaction_numerical_vs_numrical"){
+    # selection bias / splitting strategy interactions
+  } else if (type == "selection_bias_interaction_numerical_vs_numrical"){
     x1 = runif(n, 0, 1)
     x2 = runif(n, 0, 1)
     x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE) 
@@ -604,127 +294,9 @@ create_sim_data = function(job, n = 1000, type, rho = 0, ...){
     data = data.frame(x1, x2, x3, x4, y)
     fm = NULL
     lrn = NULL
-    
   }
   
- else if (type == "selection_bias_interaction_binary_numeric"){
-    # x1 and x2 should be chosen equally often, x3 should never be selected
-    x1 = runif(n, 0, 1)
-    x2 = runif(n, 0, 1)
-    x3 = as.factor(rbinom(n, 1, 0.5))
-    # formula = x1 + x2 + as.numeric(x3) + 0.01*x1*x2
-    formula = 0.01*x1*x2
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, y)
-    fm = NULL
-    lrn = NULL
 
-    
-  } else if (type == "selection_bias_interaction_categorical_numeric"){
-    # x1 and x2 should be chosen equally often, the rest should never be selected
-    x1 = runif(n, 0, 1)
-    x2 = runif(n, 0, 1)
-    x3 = as.factor(sample(1:2, n, replace = TRUE))
-    x4 = as.factor(sample(1:5, n, replace = TRUE))
-    x5 = as.factor(sample(1:8, n, replace = TRUE))
-    
-    formula = 0.01*x1*x2
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-    
-  } else if (type == "selection_bias_interaction_categorical_numeric_small"){
-    # x1 and x2 should be chosen equally often, the rest should never be selected
-    x1 = runif(n, 0, 1)
-    x2 = runif(n, 0, 1)
-    x3 = as.factor(sample(1:2, n, replace = TRUE))
-    x4 = as.factor(sample(1:5, n, replace = TRUE))
-    x5 = as.factor(sample(1:8, n, replace = TRUE))
-    
-    formula = 0.001*x1*x2
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-    
-  } else if (type == "selection_bias_interaction_numeric"){
-    # x1 and x2 should be chosen equally often, the rest should never be selected
-    x1 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)    
-    x2 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    x3 = runif(n,0,1)
-    x4 = runif(n,0,1)
-    x5 = runif(n,0,1)
-    
-    formula = 0.01*x1*x2
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-    
-  } else if (type == "selection_bias_interaction_numeric_small"){
-    # x1 and x2 should be chosen equally often, the rest should never be selected
-    x1 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)    
-    x2 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    x3 = runif(n,0,1)
-    x4 = runif(n,0,1)
-    x5 = runif(n,0,1)
-    
-    formula = 0.001*x1*x2
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-    
-  }else if (type == "selection_bias_interaction_numeric_2"){
-    # x1 and x2 should be chosen equally often, the rest should never be selected
-    x1 = runif(n,0,1)   
-    x2 = runif(n,0,1)
-    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    x4 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    x5 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    
-    formula = 0.01*x1*x2
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-    
-  } else if (type == "selection_bias_interaction_numeric_2_small"){
-    # x1 and x2 should be chosen equally often, the rest should never be selected
-    x1 = runif(n,0,1)   
-    x2 = runif(n,0,1)
-    x3 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    x4 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    x5 = sample(seq(0, 1, 0.1), size = n, replace = TRUE)
-    
-    formula = 0.001*x1*x2
-    
-    eps = rnorm(n, 0, sd(formula)*0.1)
-    y =  formula + eps
-    data = data.frame(x1, x2, x3, x4, x5, y)
-    fm = NULL
-    lrn = NULL
-
-    
-  }
 
   return(list(data = data, fm = fm, lrn = lrn))
 }
