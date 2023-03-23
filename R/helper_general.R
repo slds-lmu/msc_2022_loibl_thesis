@@ -1,6 +1,6 @@
 # Helper functions
 
-# ----- SLIM tree evaluation -----
+# ----- SLIM tree evaluation functions -----
 # Get predictions of SLIM tree (type response or node)
 predict_slim = function(tree, newdata, type = "response", degree.poly = 1){
   node_list = data_to_nodes(tree, newdata, nodes = "leafnode", degree.poly = degree.poly)
@@ -874,8 +874,9 @@ r_2 = function(y_true, y_hat){
 }
 
 
-# objectives and fitting functions
 
+
+# objectives and fitting functions (for each model three function are necessary)
 
 get_model_lm = function(y, x, .family, .degree.poly, .fit.bsplines, .df.spline,
                         .exclude.categoricals, .type = "model", ...) {
