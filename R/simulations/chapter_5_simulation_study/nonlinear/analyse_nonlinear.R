@@ -1,6 +1,3 @@
-library(dplyr)
-library(kableExtra)
-
 
 result_nonlinear = readRDS("Data/simulations/chapter_5_simulation_study/nonlinear/results/result_summary.rds")
 
@@ -18,7 +15,7 @@ result_nonlinear[r2 == 0.9,.(surrogate, model, n_leaves, n_leaves_min, n_leaves_
 
 result_nonlinear[r2 == 0.9, .(surrogate, model, r2_train, r2_train_sd, r2_test, r2_test_sd, time)] %>%
   arrange(., surrogate) %>%
-  kbl(caption="Performance simulation results on  50 simulation runs as stand alone model on scenario nonlinear with n = 3000, impr = 0.1",
+  kbl(caption="Performance simulation results on 50 simulation runs as stand alone model on scenario nonlinear with n = 3000, impr = 0.1",
       format="latex",
       col.names = c("black box", "MBT", "R2 train", "R2 train sd", "R2 test", "R2 test sd", "time"),
       align="r",

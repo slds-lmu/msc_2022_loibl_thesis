@@ -1,10 +1,8 @@
 get_sim_results_nonlinear = function(data, job, instance, 
                                      n.quantiles = 50, min.split = 100, n.split = 6, impr.par = 0.05, r2 = 1, ... ){
   
-  instance = create_sim_data(n = 4500, type = "nonlinear_mixed")
-  # The data used to train the trees and evaluate their performance is re-simulated with each repetition.
+
   data = instance$data
-  
   
   # -- standalone model 
   

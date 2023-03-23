@@ -1,11 +1,3 @@
-library(dplyr)
-library(REdaS)
-library(kableExtra)
-library(batchtools)
-library(data.table)
-library(GGally)
-library(ggpubr)
-
 
 # Reduce results
 # source("R/simulations/chapter_5_simulation_study/reduce_results.R")
