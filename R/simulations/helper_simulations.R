@@ -251,7 +251,6 @@ predict_ctree = function(ctree, fit_ctree, newdata){
   for(node in names(newdata_list)){
     newdata_list[[node]]$y_hat = predict(fit_ctree[[node]], newdata = newdata_list[[node]])
   }
-  
   predictions = lapply(newdata_list, function(el) el[, c("row_id", "y_hat")])
   predictions = do.call(rbind, predictions)
   predictions = predictions[order(predictions$row_id),]
