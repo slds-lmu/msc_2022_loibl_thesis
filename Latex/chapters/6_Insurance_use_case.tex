@@ -193,7 +193,7 @@ few observations in this area, which is shown in Figure \ref{fig:app_ins_k2204_h
 
 With the feature duration, it can be seen that the negative effect seems to decrease with increasing duration, which is again just a nonlinearity.
 
-To investigate the effect of splits with respect to feature age, on the one hand nodes 4,7 and 8 are compared, which cover the feature space for duration $\leq 25$, and on the other hand nodes 11 and 12, which cover the feature space for $25 < $duration $<= 40$. In the Figures \ref{fig:ins_k2204_effects_age_low_duration} and \ref{fig:ins_k2204_effects_age_medium_duration} the corresponding input-output relations of the features are shown.
+To investigate the effect of splits with respect to feature age, on the one hand nodes 4,7 and 8 are compared, which cover the feature space for duration $\leq 25$, and on the other hand nodes 11 and 12, which cover the feature space for $25 < $ duration $<= 40$. In the Figures \ref{fig:ins_k2204_effects_age_low_duration} and \ref{fig:ins_k2204_effects_age_medium_duration} the corresponding input-output relations of the features are shown.
 
 \begin{figure}[!htb]
     \centering    
@@ -205,7 +205,7 @@ To investigate the effect of splits with respect to feature age, on the one hand
 \begin{figure}[!htb]
     \centering    
     \includegraphics[width = 16cm]{Figures/insurance_use_case/k2204_BPV/effects_age_medium_duration.png}
-    \caption{Input-output relation of features in nodes with $25 > $duration $<= 40$ split by age for SLIM tree with B-splines and depth 3}
+    \caption{Input-output relation of features in nodes with $25 < $ duration $<= 40$ split by age for SLIM tree with B-splines and depth 3}
     \label{fig:ins_k2204_effects_age_medium_duration}
 \end{figure}
 
@@ -249,6 +249,8 @@ For the application of the MBTs, subsets of the training and test data sets incl
 In order to model nonlinearities in the nodes, MBTs with B-spline models are used. As with K2204, trees with two different depths are evaluated, shallow trees with a maximum depth of 3 and deep trees with a maximum depth of 7. $impr$ and $alpha$ are set to 0.05 and a minimum node size of 500 observations is required.
 
 For the interpretation of the splits and models, the shallow SLIM tree is examined in more detail. Its structure is shown in Figure \ref{fig:ins_k108_slim_bsplines_small_tree}.
+If the tree is fitted on the test data instead of the training data, exactly the same splits result. The same applies if the tree is used as a standalone model for BPV instead of a surrogate model. This indicates that the black box model replicates the true data and relationships well.
+
 
 \begin{figure}[!htb]
     \centering
@@ -284,22 +286,19 @@ The consequences of the splits with respect to duration are shown in Figure \ref
 Since increment\_factor interacts with so many features, the splits are very effective here and bring a great improvement in performance. Table \ref{tab:ins_k108_share} lists the share of the splits by the different features. From this it can be seen that MOB and CTree split shallow MBTs considerably less by increment\_factor than SLIM and GUIDE. At the same time, their performance is behind that of SLIM and GUIDE, as can be seen in Table \ref{tab:ins_k108_bsplines_surrogates_perf}. SLIM achieves the best performance.
 
 
-If the tree is fitted on the test data instead of the training data, exactly the same splits result. The same applies if the tree is used as a standalone model for BPV instead of a surrogate model. This indicates that the black box model replicates the true data and relationships well.
 
 
 
 
-By using deep trees, the fidelity increases and the results of the different algorithms move closer together. The values for share also get closer. Overall, the differences between the different algorithms are therefore less pronounced with the deep trees than with the shallow trees. Although the deep trees achieve a high training performance, an interpretation is hardly possible with this high number of leaf nodes. In addition, the test performance differs more strongly from the training performance than with the shallow trees, which is a sign of overfitting.
-
-
+By using deep trees, the fidelity increases and the results of the different algorithms move closer together. The values for share also get closer. Overall, the differences between the different algorithms are therefore less pronounced with the deep trees than with the shallow trees. Although the deep trees achieve a high training performance, an interpretation is hardly possible with this high number of leaf nodes. In addition, the test performance differs more strongly from the training performance than with the shallow trees, which is a sign of overfitting. The almost identical values for max AE have been checked and are correct. They result from the same observation for all four algorithms and the observation falls in nodes with almost identical subregions. This shows again that the MTBs or, more precisely, the subregions found by the different algorithms and thus also their performance move closer together when deep MBTs are formed.
 
 \begin{table}[!htb]
 
-\centering \scriptsize
+\centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
 & \multicolumn{4}{|c|}{train} & \multicolumn{4}{|c|}{test} & \\
-hline
+\hline
  & $R^2$ & MSE & MAE & max AE & $R^2$ & MSE & MAE & max AE & n leaves\\
 \hline
 

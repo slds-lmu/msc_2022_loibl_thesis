@@ -1,6 +1,6 @@
 In the following, MBTs are introduced and the different algorithms are presented.
 
-\subsection{Model and Notation}
+\subsection{Model and notation}
 Following \citep{Zeileis.2008} and \citep{Seibold.2016}, let $\mathcal{M}((y, \mathbf{x}), \theta)$ be a parametric model, that describes the target $y \in \mathcal{Y}$ as a function of a feature matrix $\mathbf{x}\in \mathcal{X}$ with $p$ features $\mathbf{x_1}, ... \mathbf{x_p} $  and a vector of parameters $\mathbf{\theta} \in \Theta$. When the model is used as a surrogate model, $y$ is the prediction of the black box model that should be explained.  If it must be explicitly stated that the response is the prediction of a black-box model, the notation $y^{bb}$ is used. Given $n$ observations $(y, \mathbf{x}) = (y^{(1)}, \mathbf{x}^{(1)}),..., (y^{(n)}, \mathbf{x}^{(n)})$ the model can be fitted by minimizing some objective function $\Psi((y, \mathbf{x}), \theta)$ yielding the parameter estimate $\hat{\theta}$
 \begin{align}
     \hat{\mathbf{\theta}} = \argmin_{\theta \in \Theta} \sum_{i=1}^{n}\Psi(y^{(i)}, \mathbf{x}^{(i)}, \theta).
@@ -16,7 +16,7 @@ and has to be minimized over all partitions $\{\mathcal{B}_b\}$ (with correspond
 
 
 
-\subsection{Model-based Tree algorithms}
+\subsection{Model-based tree algorithms}
 In this chapter, four algorithms are described that aim to find a partition that is close to the optimal one and the associated estimators for $\theta_b$ through binary recursive partitioning. All approaches use a greedy forward search to optimize the objective function $\Psi$ locally in each step \citep{Zeileis.2008}.  
 The resulting global models are called Model-based trees .
 
@@ -24,14 +24,14 @@ The resulting global models are called Model-based trees .
 
 A recursive partitioning algorithm for MBTs can generally be divided into the following steps:
 \begin{enumerate}
-    \item Start with the partition (node) $I_0 = 1,...,n$
+    \item Start with the partition (node) $I_0 = \{1,...,n\}$
     \item Fit the model to all observations in the current node $\{y^{(i)}, \mathbf{x}^{(i)}\}, i \in I_b$ by estimating $\hat{\theta}_b$ via minimization of the objective function $\Psi$
     \item Find the local optimal splitpoint for this node 
     \item If no stop criterion is met (e.g. depth of the tree, improvement of the objective through split, significance of parameter instability) split the node in two child nodes and repeat the steps 2-4.
 \end{enumerate}
 
 
-The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in step 3. This can lead to the phenomenon that, even if the strength of all feature effects (or in our case interaction effects) are the same, features with many possible split points are more often chosen as split variables than features with few possible split points. This phenomenon is called selection bias and is explained in more detail in chapter \ref{selection} and examined for the four MBT algorithms.
+The algorithms SLIM, MOB, CTree and GUIDE considered in this work can be divided into two groups. SLIM falls into the group of biased recursive partitioning algorithms, which also includes classical methods like AID \citep{Morgan.1963} and CART \citep{Breiman.1984}. These algorithms use an exhaustive search to select the optimal split point in step 3. This can lead to the phenomenon that, even if the strength of all feature effects (or in our case interaction effects) are the same, for example features with many possible split points are more often chosen as split variables than features with few possible split points. This phenomenon is called selection bias and is explained in more detail in chapter \ref{selection} and examined for the four MBT algorithms.
 MOB, CTree and GUIDE are assigned to unbiased recursive partitioning. Instead of comparing the objective for all possible split points and variables, step 3 of the recursive partitioning algorithm is split into 2 steps:
 
 \begin{enumerate}
@@ -109,9 +109,8 @@ CTree was originally developed as a non-parametric regression tree (i.e. for con
 CTree follows a very similar approach to MOB and also tries to detect parameter instability by analysing the dependency between potential splitting variables and a transformation $h()$ of the response $y$.
 A common transformation used in MBTs is the score function, i.e. $h(y) = \psi$, but other transformations of the response variable that can detect instabilities in the estimates could also be used. A simple alternative would be to use the residuals. According to \citep{Schlosser.2019}, however, the use of the scores - if they exist - is preferable, since instabilities can be better detected with them.
 
-To test the independence between the scores and the potential partition variables, CTree uses a linear association test.
-
-To measure the association between the scores $y$ and a potential splitting variable $\textbf{x}_{j}, j = 1,...,p$ a linear statistics of the form 
+CTree uses a linear association test to test the independence between the scores and the potential partition variables.
+To measure the association between the scores $\psi$ and a potential splitting variable $\textbf{x}_{j}, j = 1,...,p$ a linear statistics of the form 
 \begin{align}
     T_{j}(y,\textbf{x}) = vec\left(\sum_{i=1}^n \textbf{x}_j^{(i)}\hat{\psi}^{(i)T}\right) \in \mathbf{R}^{p_{j} q}
 \end{align}

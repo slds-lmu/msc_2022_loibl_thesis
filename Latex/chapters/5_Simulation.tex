@@ -9,16 +9,14 @@ To evaluate the desired properties the following definitions and measurements ar
 \subsubsection{Performance}
 A central aspect in the comparison of the different MBT algorithms is their performance. 
 To find out how well an MBT algorithm performs as a stand-alone machine learning model, the MBT is fitted to the original response. 
-In the following, the mean squared error ($MSE$) and $R^2$ are used as performance measures of accuracy, which are defined as
-\begin{align}
-    MSE \left( \left\{y, \hat{y}\right\}\right) = \frac{1}{n}\sum_{i = 1}^{n}\left(y^{(i)}-\hat{y}^{(i)}\right)^2
-\end{align}
+In the following, the $R^2$ is used as performance measure of accuracy, which is defined as
+
 \begin{align}
     R^2\left( \left\{y, \hat{y}\right\}\right) = 1-\frac{\sum_{i = 1}^{n}\left(\hat{y}^{(i) } - y\right)^2}{\sum_{i = 1}^{n}\left(y^{(i)} - \bar{y}\right)^2},
 \end{align}
 where $\hat{y}^{(i)}, i = 1,...,n$ are the predictions of the MBT model and $\bar{y}$ is the arithmetic mean of the target $y$.
 
-To determine how well the respective MBT algorithm works as a surrogate model, i.e. how well the predictions of a black box model are replicated by the MBT, $MSE(\left( \left\{y^{bb}, \hat{y}\right\}\right)$ and $R^2_{fid}\left( \left\{y^{bb}, \hat{y}\right\}\right)$ are used to measure the so-called fidelity. 
+To determine how well the respective MBT algorithm works as a surrogate model, i.e. how well the predictions of a black box model are replicated by the MBT, $R^2\left( \left\{y^{bb}, \hat{y}\right\}\right)$ is used to measure the so-called fidelity. 
 
 Accuracy and fidelity are measured on both training and test data in order to make a statement about the generalisation performance of the MBTs.
 
@@ -59,7 +57,7 @@ Three simple scenarios that differ mainly in the type of interaction(s) they con
 
 
 
-\subsubsection{Simulation Setting}
+\subsubsection{Simulation setting}
 Since the number of leaf nodes and the performance strongly depend on the prepruning value of $impr$ for SLIM and GUIDE and $alpha$ for MOB and CTree, the simulations are carried out for different values of these parameters for all three scenarios. In addition, two different sample sizes $n$ are chosen. 
 All MBT algorithms are fitted as standalone models on the original data and as surrogate models on a correctly specified linear model (lm) or GAM and on an XGBoost model with correctly specified interactions. The configurations of the XGBoost models are listed in the appendix in Table \ref{tab:app_xgboost_config}.
 Table \ref{tab:simulation_setting} lists all varied factors and their levels. In total, there are $3 \times 2 \times 3 \times 3 = 54$ variants for each of the 4 MBT algorithms.
@@ -101,7 +99,7 @@ The RIs are calculated following the simulation based on pairwise comparisons of
 \end{enumerate}
 
 
-\subsubsection{Main Results}
+\subsubsection{Main results}
 The most important findings from the simulations of the basic scenarios are:
 \begin{itemize}
     \item SLIM and GUIDE perform better on subgroup detection tasks (Scenario linear categorical and linear mixed) in terms of better performance and interpretability than MOB and CTree. CTree is the weakest in this task.
@@ -131,7 +129,7 @@ For a comparison of the different MBT algorithms as standalone model on the scen
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r}
 \hline
-MBT & $impr$ & mean n leaves & n leaves min & n leaves max & mean $R^2_{train}$ & sd $R^2_{train}$ & mean $R^2_{test}$ & sd $R^2_{test}$\\
+model & $impr$ & mean n leaves & n leaves min & n leaves max & mean $R^2_{train}$ & sd $R^2_{train}$ & mean $R^2_{test}$ & sd $R^2_{test}$\\
 \hline
 SLIM & 0.15 & 2.27 & 2 & 5 & 0.9584 & 0.0072 & 0.9557 & 0.0076\\
 SLIM & 0.10 & 10.09 & 5 & 15 & 0.9860 & 0.0057 & 0.9835 & 0.0059\\
@@ -252,7 +250,7 @@ MOB and CTree, on the other hand, split almost only with respect to the variable
 \centering \tiny
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
-MBT & $impr$  & n leaves & n leaves min & n leaves max & $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & share $x_2$\\
+model & $impr$  & n leaves & n leaves min & n leaves max & $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & share $x_2$\\
 \hline
 
 \hline
@@ -327,7 +325,7 @@ Numerical and binary features with linear effects, subgroup dependent and smooth
 \begin{tabular}[t]{l|r|r|r|r|r|r|r|r|r}
 \hline
 
-MBT & $impr$  & n leaves & n leaves min & n leaves max & $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & share $x_1$ $x_2$\\
+model & $impr$  & n leaves & n leaves min & n leaves max & $R^2_{train}$ & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ & share $x_1$ $x_2$\\
 \hline
 
 SLIM & 0.15 & 3.40 & 2 & 11 & 0.8853 & 0.0309 & 0.8771 & 0.0336 & 0.9592\\
@@ -394,7 +392,7 @@ In Figure \ref{fig:lm_1000_standalone_r2_test} and Figure \ref{fig:lm_1000_stand
     \label{fig:lm_1000_standalone_lm_sta}
 \end{figure}
 
-For the comparison of stability one can look at Figure \ref{fig:lm_1000_standalone_lm_sta}. On the one hand, it can be seen that MOB and CTree seem to be somewhat more stable than SLIM and GUIDE with the same number of leaf nodes, but the difference is not great. Furthermore, it can be seen that in most cases the stability of trees with the same number of leaf nodes is higher when they are used as surrogates than when they are used as standalone models. Here, the assertion of \citep{Hu.2020} that SLIM is more stable when used as a surrogate is true and also applies to the other algorithms.
+For the comparison of stability one can look at Figure \ref{fig:lm_1000_standalone_lm_sta}. On the one hand, it can be seen that MOB and CTree seem to be somewhat more stable than SLIM and GUIDE with the same number of leaf nodes, but the difference is not great. Furthermore, it can be seen that in most cases the stability of trees with the same number of leaf nodes is higher when they are used as surrogates than when they are used as standalone models. Here, the assertion of \citet{Hu.2020} that SLIM is more stable when used as a surrogate is true and also applies to the other algorithms.
 
 
 \newpage
@@ -477,7 +475,7 @@ For the simulation, the MBTs are fitted on a data set with sample size $ n = 150
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black nox & MBT & $\rho_{13}$ & $x_1$ frequency & n leaves & n leaves min & n leaves max & $R^2_{train}$  & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ \\
+black box & MBT & $\rho_{13}$ & $x_1$ frequency & n leaves & n leaves min & n leaves max & $R^2_{train}$  & sd $R^2_{train}$ & $R^2_{test}$ & sd $R^2_{test}$ \\
 \hline
 standalone & SLIM & 0.1 & 0.088 & 10.012 & 3 & 16 & 0.9863 & 0.0055 & 0.9836 & 0.0061\\
 standalone & SLIM Ridge & 0.1 & 0.096 & 9.756 & 4 & 15 & 0.9860 & 0.0057 & 0.9834 & 0.0063\\
@@ -530,7 +528,7 @@ If the MBTs are used as surrogates for the linear regression predictions instead
 
 
 
-\subsection{Nonlinear Effects}
+\subsection{Nonlinear effects}
 While the main goal so far has been to compare the different MBT algorithms on simple scenarios with linear main effects, the following scenario will investigate how the choice of different objective functions affects the interpretability and performance of SLIM MBTs when nonlinear main effects are included in the data generating process. 
 As it is very flexible in the selection of the objective, only the SLIM algorithm is used. The data is defined as follows:
 
@@ -581,7 +579,10 @@ The simulated data contains 3000 observations (2000 train/ 1000 test). The SLIM 
 \centering \tiny
 \begin{tabular}[t]{l|l|r|r|r|r|r|r|r|r|r}
 \hline
-black box & model & n leaves & n l min & n l max & n split feat & n sf min & n sf max & \% main effect & df & sd df\\
+\multicolumn{2}{c}{} & \multicolumn{3}{|c}{n leaves} & \multicolumn{3}{|c|}{n split features} & \multicolumn{2}{c}{}   \\
+
+\hline
+blackbox & model & n leaves & n l min & n l max & n split feat & n sf min & n sf max & \% main effect & df & sd df\\
 \hline
 standalone & lm & 17.48 & 13 & 28 & 4.76 & 4 & 6 & 0.4525 & 6.5763 & 0.1578\\
 standalone & penalised poly & 4.36 & 3 & 7 & 2.16 & 2 & 3 & 0.3605 & 8.1847 & 0.8960\\
@@ -619,7 +620,7 @@ If it is not explicitly required that the model weights are directly interpretab
 \centering \footnotesize
 \begin{tabular}[t]{l|l|r|r|r|r|r}
 \hline
-black box & MBT & R2 train & R2 train sd & R2 test & R2 test sd & time\\
+black box & model & R2 train & R2 train sd & R2 test & R2 test sd & time\\
 \hline
 standalone & lm & 0.9243 & 0.0062 & 0.9113 & 0.0054 & 53.9438\\
 standalone & penalised poly & 0.9204 & 0.0092 & 0.9161 & 0.0108 & 46.6282\\
