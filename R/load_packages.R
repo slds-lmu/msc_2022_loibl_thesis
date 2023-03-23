@@ -1,7 +1,10 @@
-# install.packages(c("stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table", "dplyr", 
-#                    "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", 
-#                    "splines", "partitions", "partykit", "checkmate"))
+# install.packages(c("R6", "BBmisc", "stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table",
+#                    "dplyr", "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", "splines",
+#                    "partitions", "partykit", "checkmate", "mlr3", "mlr3learners", "mlr3measures",
+#                    "mlr3pipelines", "mlr3tuning", "caTools", "igraph", "fossil"))
 
+library(R6)
+library(BBmisc)
 library(stringr)
 library(tidyverse)
 library(rlist)
@@ -11,7 +14,6 @@ library(data.table)
 library(dplyr)
 library(ggplot2)
 library(ggpubr)
-library(batchtools)
 library(glmnet)
 library(quantreg)
 library(splines)
