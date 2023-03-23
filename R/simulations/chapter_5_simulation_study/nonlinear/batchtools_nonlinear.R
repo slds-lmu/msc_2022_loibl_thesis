@@ -1,4 +1,3 @@
-library(batchtools)
 source("R/load_packages.R")
 
 # --- 1. SETUP REGISTRY ---
@@ -39,7 +38,7 @@ addExperiments(
   repls = 50)
 
 summarizeExperiments()
-pars = unwrap(getJobPars(reg = reg))
-testJob(101)
+
+testJob(1)
 
 submitJobs(resources = list(walltime = 9000))
