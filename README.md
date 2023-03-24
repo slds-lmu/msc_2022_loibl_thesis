@@ -20,7 +20,7 @@ This repository contains code, data and figures for my Masters's Thesis "Interpr
     └── README.md 
     
 To reproduce the simulation studies:
-1. Install all required packages 
+1. Install all required packages \\
 ``install.packages(c("R6", "BBmisc", "stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table",
                    "dplyr", "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", "splines",
                    "partitions", "partykit", "checkmate", "mlr3", "mlr3learners", "mlr3measures",
