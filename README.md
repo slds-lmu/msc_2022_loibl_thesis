@@ -21,10 +21,10 @@ This repository contains code, data and figures for my Masters's Thesis "Interpr
     
 To reproduce the simulation studies:
 1. Install all required packages 
-install.packages(c("R6", "BBmisc", "stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table",
+``install.packages(c("R6", "BBmisc", "stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table",
                    "dplyr", "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", "splines",
                    "partitions", "partykit", "checkmate", "mlr3", "mlr3learners", "mlr3measures",
-                   "mlr3pipelines", "mlr3tuning", "caTools", "igraph", "fossil", "kableExtra))
+                   "mlr3pipelines", "mlr3tuning", "caTools", "igraph", "fossil", "kableExtra))``
 2. Generate and run batchtools experiments with the files "batchtools_....R" in the simulations folder.
 3. Run the files "analyse_....R" in the simulations folder to aggregate the data and create the figures shown in the thesis.
 
