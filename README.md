@@ -19,7 +19,13 @@ This repository contains code, data and figures for my Masters's Thesis "Interpr
     │   |   ├── insurance_use_case/             # Location where figures for insurance use case are stored (generation is in another private repo)
     └── README.md 
     
-To reproduce the simulation studies run the files "batchtools_....R" in the simulations folder.
-Afterwards run the file "analyse_....R" in the simulations folder, to aggregate the data and create the figures shown in the thesis.
+To reproduce the simulation studies:
+1. Install all required packages 
+install.packages(c("R6", "BBmisc", "stringr", "tidyverse", "rlist", "mgcv", "mvtnorm", "data.table",
+                   "dplyr", "ggplot2", "ggpubr", "batchtools", "glmnet", "quantreg", "splines",
+                   "partitions", "partykit", "checkmate", "mlr3", "mlr3learners", "mlr3measures",
+                   "mlr3pipelines", "mlr3tuning", "caTools", "igraph", "fossil", "kableExtra))
+2. Generate and run batchtools experiments with the files "batchtools_....R" in the simulations folder.
+3. Run the files "analyse_....R" in the simulations folder to aggregate the data and create the figures shown in the thesis.
 
 To fit a single slim tree, source the file "tree_splitting_slim.R" and run the function compute_tree_slim(...). A description of the input parameters can be found in the file "tree_splitting_slim.R"
